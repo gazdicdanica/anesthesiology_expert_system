@@ -1,5 +1,9 @@
 package com.ftn.sbnz.model.procedure;
 
-public class PostOperative extends Procedure {
+import javax.persistence.*;
+
+@Entity
+@Table(name = "post_operative_procedures")
+public class PostOperative {
 
 }

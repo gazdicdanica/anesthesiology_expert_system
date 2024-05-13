@@ -1,5 +1,9 @@
 package com.ftn.sbnz.model.procedure;
 
-public class IntraOperative extends Procedure {
+import javax.persistence.*;
+
+@Entity
+@Table(name = "intra_operative_procedures")
+public class IntraOperative {
 
 }

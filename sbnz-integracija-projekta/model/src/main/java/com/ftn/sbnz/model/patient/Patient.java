@@ -3,6 +3,7 @@ package com.ftn.sbnz.model.patient;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "Patients")
 public class Patient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -12,14 +13,10 @@ public class Patient {
     private int age;
     private double weight;
     private double height;
-    private double BMI;
 
     private int basalSAP;
 
-    private double SIB;
-    private double HBA1C;
-    private double kreatinin;
-
+    private PatientRisk risk;
     private boolean hasDiabetes;
     private boolean isDMControlled;
     private boolean hadHearthAttack;
@@ -40,6 +37,10 @@ public class Patient {
         I, II, III, IV, V
     }
 
+    public enum PatientRisk {
+        LOW, MEDIUM, HIGH
+    }
+
     public Patient() {
     }
 
@@ -47,17 +48,14 @@ public class Patient {
             double SIB, double HBA1C, double kreatinin, boolean hasDiabetes, boolean isDMControlled,
             boolean hadHearthAttack, boolean hasHearhFailure, boolean hasHyperTension, boolean controlledHyperTension,
             boolean hadStroke, boolean hasRenalFailure, boolean addictions, boolean smokerOrAlcoholic,
-            boolean pregnant) {
+            boolean pregnant, PatientRisk patientRisk) {
         this.id = id;
         this.fullname = fullname;
         this.age = age;
         this.weight = weight;
         this.height = height;
-        this.BMI = BMI;
         this.basalSAP = basalSAP;
-        this.SIB = SIB;
-        this.HBA1C = HBA1C;
-        this.kreatinin = kreatinin;
+        this.risk = patientRisk;
         this.hasDiabetes = hasDiabetes;
         this.isDMControlled = isDMControlled;
         this.hadHearthAttack = hadHearthAttack;
@@ -69,6 +67,14 @@ public class Patient {
         this.addictions = addictions;
         this.smokerOrAlcoholic = smokerOrAlcoholic;
         this.pregnant = pregnant;
+    }
+
+    public PatientRisk getRisk() {
+        return risk;
+    }
+
+    public void setRisk(PatientRisk risk) {
+        this.risk = risk;
     }
 
     public Long getId() {
@@ -111,44 +117,12 @@ public class Patient {
         this.height = height;
     }
 
-    public double getBMI() {
-        return BMI;
-    }
-
-    public void setBMI(double BMI) {
-        this.BMI = BMI;
-    }
-
     public int getBasalSAP() {
         return basalSAP;
     }
 
     public void setBasalSAP(int basalSAP) {
         this.basalSAP = basalSAP;
-    }
-
-    public double getSIB() {
-        return SIB;
-    }
-
-    public void setSIB(double SIB) {
-        this.SIB = SIB;
-    }
-
-    public double getHBA1C() {
-        return HBA1C;
-    }
-
-    public void setHBA1C(double HBA1C) {
-        this.HBA1C = HBA1C;
-    }
-
-    public double getKreatinin() {
-        return kreatinin;
-    }
-
-    public void setKreatinin(double kreatinin) {
-        this.kreatinin = kreatinin;
     }
 
     public boolean isHasDiabetes() {
