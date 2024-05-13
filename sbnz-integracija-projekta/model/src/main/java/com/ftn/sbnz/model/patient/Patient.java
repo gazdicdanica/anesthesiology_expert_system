@@ -1,7 +1,13 @@
 package com.ftn.sbnz.model.patient;
 
+import javax.persistence.*;
+
+@Entity
 public class Patient {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String fullname;
     private int age;
     private double weight;
