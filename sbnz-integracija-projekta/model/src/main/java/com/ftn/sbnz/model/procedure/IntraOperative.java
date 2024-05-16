@@ -6,4 +6,6 @@ import javax.persistence.*;
 @Table(name = "intra_operative_procedures")
 public class IntraOperative {
 
+    public IntraOperative() {
+    }
 }

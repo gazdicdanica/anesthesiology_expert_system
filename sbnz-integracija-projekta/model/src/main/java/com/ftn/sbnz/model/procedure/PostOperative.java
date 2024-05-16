@@ -6,4 +6,6 @@ import javax.persistence.*;
 @Table(name = "post_operative_procedures")
 public class PostOperative {
 
+    public PostOperative() {
+    }
 }
