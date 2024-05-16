@@ -7,8 +7,6 @@ import javax.persistence.*;
 public class PreOperative {
     private boolean shouldContinueProcedure;
 
-    private double BMI;
-
     private double SIB;
     private double HBA1C;
     private double kreatinin;
@@ -16,9 +14,8 @@ public class PreOperative {
     public PreOperative() {
     }
 
-    public PreOperative(boolean shouldContinueProcedure, double BMI, double SIB, double HBA1C, double kreatinin) {
+    public PreOperative(boolean shouldContinueProcedure, double SIB, double HBA1C, double kreatinin) {
         this.shouldContinueProcedure = shouldContinueProcedure;
-        this.BMI = BMI;
         this.SIB = SIB;
         this.HBA1C = HBA1C;
         this.kreatinin = kreatinin;
@@ -30,14 +27,6 @@ public class PreOperative {
 
     public void setShouldContinueProcedure(boolean shouldContinueProcedure) {
         this.shouldContinueProcedure = shouldContinueProcedure;
-    }
-
-    public double getBMI() {
-        return BMI;
-    }
-
-    public void setBMI(double BMI) {
-        this.BMI = BMI;
     }
 
     public double getSIB() {

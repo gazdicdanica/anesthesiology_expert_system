@@ -60,3 +60,69 @@ rule "Undiagnosed DM"
         }
 end
 
+// ASA Rules
+rule "Classify ASA I"
+    when
+        $patient: Patient(
+            !smokerOrAlcoholic,
+            !hasDiabetes,
+            !hadHearthAttack,
+            !hasHearthFailure,
+            !hasHypertension,
+            !hadStroke,
+            !hasRenalFailure,
+            !addictions,
+            !pregnant
+        )
+    then
+        modify($patient){
+            setAsa(Patient.ASA.I);
+            }
+end
+
+rule "Classify ASA II"
+    when
+        $patient: Patient(
+            (hasHypertension && controlledHypertension) || 
+            (hasDiabetes && DMControlled) || 
+            smokerOrAlcoholic || 
+            pregnant || 
+            (BMI >= 30 && BMI < 40)
+        )
+    then
+        modify($patient){
+            setAsa(Patient.ASA.II);
+            }
+end
+
+rule "Classify ASA III"
+    no-loop
+    when
+        $patient: Patient(
+            (asa != Patient.ASA.IV) &&
+            (
+                (hasHypertension && !controlledHypertension) || 
+                (hasDiabetes && !DMControlled) || 
+                BMI >= 40 || 
+                addictions
+            ) 
+        )
+    then
+        modify($patient){
+            setAsa(Patient.ASA.III);
+            }
+end
+
+rule "Classify ASA IV"
+    when
+        $patient: Patient(
+            hadHearthAttack || 
+            hadStroke || 
+            hasHearthFailure || 
+            hasRenalFailure 
+        )
+    then
+        modify($patient){
+            setAsa(Patient.ASA.IV);
+            }
+end

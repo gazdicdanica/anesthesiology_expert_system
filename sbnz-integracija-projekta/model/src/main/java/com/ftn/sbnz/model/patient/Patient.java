@@ -13,6 +13,7 @@ public class Patient {
     private int age;
     private double weight;
     private double height;
+    private double BMI;
 
     private int basalSAP;
 
@@ -68,6 +69,18 @@ public class Patient {
         this.smokerOrAlcoholic = smokerOrAlcoholic;
         this.pregnant = pregnant;
 
+    }
+
+    public void calculateBMI() {
+        this.BMI = this.weight / (this.height * this.height);
+    }
+
+    public double getBMI() {
+        return BMI;
+    }
+
+    public void setBMI(double BMI) {
+        this.BMI = BMI;
     }
 
     public int getRCRIScore() {
@@ -146,8 +159,8 @@ public class Patient {
         return isDMControlled;
     }
 
-    public void setDMControlled(boolean DMControlled) {
-        isDMControlled = DMControlled;
+    public void setDMControlled(boolean isDMControlled) {
+        this.isDMControlled = isDMControlled;
     }
 
     public boolean isHadHearthAttack() {
