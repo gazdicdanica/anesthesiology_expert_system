@@ -16,13 +16,14 @@ public class Patient {
 
     private int basalSAP;
 
+    private int RCRIScore;
     private PatientRisk risk;
     private boolean hasDiabetes;
     private boolean isDMControlled;
     private boolean hadHearthAttack;
-    private boolean hasHearhFailure;
-    private boolean hasHyperTension;
-    private boolean controlledHyperTension;
+    private boolean hasHearthFailure;
+    private boolean hasHypertension;
+    private boolean controlledHypertension;
     private boolean hadStroke;
     private boolean hasRenalFailure;
 
@@ -48,25 +49,33 @@ public class Patient {
             double SIB, double HBA1C, double kreatinin, boolean hasDiabetes, boolean isDMControlled,
             boolean hadHearthAttack, boolean hasHearhFailure, boolean hasHyperTension, boolean controlledHyperTension,
             boolean hadStroke, boolean hasRenalFailure, boolean addictions, boolean smokerOrAlcoholic,
-            boolean pregnant, PatientRisk patientRisk) {
+            boolean pregnant) {
         this.id = id;
         this.fullname = fullname;
         this.age = age;
         this.weight = weight;
         this.height = height;
         this.basalSAP = basalSAP;
-        this.risk = patientRisk;
         this.hasDiabetes = hasDiabetes;
         this.isDMControlled = isDMControlled;
         this.hadHearthAttack = hadHearthAttack;
-        this.hasHearhFailure = hasHearhFailure;
-        this.hasHyperTension = hasHyperTension;
-        this.controlledHyperTension = controlledHyperTension;
+        this.hasHearthFailure = hasHearhFailure;
+        this.hasHypertension = hasHyperTension;
+        this.controlledHypertension = controlledHyperTension;
         this.hadStroke = hadStroke;
         this.hasRenalFailure = hasRenalFailure;
         this.addictions = addictions;
         this.smokerOrAlcoholic = smokerOrAlcoholic;
         this.pregnant = pregnant;
+
+    }
+
+    public int getRCRIScore() {
+        return RCRIScore;
+    }
+
+    public void setRCRIScore(int RCRIScore) {
+        this.RCRIScore = RCRIScore;
     }
 
     public PatientRisk getRisk() {
@@ -149,28 +158,28 @@ public class Patient {
         this.hadHearthAttack = hadHearthAttack;
     }
 
-    public boolean isHasHearhFailure() {
-        return hasHearhFailure;
+    public boolean isHasHearthFailure() {
+        return hasHearthFailure;
     }
 
-    public void setHasHearhFailure(boolean hasHearhFailure) {
-        this.hasHearhFailure = hasHearhFailure;
+    public void setHasHearthFailure(boolean hasHearhFailure) {
+        this.hasHearthFailure = hasHearhFailure;
     }
 
-    public boolean isHasHyperTension() {
-        return hasHyperTension;
+    public boolean isHasHypertension() {
+        return hasHypertension;
     }
 
-    public void setHasHyperTension(boolean hasHyperTension) {
-        this.hasHyperTension = hasHyperTension;
+    public void setHasHypertension(boolean hasHyperTension) {
+        this.hasHypertension = hasHyperTension;
     }
 
-    public boolean isControlledHyperTension() {
-        return controlledHyperTension;
+    public boolean isControlledHypertension() {
+        return controlledHypertension;
     }
 
-    public void setControlledHyperTension(boolean controlledHyperTension) {
-        this.controlledHyperTension = controlledHyperTension;
+    public void setControlledHypertension(boolean controlledHyperTension) {
+        this.controlledHypertension = controlledHyperTension;
     }
 
     public boolean isHadStroke() {
