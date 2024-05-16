@@ -1,0 +1,62 @@
+package base;
+
+import com.ftn.sbnz.model.patient.Patient;
+import com.ftn.sbnz.model.procedure.Procedure;
+import com.ftn.sbnz.model.procedure.PreOperative;
+
+rule "Controlled DM by SIB"
+    when
+        $p: Patient( hasDiabetes == true)
+        $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
+        eval($preOp.getSIB() <= 8)
+    then
+        modify($p){
+            setDMControlled(true);
+        }
+end
+
+rule "Uncotrolled DM by SIB"
+    when
+        $p: Patient( hasDiabetes == true)
+        $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
+        eval($preOp.getSIB() > 8)
+    then
+        modify($p){
+            setDMControlled(false);
+        }
+end
+
+rule "Controlled DM by HbA1c"
+    when
+        $p: Patient( hasDiabetes == true)
+        $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
+        eval($preOp.getHBA1C() <= 7)
+    then
+        modify($p){
+            setDMControlled(true);
+        }
+end
+
+// CHECK
+rule "Uncotrolled DM by HbA1c"
+    when
+        $p: Patient( hasDiabetes == true)
+        $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
+        eval($preOp.getHBA1C() > 7)
+    then
+        modify($p){
+            setDMControlled(false);
+        }
+end
+
+rule "Undiagnosed DM"
+    when
+        $p: Patient( hasDiabetes == false)
+        $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
+        eval($preOp.getSIB() > 6)
+    then
+        modify($preOp){
+            setShouldContinueProcedure(false);
+        }
+end
+

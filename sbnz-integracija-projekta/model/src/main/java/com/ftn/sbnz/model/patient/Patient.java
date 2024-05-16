@@ -16,6 +16,7 @@ public class Patient {
 
     private int basalSAP;
 
+    private int RCRIScore;
     private PatientRisk risk;
     private boolean hasDiabetes;
     private boolean isDMControlled;
@@ -48,14 +49,13 @@ public class Patient {
             double SIB, double HBA1C, double kreatinin, boolean hasDiabetes, boolean isDMControlled,
             boolean hadHearthAttack, boolean hasHearhFailure, boolean hasHyperTension, boolean controlledHyperTension,
             boolean hadStroke, boolean hasRenalFailure, boolean addictions, boolean smokerOrAlcoholic,
-            boolean pregnant, PatientRisk patientRisk) {
+            boolean pregnant) {
         this.id = id;
         this.fullname = fullname;
         this.age = age;
         this.weight = weight;
         this.height = height;
         this.basalSAP = basalSAP;
-        this.risk = patientRisk;
         this.hasDiabetes = hasDiabetes;
         this.isDMControlled = isDMControlled;
         this.hadHearthAttack = hadHearthAttack;
@@ -67,6 +67,15 @@ public class Patient {
         this.addictions = addictions;
         this.smokerOrAlcoholic = smokerOrAlcoholic;
         this.pregnant = pregnant;
+
+    }
+
+    public int getRCRIScore() {
+        return RCRIScore;
+    }
+
+    public void setRCRIScore(int RCRIScore) {
+        this.RCRIScore = RCRIScore;
     }
 
     public PatientRisk getRisk() {
