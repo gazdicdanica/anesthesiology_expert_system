@@ -26,6 +26,7 @@ public class Patient {
     private boolean controlledHypertension;
     private boolean hadStroke;
     private boolean hasRenalFailure;
+    private boolean hasCVSFamilyHistory;
 
     private boolean addictions;
     private boolean smokerOrAlcoholic;
@@ -49,7 +50,7 @@ public class Patient {
             double SIB, double HBA1C, double kreatinin, boolean hasDiabetes, boolean isDMControlled,
             boolean hadHearthAttack, boolean hasHearhFailure, boolean hasHyperTension, boolean controlledHyperTension,
             boolean hadStroke, boolean hasRenalFailure, boolean addictions, boolean smokerOrAlcoholic,
-            boolean pregnant) {
+            boolean pregnant, boolean hasCVSFamilyHistory) {
         this.id = id;
         this.fullname = fullname;
         this.age = age;
@@ -67,7 +68,15 @@ public class Patient {
         this.addictions = addictions;
         this.smokerOrAlcoholic = smokerOrAlcoholic;
         this.pregnant = pregnant;
+        this.hasCVSFamilyHistory = hasCVSFamilyHistory;
+    }
 
+    public boolean isHasCVSFamilyHistory() {
+        return hasCVSFamilyHistory;
+    }
+
+    public void setHasCVSFamilyHistory(boolean hasCVSFamilyHistory) {
+        this.hasCVSFamilyHistory = hasCVSFamilyHistory;
     }
 
     public int getRCRIScore() {

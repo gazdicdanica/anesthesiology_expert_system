@@ -5,13 +5,14 @@ import javax.persistence.*;
 @Entity
 @Table(name = "pre_operative_procedures")
 public class PreOperative {
-    private boolean shouldContinueProcedure;
+    private boolean shouldContinueProcedure = true;
 
     private double BMI;
 
     private double SIB;
     private double HBA1C;
     private double kreatinin;
+    private double bnpValue; // B-type natriuretic peptide
 
     public PreOperative() {
     }
@@ -22,6 +23,14 @@ public class PreOperative {
         this.SIB = SIB;
         this.HBA1C = HBA1C;
         this.kreatinin = kreatinin;
+    }
+
+    public double getBnpValue() {
+        return bnpValue;
+    }
+
+    public void setBnpValue(double bnpValue) {
+        this.bnpValue = bnpValue;
     }
 
     public boolean isShouldContinueProcedure() {

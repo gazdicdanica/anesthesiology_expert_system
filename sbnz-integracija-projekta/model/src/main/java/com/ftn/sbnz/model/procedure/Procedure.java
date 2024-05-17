@@ -17,7 +17,7 @@ public class Procedure {
 
     private LocalDateTime date;
     private OperationRisk risk;
-    private ProcedureUrget urget;
+    private ProcedureUrgency urgency;
 
     private PreOperative preOperative;
     private IntraOperative intraOperative;
@@ -26,13 +26,13 @@ public class Procedure {
     public Procedure() {
     }
 
-    public Procedure(Long patientId, Long medicalStaffId, LocalDateTime date, OperationRisk risk, ProcedureUrget urget,
+    public Procedure(Long patientId, Long medicalStaffId, LocalDateTime date, OperationRisk risk, ProcedureUrgency urget,
             PreOperative preOperative, IntraOperative intraOperative, PostOperative postOperative) {
         this.patientId = patientId;
         this.medicalStaffId = medicalStaffId;
         this.date = date;
         this.risk = risk;
-        this.urget = urget;
+        this.urgency = urget;
         this.preOperative = preOperative;
         this.intraOperative = intraOperative;
         this.postOperative = postOperative;
@@ -78,12 +78,12 @@ public class Procedure {
         this.risk = risk;
     }
 
-    public ProcedureUrget getUrget() {
-        return urget;
+    public ProcedureUrgency getUrgency() {
+        return urgency;
     }
 
-    public void setUrget(ProcedureUrget urget) {
-        this.urget = urget;
+    public void setUrgency(ProcedureUrgency urget) {
+        this.urgency = urget;
     }
 
     public PreOperative getPreOperative() {
@@ -116,7 +116,7 @@ public class Procedure {
         HIGH
     }
 
-    public enum ProcedureUrget {
+    public enum ProcedureUrgency {
         IMMEDIATE,
         URGENT,
         TIME_SENSITIVE,
