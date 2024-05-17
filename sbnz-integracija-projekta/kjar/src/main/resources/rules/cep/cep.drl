@@ -10,15 +10,24 @@ import com.ftn.sbnz.model.events.BradycardiaEvent;
 import com.ftn.sbnz.model.events.TachycardiaEvent;
 
 
+declare Alarm
+    patientId: Long
+    doctorId: Long
+    message: String
+end
+
+
 rule "exstrasystole rule"
     when
         $patient : Patient($id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
         Number(value >= 25) from accumulate(
             $exs: ExstrasystoleEvent(patientId == $id)
             over window: time(5m), count($exs)
         )
     then
         //предиктор срчаних компликација, алармирај лекара
+        insert(new Alarm($id, $doctorId, "Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible."));
 end
 
 rule "tachycardia rule"
@@ -33,6 +42,15 @@ rule "tachycardia rule"
         insert(new TachycardiaEvent($id))
 end
 
+rule "tachycardia alarm"
+    when 
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
+        exists(TachycardiaEvent(patientId == $id))
+    then
+        insert(new Alarm($id, $doctorId, "Detected tachycardia."));
+end
+
 rule "bradycardia rule"
     when
         $patient: Patient($id: id)
@@ -45,6 +63,15 @@ rule "bradycardia rule"
         insert(new BradycardiaEvent($id))    
 end
 
+rule "bradycardia alarm"
+    when 
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
+        exists(BradycardiaEvent(patientId == $id))
+    then
+        insert(new Alarm($id, $doctorId, "Detected bradycardia."));
+end
+
 rule "hypertension rule"
     when
         $patient: Patient($id: id)
@@ -55,6 +82,15 @@ rule "hypertension rule"
     then
         //hipertenzija
         insert(new HypertensionEvent($id));
+end
+
+rule "hypertension alarm rule"
+    when
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
+        exists(HypertensionEvent(patientId == $id))
+    then
+        insert(new Alarm($id, $doctorId, "Detected hypertension."));
 end
 
 rule "hypotension rule"
@@ -71,10 +107,11 @@ end
 rule "hypotension alarm rule"
     when
         $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
         Number(value == 2) from accumulate(
             $hypotension: HypotensionEvent(patientId == $id)
             over window: time(10m), count($hypotension)
         )
     then
-        //предиктор срчаних компликација, алармирај лекара
+        insert(new Alarm($id, $doctorId, "Detected hypotension. Cardiovascular complications are possible."));
 end

@@ -2,9 +2,11 @@ package com.ftn.sbnz.model.events;
 
 import java.io.Serializable;
 
+import org.kie.api.definition.type.Expires;
 import org.kie.api.definition.type.Role;
 
 @Role(Role.Type.EVENT)
+@Expires("1d")
 public class TachycardiaEvent implements Serializable{
 
     private static final long serialVersionUID = 1L;
