@@ -260,8 +260,7 @@ rule "ASA III stres test and echocardiography"
         $patient : Patient(asa == Patient.ASA.III, risk == Patient.PatientRisk.HIGH, hasCVSFamilyHistory == true)
         $procedure: Procedure(patientId == $patient.getId(), !preOperative.shouldContinueProcedure)
     then
-        // stres test and echocardiography
-
+        System.out.println("Stres test and echocardiography");
         //•	ако исхемија није изазвана стрес тестом, започни операцију уз периоперативну примену одговарајуће терапије
         //•	са значајном исхемијом на стрес тесту, упутити кардиохирургу
 end
@@ -271,7 +270,7 @@ rule "ASA IV tests"
         $patient : Patient(asa == Patient.ASA.IV, !hasHearthFailure)
         $procedure: Procedure(patientId == $patient.getId(), !preOperative.shouldContinueProcedure)
     then
-        // stres test, echocardiography, B-type natriuretic peptide
+        System.out.println("Stres test, echocardiography, B-type natriuretic peptide");
 
 end
 
@@ -292,7 +291,7 @@ end
 rule "B-type natriuretic peptide no heart failure"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, preOperative.bnpValue <= 500)
+        $procedure: Procedure(patientId == $id, preOperative.bnpValue <= 500 && preOperative.bnpValue > 0)
     then
         modify($patient){
             setHasHearthFailure(false);
