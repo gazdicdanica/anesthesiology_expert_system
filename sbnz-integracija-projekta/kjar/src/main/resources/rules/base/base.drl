@@ -8,7 +8,7 @@ rule "Controlled DM by SIB"
     when
         $p: Patient( hasDiabetes == true)
         $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
-        eval($preOp.getSIB() <= 8)
+        eval($preOp.getSIB() <= 8) && eval($preOp.getSIB() > 0)
     then
         modify($p){
             setDMControlled(true);
@@ -30,14 +30,13 @@ rule "Controlled DM by HbA1c"
     when
         $p: Patient( hasDiabetes == true)
         $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
-        eval($preOp.getHBA1C() <= 7)
+        eval($preOp.getHBA1C() <= 7) && eval($preOp.getHBA1C() > 0)
     then
         modify($p){
             setDMControlled(true);
         }
 end
 
-// CHECK
 rule "Uncotrolled DM by HbA1c"
     when
         $p: Patient( hasDiabetes == true)
@@ -60,3 +59,242 @@ rule "Undiagnosed DM"
         }
 end
 
+// RCRI
+rule "High risk operation"
+    lock-on-active true
+    when 
+        $p: Patient()
+        $proc: Procedure(patientId == $p.getId(), risk == Procedure.Risk.HIGH)
+    then
+        modify($p){
+            setRCRIScore($p.getRCRIScore() + 1);
+        }
+end
+
+rule "Ischemic heart disease"
+    lock-on-active true
+    when 
+        $p: Patient(hadHearthAttack == true)
+        $proc: Procedure(patientId == $p.getId())
+    then
+        modify($p){
+            setRCRIScore($p.getRCRIScore() + 1);
+        }
+end
+
+rule "Heart failure"
+    lock-on-active true
+    when 
+        $p: Patient(hasHearthFailure == true)
+        $proc: Procedure(patientId == $p.getId())
+    then
+        modify($p){
+            setRCRIScore($p.getRCRIScore() + 1);
+        }
+end
+
+rule "Cerebrovascular disease"
+    lock-on-active true
+    when 
+        $p: Patient(hadStroke == true)
+        $proc: Procedure(patientId == $p.getId())
+    then
+        modify($p){
+            setRCRIScore($p.getRCRIScore() + 1);
+        }
+end
+
+rule "Has diabetes"
+    lock-on-active true
+    when 
+        $p: Patient(hasDiabetes == true)
+        $proc: Procedure(patientId == $p.getId())
+    then
+        modify($p){
+            setRCRIScore($p.getRCRIScore() + 1);
+        }
+end
+
+rule "Elevated creatinine"
+    lock-on-active true
+    when 
+        $p: Patient(hasRenalFailure == true)
+        $proc: Procedure(patientId == $p.getId(), preOperative.creatinine > 2)
+    then
+        modify($p){
+            setRCRIScore($p.getRCRIScore() + 1);
+        }
+end
+
+
+// ASA Rules
+rule "Classify ASA I"
+    when
+        $patient: Patient(
+            !smokerOrAlcoholic,
+            !hasDiabetes,
+            !hadHearthAttack,
+            !hasHearthFailure,
+            !hasHypertension,
+            !hadStroke,
+            !hasRenalFailure,
+            !addictions,
+            !pregnant
+        )
+    then
+        modify($patient){
+            setAsa(Patient.ASA.I);
+            }
+end
+
+rule "Classify ASA II"
+    when
+        $patient: Patient(
+            (hasHypertension && controlledHypertension) || 
+            (hasDiabetes && DMControlled) || 
+            smokerOrAlcoholic || 
+            pregnant || 
+            (BMI >= 30 && BMI < 40)
+        )
+    then
+        modify($patient){
+            setAsa(Patient.ASA.II);
+            }
+end
+
+rule "Classify ASA III"
+    no-loop
+    when
+        $patient: Patient(
+            (asa != Patient.ASA.IV) &&
+            (
+                (hasHypertension && !controlledHypertension) || 
+                (hasDiabetes && !DMControlled) || 
+                BMI >= 40 || 
+                addictions
+            ) 
+        )
+    then
+        modify($patient){
+            setAsa(Patient.ASA.III);
+            }
+end
+
+rule "Classify ASA IV"
+    when
+        $patient: Patient(
+            hadHearthAttack || 
+            hadStroke || 
+            hasHearthFailure || 
+            hasRenalFailure 
+        )
+    then
+        modify($patient){
+            setAsa(Patient.ASA.IV);
+            }
+end
+
+rule "ASA I and ASA II start operation"
+    when
+        $patient : Patient(asa == Patient.ASA.I || asa == Patient.ASA.II)
+        $procedure: Procedure(patientId == $patient.getId(), $preOp: preOperative)
+    then
+        modify($preOp){
+            setShouldContinueProcedure(true);
+        }
+end
+
+rule "ASA III start operation"
+    when
+        $patient : Patient(asa == Patient.ASA.III)
+        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.Urgency.IMMEDIATE || urgency == Procedure.Urgency.URGENT || urgency == Procedure.Urgency.TIME_SENSITIVE), $preOp: preOperative)
+    then
+        modify($preOp){
+            setShouldContinueProcedure(true);
+        }
+end
+
+rule "ASA III postpone operation"
+    when
+        $patient : Patient(asa == Patient.ASA.III)
+        $procedure: Procedure(patientId == $patient.getId(), urgency == Procedure.Urgency.ELECTIVE, $preOp: preOperative)
+    then
+        // postpone operation
+        modify($preOp){
+            setShouldContinueProcedure(false);
+        }
+end
+
+rule "ASA IV start operation"
+    when
+        $patient : Patient(asa == Patient.ASA.IV)
+        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.Urgency.IMMEDIATE || urgency == Procedure.Urgency.URGENT), $preOp: preOperative)
+    then
+        // start operation
+        modify($preOp){
+            setShouldContinueProcedure(true);
+        }
+end
+
+rule "ASA IV postpone operation"
+    when
+        $patient : Patient(asa == Patient.ASA.IV)
+        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.Urgency.TIME_SENSITIVE || urgency == Procedure.Urgency.ELECTIVE), $preOp: preOperative)
+    then
+        // postpone operation
+        modify($preOp){
+            setShouldContinueProcedure(false);
+        }
+end
+
+rule "ASA III echocardiography"
+    when
+        $patient : Patient(asa == Patient.ASA.III)
+        $procedure: Procedure(patientId == $patient.getId(), !preOperative.shouldContinueProcedure, risk == Procedure.Risk.HIGH)
+    then
+        // echocardiography
+end
+
+rule "ASA III stres test and echocardiography"
+    when
+        $patient : Patient(asa == Patient.ASA.III, risk == Patient.PatientRisk.HIGH, hasCVSFamilyHistory == true)
+        $procedure: Procedure(patientId == $patient.getId(), !preOperative.shouldContinueProcedure)
+    then
+        // stres test and echocardiography
+
+        //•	ако исхемија није изазвана стрес тестом, започни операцију уз периоперативну примену одговарајуће терапије
+        //•	са значајном исхемијом на стрес тесту, упутити кардиохирургу
+end
+
+rule "ASA IV tests"
+    when
+        $patient : Patient(asa == Patient.ASA.IV, !hasHearthFailure)
+        $procedure: Procedure(patientId == $patient.getId(), !preOperative.shouldContinueProcedure)
+    then
+        // stres test, echocardiography, B-type natriuretic peptide
+
+end
+
+// B-type natriuretic peptide
+    // •	< 500 pg / ml, онда нема срчану инсуфицијенцију
+    // •	> 500 pg / ml, онда има срчану инсуфицијенцију
+    // 100-500 pg/ml - дај лекару да унесе да ли има или нема?
+rule "B-type natriuretic peptide heart failure"
+    when
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, preOperative.bnpValue > 500)
+    then
+        modify($patient){
+            setHasHearthFailure(true);
+        }
+end
+
+rule "B-type natriuretic peptide no heart failure"
+    when
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, preOperative.bnpValue <= 500)
+    then
+        modify($patient){
+            setHasHearthFailure(false);
+        }
+end

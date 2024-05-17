@@ -5,23 +5,29 @@ import javax.persistence.*;
 @Entity
 @Table(name = "pre_operative_procedures")
 public class PreOperative {
-    private boolean shouldContinueProcedure;
-
-    private double BMI;
+    private boolean shouldContinueProcedure = true;
 
     private double SIB;
     private double HBA1C;
-    private double kreatinin;
+    private double creatinine;
+    private double bnpValue; // B-type natriuretic peptide
 
     public PreOperative() {
     }
 
-    public PreOperative(boolean shouldContinueProcedure, double BMI, double SIB, double HBA1C, double kreatinin) {
+    public PreOperative(boolean shouldContinueProcedure, double SIB, double HBA1C, double kreatinin) {
         this.shouldContinueProcedure = shouldContinueProcedure;
-        this.BMI = BMI;
         this.SIB = SIB;
         this.HBA1C = HBA1C;
-        this.kreatinin = kreatinin;
+        this.creatinine = kreatinin;
+    }
+
+    public double getBnpValue() {
+        return bnpValue;
+    }
+
+    public void setBnpValue(double bnpValue) {
+        this.bnpValue = bnpValue;
     }
 
     public boolean isShouldContinueProcedure() {
@@ -30,14 +36,6 @@ public class PreOperative {
 
     public void setShouldContinueProcedure(boolean shouldContinueProcedure) {
         this.shouldContinueProcedure = shouldContinueProcedure;
-    }
-
-    public double getBMI() {
-        return BMI;
-    }
-
-    public void setBMI(double BMI) {
-        this.BMI = BMI;
     }
 
     public double getSIB() {
@@ -56,11 +54,11 @@ public class PreOperative {
         this.HBA1C = HBA1C;
     }
 
-    public double getKreatinin() {
-        return kreatinin;
+    public double getCreatinine() {
+        return creatinine;
     }
 
-    public void setKreatinin(double kreatinin) {
-        this.kreatinin = kreatinin;
+    public void setCreatinine(double kreatinin) {
+        this.creatinine = kreatinin;
     }
 }

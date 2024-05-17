@@ -7,16 +7,16 @@ import org.kie.api.definition.type.Role;
 
 @Role(Role.Type.EVENT)
 @Expires("10m")
-public class HeartBeatEvent implements Serializable {
+public class ExstrasystoleEvent implements Serializable{
 
     private static final long serialVersionUID = 1L;
     private Long patientId;
 
-    public HeartBeatEvent() {
+    public ExstrasystoleEvent() {
         super();
     }
 
-    public HeartBeatEvent(Long patientId) {
+    public ExstrasystoleEvent(Long patientId) {
         super();
         this.patientId = patientId;
     }
@@ -28,5 +28,5 @@ public class HeartBeatEvent implements Serializable {
     public void setPatientId(Long patientId) {
         this.patientId = patientId;
     }
+    
 }
-
