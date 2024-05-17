@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-
 @RestController
 public class SampleAppController {
 	private static Logger log = LoggerFactory.getLogger(SampleAppController.class);
@@ -19,6 +18,5 @@ public class SampleAppController {
 	public SampleAppController(SampleAppService sampleService) {
 		this.sampleService = sampleService;
 	}
-	
-	
+
 }

@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-
 @Service
 public class SampleAppService {
 
@@ -20,4 +19,5 @@ public class SampleAppService {
 		log.info("Initialising a new example session.");
 		this.kieContainer = kieContainer;
 	}
+
 }
