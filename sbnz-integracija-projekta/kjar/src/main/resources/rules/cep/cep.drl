@@ -1,6 +1,7 @@
 package cep;
 
 import com.ftn.sbnz.model.patient.Patient;
+import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.model.events.HeartBeatEvent;
 import com.ftn.sbnz.model.events.ExstrasystoleEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
@@ -11,7 +12,9 @@ import com.ftn.sbnz.model.events.TachycardiaEvent;
 import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.TachypneaEvent;
 import com.ftn.sbnz.model.events.BradypneaEvent;
-
+import com.ftn.sbnz.model.events.PulseOximetryEvent;
+import com.ftn.sbnz.model.events.HypoxemiaEvent;
+import com.ftn.sbnz.model.events.CyanosisEvent;
 
 
 declare Alarm
@@ -22,7 +25,7 @@ end
 
 declare VasopressorIV
     @role(event)
-    @expires(16min)
+    @expires(16m)
     patientId: Long
 end
 
@@ -31,10 +34,11 @@ rule "exstrasystole rule"
     when
         $patient : Patient($id: id)
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
-        Number(value >= 25) from accumulate(
+        Number($count : intValue) from accumulate(
             $exs: ExstrasystoleEvent(patientId == $id)
             over window: time(5m), count($exs)
         )
+        eval($count >= 25)
     then
         //предиктор срчаних компликација, алармирај лекара
         insert(new Alarm($id, $doctorId, "Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible."));
@@ -42,14 +46,15 @@ end
 
 rule "tachycardia rule"
     when
-        $patient: Patiner($id: id)
-        Number(value > 80) from accumulate(
+        $patient: Patient($id: id)
+        Number($count : intValue) from accumulate(
             $heartBeat: HeartBeatEvent(patientId == $id)
             over window: time(1m), count($heartBeat)
         )
+        eval($count > 80)
     then
         //tahikardija
-        insert(new TachycardiaEvent($id))
+        insert(new TachycardiaEvent($id));
 end
 
 rule "tachycardia alarm"
@@ -64,13 +69,14 @@ end
 rule "bradycardia rule"
     when
         $patient: Patient($id: id)
-        Number(value < 60) from accumulate(
+        Number($count : intValue) from accumulate(
             $heartBeat: HeartBeatEvent(patientId == $id)
             over window: time(1m), count($heartBeat)
         )
+        eval($count < 60)
     then
         //bradikardija
-        insert(new BradycardiaEvent($id))    
+        insert(new BradycardiaEvent($id));    
 end
 
 rule "bradycardia alarm"
@@ -84,11 +90,11 @@ end
 
 rule "hypertension rule"
     when
-        $patient: Patient($id: id)
-        Number(averageVal > 130 || (averageVal > ($patient.getBasalSAP() * 1.2))) from accumulate(
-            $sap: SAPEvent(patientId == $id)
-            over window: time(5m), average($sap.getValue())
+        $patient: Patient($id: id, $basalSAP: basalSAP)
+        Number($count : doubleValue) from accumulate(
+            $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
+        eval($count > 130 || $count > ($basalSAP * 1.2))
     then
         //hipertenzija
         insert(new HypertensionEvent($id));
@@ -106,10 +112,11 @@ end
 rule "hypotension rule"
     when
         $patient: Patient($id: id)
-        Number(averageVal < 80 || (averageVal < ($patient.getBasalSAP() * 0.8))) from accumulate(
+        Number($averageVal : doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id)
             over window: time(5m), average($sap.getValue())
         )
+        eval($averageVal < 80 || ($averageVal < ($patient.getBasalSAP() * 0.8)))
     then
         insert(new HypotensionEvent($id));
 end
@@ -118,10 +125,10 @@ rule "hypotension alarm rule"
     when
         $patient: Patient($id: id)
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
-        Number(value == 2) from accumulate(
-            $hypotension: HypotensionEvent(patientId == $id)
-            over window: time(10m), count($hypotension)
+        Number($count: intValue) from accumulate(
+            $hypotension: HypotensionEvent(patientId == $id) over window: time(10m), count($hypotension)
         )
+        eval($count == 2)
     then
         insert(new Alarm($id, $doctorId, "Detected hypotension. Cardiovascular complications are possible."));
 end
@@ -132,11 +139,10 @@ rule "Post op SAP - Crystalloids"
     when
         $patient: Patient($id: id)
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
-        $averageVal: Number(intValue <= ($patient.getBasalSAP() - 20) && intValue >= ($patient.getBasalSAP() - 50))
-        from accumulate(
-            $sap: SAPEvent(patientId == $id) over window: time(5m),
-            average($sap.getValue())
+        Number($averageVal: doubleValue) from accumulate(
+            $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
+        eval($averageVal < ($patient.getBasalSAP() - 20) && $averageVal > ($patient.getBasalSAP() - 50))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Initiate IV crystalloids and alert anesthesiologist.");
         insert(new Alarm($id, $doctorId, "Initiate IV crystalloids and alert anesthesiologist."));
@@ -147,11 +153,10 @@ rule "Post op SAP - Vasopressors Infusion"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
-        $averageVal: Number(intValue <= ($basalSAP - 50))
-            from accumulate(
-                $sap: SAPEvent(patientId == $id) over window: time(5m),
-                average($sap.getValue())
-            )
+        Number($averageVal: doubleValue) from accumulate(
+            $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
+        )
+        eval($averageVal <= ($basalSAP - 50))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Start vasopressors infusion.");
         insert(new Alarm($id, $doctorId, "Start vasopressors infusion."));
@@ -164,7 +169,7 @@ rule "Post op SAP - Vasopressors IV still low"
         $patient: Patient($id: id, $basalSAP: basalSAP)
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
         $vasopressorIV: VasopressorIV(patientId == $id)
-        $SAPEvent: SAPEvent(this after[15min] $vasopressorIV, patientId == $id, value <= ($basalSAP - 50))
+        $SAPEvent: SAPEvent(this after[15m] $vasopressorIV, patientId == $id, value <= ($basalSAP - 50))
     then
         System.out.println("Patient " + $patient.getFullname() + ": determine hemoglobin.");
         insert(new Alarm($id, $doctorId, "Determine hemoglobin."));
@@ -174,11 +179,10 @@ end
 rule "Post op SAP - Inc"
     when
         $patient: Patient($id: id)
-        $averageVal: Number(intValue >= ($patient.getBasalSAP() + 20) && intValue <= ($patient.getBasalSAP() + 50))
-        from accumulate(
-            $sap: SAPEvent(patientId == $id) over window: time(5m),
-            average($sap.getValue())
+        Number($averageVal: doubleValue) from accumulate(
+            $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
+        eval($averageVal >= ($patient.getBasalSAP() + 20) && $averageVal <= ($patient.getBasalSAP() + 50))
     then
         System.out.println("Patient " + $patient.getFullname() + ": бол, делиријум, мучнина и повраћање, плитко дисање.");
         // Todo add alert
@@ -187,24 +191,49 @@ end
 rule "Post op SAP - Inc 50"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $averageVal: Number(intValue >= ($basalSAP + 50))
-            from accumulate(
-                $sap: SAPEvent(patientId == $id) over window: time(5m),
-                average($sap.getValue())
-            )
+        Number($averageVal: doubleValue) from accumulate(
+            $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
+        )
+        eval($averageVal >= ($basalSAP + 50))
     then
         System.out.println("Patient " + $patient.getFullname() + ": дати хипертензив.");
         // Todo add alert
 end
 
+rule "hypoxemia rule"
+    when
+        $patient: Patient($id: id)
+        Number($count : doubleValue) from accumulate(
+            $pulseOximetry: PulseOximetryEvent(patientId == $id)
+            over window: time(5m), average($pulseOximetry.getValue())
+        )
+        eval($count < 92.0)
+    then
+        System.out.println("Hypoxemia detected.");
+        insert(new HypoxemiaEvent($id));
+end
+
+rule "cyanosis rule"
+    when 
+        $patient: Patient($id: id)
+        Number($count : doubleValue) from accumulate(
+            $pulseOximetry: PulseOximetryEvent(patientId == $id)
+            over window: time(5m), average($pulseOximetry.getValue())  
+        )
+        eval($count < 67.0)
+    then
+        System.out.println("Cyanosis detected.");
+        insert(new CyanosisEvent($id));
+end
 
 rule "Breath frequency - tachypnea"
     when
         $patient: Patient($id: id)
-        Number(intValue > 20) from accumulate(
+        Number($count: intValue) from accumulate(
             $e: BreathEvent(patientId == $id)
             over window: time(1m), count($e)
         )
+        eval($count > 20)
     then
         System.out.println("Patient " + $patient.getFullname() + ": Tachypnea detected.");
         insert(new TachypneaEvent($id));
@@ -213,10 +242,11 @@ end
 rule "Breath frequency - bradypnea"
     when
         $patient: Patient($id: id)
-        Number(intValue < 12) from accumulate(
+        Number($count: intValue) from accumulate(
             $e: BreathEvent(patientId == $id)
             over window: time(1m), count($e)
         )
+        eval($count < 12)
     then
         System.out.println("Patient " + $patient.getFullname() + ": Bradypnea detected.");
         insert(new BradypneaEvent($id));
