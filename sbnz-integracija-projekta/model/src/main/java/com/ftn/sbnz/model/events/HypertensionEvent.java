@@ -2,21 +2,18 @@ package com.ftn.sbnz.model.events;
 
 import java.io.Serializable;
 
-import org.kie.api.definition.type.Expires;
 import org.kie.api.definition.type.Role;
 
 @Role(Role.Type.EVENT)
-@Expires("10m")
-public class HeartBeatEvent implements Serializable {
-
+public class HypertensionEvent implements Serializable {
     private static final long serialVersionUID = 1L;
     private Long patientId;
 
-    public HeartBeatEvent() {
+    public HypertensionEvent() {
         super();
     }
 
-    public HeartBeatEvent(Long patientId) {
+    public HypertensionEvent(Long patientId) {
         super();
         this.patientId = patientId;
     }
@@ -29,4 +26,3 @@ public class HeartBeatEvent implements Serializable {
         this.patientId = patientId;
     }
 }
-

@@ -1,1 +1,80 @@
 package cep;
+
+import com.ftn.sbnz.model.patient.Patient;
+import com.ftn.sbnz.model.events.HeartBeatEvent;
+import com.ftn.sbnz.model.events.ExstrasystoleEvent;
+import com.ftn.sbnz.model.events.SAPEvent;
+import com.ftn.sbnz.model.events.HypotensionEvent;
+import com.ftn.sbnz.model.events.HypertensionEvent;
+import com.ftn.sbnz.model.events.BradycardiaEvent;
+import com.ftn.sbnz.model.events.TachycardiaEvent;
+
+
+rule "exstrasystole rule"
+    when
+        $patient : Patient($id: id)
+        Number(value >= 25) from accumulate(
+            $exs: ExstrasystoleEvent(patientId == $id)
+            over window: time(5m), count($exs)
+        )
+    then
+        //предиктор срчаних компликација, алармирај лекара
+end
+
+rule "tachycardia rule"
+    when
+        $patient: Patiner($id: id)
+        Number(value > 80) from accumulate(
+            $heartBeat: HeartBeatEvent(patientId == $id)
+            over window: time(1m), count($heartBeat)
+        )
+    then
+        //tahikardija
+        insert(new TachycardiaEvent($id))
+end
+
+rule "bradycardia rule"
+    when
+        $patient: Patient($id: id)
+        Number(value < 60) from accumulate(
+            $heartBeat: HeartBeatEvent(patientId == $id)
+            over window: time(1m), count($heartBeat)
+        )
+    then
+        //bradikardija
+        insert(new BradycardiaEvent($id))    
+end
+
+rule "hypertension rule"
+    when
+        $patient: Patient($id: id)
+        Number(averageVal > 130 || (averageVal > ($patient.getBasalSAP() * 1.2))) from accumulate(
+            $sap: SAPEvent(patientId == $id)
+            over window: time(5m), average($sap.getValue())
+        )
+    then
+        //hipertenzija
+        insert(new HypertensionEvent($id));
+end
+
+rule "hypotension rule"
+    when
+        $patient: Patient($id: id)
+        Number(averageVal < 80 || (averageVal < ($patient.getBasalSAP() * 0.8))) from accumulate(
+            $sap: SAPEvent(patientId == $id)
+            over window: time(5m), average($sap.getValue())
+        )
+    then
+        insert(new HypotensionEvent($id));
+end
+
+rule "hypotension alarm rule"
+    when
+        $patient: Patient($id: id)
+        Number(value == 2) from accumulate(
+            $hypotension: HypotensionEvent(patientId == $id)
+            over window: time(10m), count($hypotension)
+        )
+    then
+        //предиктор срчаних компликација, алармирај лекара
+end

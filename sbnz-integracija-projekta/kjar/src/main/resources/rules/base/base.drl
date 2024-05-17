@@ -59,6 +59,74 @@ rule "Undiagnosed DM"
         }
 end
 
+// RCRI
+rule "High risk operation"
+    lock-on-active true
+    when 
+        $p: Patient()
+        $proc: Procedure(patientId == $p.getId(), risk == Procedure.Risk.HIGH)
+    then
+        modify($p){
+            setRCRIScore($p.getRCRIScore() + 1);
+        }
+end
+
+rule "Ischemic heart disease"
+    lock-on-active true
+    when 
+        $p: Patient(hadHearthAttack == true)
+        $proc: Procedure(patientId == $p.getId())
+    then
+        modify($p){
+            setRCRIScore($p.getRCRIScore() + 1);
+        }
+end
+
+rule "Heart failure"
+    lock-on-active true
+    when 
+        $p: Patient(hasHearthFailure == true)
+        $proc: Procedure(patientId == $p.getId())
+    then
+        modify($p){
+            setRCRIScore($p.getRCRIScore() + 1);
+        }
+end
+
+rule "Cerebrovascular disease"
+    lock-on-active true
+    when 
+        $p: Patient(hadStroke == true)
+        $proc: Procedure(patientId == $p.getId())
+    then
+        modify($p){
+            setRCRIScore($p.getRCRIScore() + 1);
+        }
+end
+
+rule "Has diabetes"
+    lock-on-active true
+    when 
+        $p: Patient(hasDiabetes == true)
+        $proc: Procedure(patientId == $p.getId())
+    then
+        modify($p){
+            setRCRIScore($p.getRCRIScore() + 1);
+        }
+end
+
+rule "Elevated creatinine"
+    lock-on-active true
+    when 
+        $p: Patient(hasRenalFailure == true)
+        $proc: Procedure(patientId == $p.getId(), preOperative.creatinine > 2)
+    then
+        modify($p){
+            setRCRIScore($p.getRCRIScore() + 1);
+        }
+end
+
+
 // ASA Rules
 rule "Classify ASA I"
     when
@@ -126,8 +194,7 @@ rule "Classify ASA IV"
             }
 end
 
-
-rule "ASA I and ASA II"
+rule "ASA I and ASA II start operation"
     when
         $patient : Patient(asa == Patient.ASA.I || asa == Patient.ASA.II)
         $procedure: Procedure(patientId == $patient.getId(), $preOp: preOperative)
@@ -211,6 +278,7 @@ end
 // B-type natriuretic peptide
     // •	< 500 pg / ml, онда нема срчану инсуфицијенцију
     // •	> 500 pg / ml, онда има срчану инсуфицијенцију
+    // 100-500 pg/ml - дај лекару да унесе да ли има или нема?
 rule "B-type natriuretic peptide heart failure"
     when
         $patient: Patient($id: id)

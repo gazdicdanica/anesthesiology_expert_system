@@ -9,7 +9,7 @@ public class PreOperative {
 
     private double SIB;
     private double HBA1C;
-    private double kreatinin;
+    private double creatinine;
     private double bnpValue; // B-type natriuretic peptide
 
     public PreOperative() {
@@ -19,7 +19,7 @@ public class PreOperative {
         this.shouldContinueProcedure = shouldContinueProcedure;
         this.SIB = SIB;
         this.HBA1C = HBA1C;
-        this.kreatinin = kreatinin;
+        this.creatinine = kreatinin;
     }
 
     public double getBnpValue() {
@@ -54,11 +54,11 @@ public class PreOperative {
         this.HBA1C = HBA1C;
     }
 
-    public double getKreatinin() {
-        return kreatinin;
+    public double getCreatinine() {
+        return creatinine;
     }
 
-    public void setKreatinin(double kreatinin) {
-        this.kreatinin = kreatinin;
+    public void setCreatinine(double kreatinin) {
+        this.creatinine = kreatinin;
     }
 }
