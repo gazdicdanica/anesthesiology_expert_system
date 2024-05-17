@@ -8,7 +8,11 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 
+import com.ftn.sbnz.model.events.CyanosisEvent;
+import com.ftn.sbnz.model.events.PulseOximetryEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.PreOperative;
@@ -259,5 +263,62 @@ public class CEPConfigTest {
 
         int temp = ksession.fireAllRules();
         System.err.println("Rules triggered " + temp);
+    }
+
+    @Test
+    public void TestPulseOxi1() {
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kContainer = ks.getKieClasspathContainer();
+        KieSession ksession = kContainer.newKieSession("baseKsession");
+
+        assertNotNull(ksession);
+
+        Patient patient = new Patient();
+        patient.setId(1L);
+        patient.setFullname("Danica Gazdic");
+        patient.setBasalSAP(100);
+
+        PulseOximetryEvent ev1 = new PulseOximetryEvent(1L, 75);
+        PulseOximetryEvent ev2 = new PulseOximetryEvent(1L, 76);
+        PulseOximetryEvent ev3 = new PulseOximetryEvent(1L, 72);
+        PulseOximetryEvent ev4 = new PulseOximetryEvent(1L, 74);
+
+        ksession.insert(patient);
+        ksession.insert(ev1);
+        ksession.insert(ev2);
+        ksession.insert(ev3);
+        ksession.insert(ev4);
+
+        int temp = ksession.fireAllRules();
+        System.err.println("Rules triggered " + temp);
+    }
+
+    @Test
+    public void TestPulseOxi2() {
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kContainer = ks.getKieClasspathContainer();
+        KieSession ksession = kContainer.newKieSession("cepKsession");
+
+        assertNotNull(ksession);
+
+        Patient patient = new Patient();
+        patient.setId(1L);
+        patient.setFullname("Danica Gazdic");
+        patient.setBasalSAP(100);
+
+        PulseOximetryEvent ev1 = new PulseOximetryEvent(1L, 65);
+        PulseOximetryEvent ev2 = new PulseOximetryEvent(1L, 68);
+        PulseOximetryEvent ev3 = new PulseOximetryEvent(1L, 62);
+        PulseOximetryEvent ev4 = new PulseOximetryEvent(1L, 64);
+
+        ksession.insert(patient);
+        ksession.insert(ev1);
+        ksession.insert(ev2);
+        ksession.insert(ev3);
+        ksession.insert(ev4);
+
+        int temp = ksession.fireAllRules();
+        System.err.println("Rules triggered " + temp);
+
     }
 }
