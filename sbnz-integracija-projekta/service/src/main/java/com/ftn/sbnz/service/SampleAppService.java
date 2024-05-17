@@ -7,9 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ftn.sbnz.model.events.Item;
-
-
 @Service
 public class SampleAppService {
 
@@ -23,11 +20,4 @@ public class SampleAppService {
 		this.kieContainer = kieContainer;
 	}
 
-	public Item getClassifiedItem(Item i) {
-		KieSession kieSession = kieContainer.newKieSession();
-		kieSession.insert(i);
-		kieSession.fireAllRules();
-		kieSession.dispose();
-		return i;
-	}
 }
