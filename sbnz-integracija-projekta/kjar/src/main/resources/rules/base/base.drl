@@ -299,58 +299,6 @@ rule "B-type natriuretic peptide no heart failure"
         }
 end
 
-// Post op
-rule "Post op SAP - Crystalloids"
-    when
-        $patient: Patient($id: id)
-        $averageVal: Number(intValue <= ($patient.getBasalSAP() - 20) && intValue >= ($patient.getBasalSAP() - 50))
-        from accumulate(
-            $sap: SAPEvent(patientId == $id) over window: time(5m),
-            average($sap.getValue())
-        )
-    then
-        System.out.println("Patient " + $patient.getFullname() + ": Initiate IV crystalloids and alert anesthesiologist.");
-        // Todo add alert
-end
-
-rule "Post op SAP - Vasopressors Infusion"
-    when
-        $patient: Patient($id: id, $basalSAP: basalSAP)
-        $averageVal: Number(intValue <= ($basalSAP - 50))
-            from accumulate(
-                $sap: SAPEvent(patientId == $id) over window: time(5m),
-                average($sap.getValue())
-            )
-    then
-        System.out.println("Patient " + $patient.getFullname() + ": Start vasopressors infusion.");
-        // Todo add alert
-end
-
-rule "Post op SAP - Inc"
-    when
-        $patient: Patient($id: id)
-        $averageVal: Number(intValue >= ($patient.getBasalSAP() + 20) && intValue <= ($patient.getBasalSAP() + 50))
-        from accumulate(
-            $sap: SAPEvent(patientId == $id) over window: time(5m),
-            average($sap.getValue())
-        )
-    then
-        System.out.println("Patient " + $patient.getFullname() + ": бол, делиријум, мучнина и повраћање, плитко дисање.");
-        // Todo add alert
-end
-
-rule "Post op SAP - Inc 50"
-    when
-        $patient: Patient($id: id, $basalSAP: basalSAP)
-        $averageVal: Number(intValue >= ($basalSAP + 50))
-            from accumulate(
-                $sap: SAPEvent(patientId == $id) over window: time(5m),
-                average($sap.getValue())
-            )
-    then
-        System.out.println("Patient " + $patient.getFullname() + ": дати хипертензив.");
-        // Todo add alert
-
 
 // monitoring rules
 rule "noninvasive monitoring - low and medium risk patient"
