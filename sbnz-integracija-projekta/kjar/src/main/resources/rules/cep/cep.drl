@@ -8,6 +8,10 @@ import com.ftn.sbnz.model.events.HypotensionEvent;
 import com.ftn.sbnz.model.events.HypertensionEvent;
 import com.ftn.sbnz.model.events.BradycardiaEvent;
 import com.ftn.sbnz.model.events.TachycardiaEvent;
+import com.ftn.sbnz.model.events.BreathEvent;
+import com.ftn.sbnz.model.events.TachypneaEvent;
+import com.ftn.sbnz.model.events.BradypneaEvent;
+
 
 
 declare Alarm
@@ -160,7 +164,7 @@ rule "Post op SAP - Vasopressors IV still low"
         $patient: Patient($id: id, $basalSAP: basalSAP)
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
         $vasopressorIV: VasopressorIV(patientId == $id)
-        $SAPEvent: SAPEvent(this after[15min] $vasopressorIV, patientId == $id, $value <= ($basalSAP - 50))
+        $SAPEvent: SAPEvent(this after[15min] $vasopressorIV, patientId == $id, value <= ($basalSAP - 50))
     then
         System.out.println("Patient " + $patient.getFullname() + ": determine hemoglobin.");
         insert(new Alarm($id, $doctorId, "Determine hemoglobin."));
@@ -191,4 +195,29 @@ rule "Post op SAP - Inc 50"
     then
         System.out.println("Patient " + $patient.getFullname() + ": дати хипертензив.");
         // Todo add alert
+end
+
+
+rule "Breath frequency - tachypnea"
+    when
+        $patient: Patient($id: id)
+        Number(intValue > 20) from accumulate(
+            $e: BreathEvent(patientId == $id)
+            over window: time(1m), count($e)
+        )
+    then
+        System.out.println("Patient " + $patient.getFullname() + ": Tachypnea detected.");
+        insert(new TachypneaEvent($id));
+end
+
+rule "Breath frequency - bradypnea"
+    when
+        $patient: Patient($id: id)
+        Number(intValue < 12) from accumulate(
+            $e: BreathEvent(patientId == $id)
+            over window: time(1m), count($e)
+        )
+    then
+        System.out.println("Patient " + $patient.getFullname() + ": Bradypnea detected.");
+        insert(new BradypneaEvent($id));
 end
