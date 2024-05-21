@@ -1,16 +1,13 @@
 package com.ftn.sbnz.model.events;
 
-import java.io.Serializable;
-
-public class CyanosisEvent implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class DyspneaEvent {
 
     private Long patientId;
 
-    public CyanosisEvent() {
+    public DyspneaEvent() {
     }
 
-    public CyanosisEvent(Long patientId) {
+    public DyspneaEvent(Long patientId) {
         this.patientId = patientId;
     }
 
@@ -21,5 +18,5 @@ public class CyanosisEvent implements Serializable {
     public void setPatientId(Long patientId) {
         this.patientId = patientId;
     }
-
+    
 }

@@ -62,6 +62,7 @@ end
 
 // RCRI
 rule "High risk operation"
+    agenda-group "RCRI"
     lock-on-active true
     when 
         $p: Patient()
@@ -73,6 +74,7 @@ rule "High risk operation"
 end
 
 rule "Ischemic heart disease"
+    agenda-group "RCRI"
     lock-on-active true
     when 
         $p: Patient(hadHearthAttack == true)
@@ -84,6 +86,7 @@ rule "Ischemic heart disease"
 end
 
 rule "Heart failure"
+    agenda-group "RCRI"
     lock-on-active true
     when 
         $p: Patient(hasHearthFailure == true)
@@ -95,6 +98,7 @@ rule "Heart failure"
 end
 
 rule "Cerebrovascular disease"
+    agenda-group "RCRI"
     lock-on-active true
     when 
         $p: Patient(hadStroke == true)
@@ -106,6 +110,7 @@ rule "Cerebrovascular disease"
 end
 
 rule "Has diabetes"
+    agenda-group "RCRI"
     lock-on-active true
     when 
         $p: Patient(hasDiabetes == true)
@@ -117,6 +122,7 @@ rule "Has diabetes"
 end
 
 rule "Elevated creatinine"
+    agenda-group "RCRI"
     lock-on-active true
     when 
         $p: Patient(hasRenalFailure == true)
@@ -282,7 +288,7 @@ end
 rule "B-type natriuretic peptide heart failure"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, preOperative.bnpValue > 500)
+        $procedure: Procedure(patientId == $id, preOperative.getBnpValue() > 500)
     then
         modify($patient){
             setHasHearthFailure(true);
@@ -292,7 +298,7 @@ end
 rule "B-type natriuretic peptide no heart failure"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, preOperative.bnpValue <= 500 && preOperative.bnpValue > 0)
+        $procedure: Procedure(patientId == $id, preOperative.getBnpValue() <= 500 && preOperative.getBnpValue() > 0)
     then
         modify($patient){
             setHasHearthFailure(false);
