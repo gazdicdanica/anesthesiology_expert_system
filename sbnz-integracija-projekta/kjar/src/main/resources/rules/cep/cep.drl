@@ -173,30 +173,42 @@ rule "Post op SAP - Vasopressors IV still low"
     then
         System.out.println("Patient " + $patient.getFullname() + ": determine hemoglobin.");
         insert(new Alarm($id, $doctorId, "Determine hemoglobin."));
-        
+end
+
+rule "Hemoglobin results"
+    when 
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative.getHemoglobin() < 70 && postOperative.getHemoglobin() > 0)
+    then
+        System.out.println("Patient " + $patient.getFullname() + ": give blood transfusion.");
+        insert(new Alarm($id, $doctorId, "Give patient blood transfusion."));
 end
 
 rule "Post op SAP - Inc"
     when
         $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
         eval($averageVal >= ($patient.getBasalSAP() + 20) && $averageVal <= ($patient.getBasalSAP() + 50))
     then
         System.out.println("Patient " + $patient.getFullname() + ": бол, делиријум, мучнина и повраћање, плитко дисање.");
+        insert(new Alarm($id, $doctorId, "Determine if has pain, delirium, nausea and vomiting or shallow breathing."));
         // Todo add alert
 end
 
 rule "Post op SAP - Inc 50"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
         eval($averageVal >= ($basalSAP + 50))
     then
-        System.out.println("Patient " + $patient.getFullname() + ": дати хипертензив.");
+        System.out.println("Patient " + $patient.getFullname() + ": give hypertensive.");
+        insert(new Alarm($id, $doctorId, "Give patient hypertensive."));
         // Todo add alert
 end
 
@@ -211,6 +223,20 @@ rule "hypoxemia rule"
     then
         System.out.println("Hypoxemia detected.");
         insert(new HypoxemiaEvent($id));
+end
+
+rule "hypoxemia alarm rule"
+    when 
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
+        exists(HypoxemiaEvent(patientId == $id))
+        Number($count : doubleValue) from accumulate(
+            $pulseOximetry: PulseOximetryEvent(patientId == $id)
+            over window: time(5m), average($pulseOximetry.getValue())
+        )
+        eval($count < 90.0)
+    then
+        insert(new Alarm($id, $doctorId, "Connect patient to ventilator."));
 end
 
 rule "cyanosis rule"
