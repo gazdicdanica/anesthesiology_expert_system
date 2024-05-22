@@ -1,1 +1,9 @@
 package backward;
+
+
+
+query isSymptomContainedIn(String s, String i, String p):
+    Illness(s, i, p; )
+    or 
+    ( Illness(z, i, p; ) and isSymptomContainedIn(z, i, p; ) )
+end
