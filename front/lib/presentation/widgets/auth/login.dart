@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:front/theme.dart';
 
 class LoginForm extends StatelessWidget {
-  const LoginForm({super.key});
+  const LoginForm({super.key, required this.onSwitchAuthMode});
+
+  final void Function() onSwitchAuthMode; 
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +38,6 @@ class LoginForm extends StatelessWidget {
                         ),
                         keyboardType: TextInputType.emailAddress,
                       ),
-                      const SizedBox(height: 10),
                       TextFormField(
                         decoration: const InputDecoration(
                           prefixIcon: Icon(Icons.lock),
@@ -54,6 +55,7 @@ class LoginForm extends StatelessWidget {
                           child: const Text('Prijavite se'),
                         ),
                       ),
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
@@ -66,7 +68,7 @@ class LoginForm extends StatelessWidget {
           children: [
             Text('Nemate nalog?', style: Theme.of(context).textTheme.bodyMedium,),
             TextButton(
-              onPressed: () {},
+              onPressed: onSwitchAuthMode,
               child: const Text('Registrujte se'),
             ),
           ],

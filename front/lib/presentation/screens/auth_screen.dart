@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:front/presentation/widgets/login.dart';
-import 'package:front/presentation/widgets/register.dart';
+import 'package:front/presentation/widgets/auth/login.dart';
+import 'package:front/presentation/widgets/auth/register.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -24,7 +24,7 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(25.0),
-                child: isLogin ? const LoginForm() : const RegisterForm(),
+                child: isLogin ?  LoginForm(onSwitchAuthMode: _switchAuthMode,) :  RegisterForm(onSwitchAuthMode: _switchAuthMode,),
               ),
             ),
           ),
