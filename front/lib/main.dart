@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:front/presentation/screens/auth_screen.dart';
+import 'package:front/presentation/screens/auth/auth_screen.dart';
 import 'package:front/theme.dart';
 
 void main() {
