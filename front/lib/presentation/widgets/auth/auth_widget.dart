@@ -26,8 +26,8 @@ class AuthWidget extends StatelessWidget {
                     children: [
                       Image.asset(
                         isLogin
-                            ? 'assets/Doctor-bro.png'
-                            : 'assets/Doctors-bro.png',
+                            ? 'assets/images/Doctor-bro.png'
+                            : 'assets/images/Doctors-bro.png',
                         height: MediaQuery.of(context).size.height / 3,
                       ),
                       const SizedBox(height: 20),
@@ -56,7 +56,7 @@ class AuthWidget extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: Image.asset(
-                  isLogin ? 'assets/Doctor-bro.png' : 'assets/Doctors-bro.png',
+                  isLogin ? 'assets/images/Doctor-bro.png' : 'assets/images/Doctors-bro.png',
                   height: MediaQuery.of(context).size.height / 1.5,
                 ),
               ),
