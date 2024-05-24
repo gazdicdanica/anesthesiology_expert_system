@@ -6,7 +6,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "procedures")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class Procedure {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

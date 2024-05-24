@@ -3,7 +3,7 @@ package base;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.model.procedure.PreOperative;
-import com.ftn.sbnz.model.events.SAPEvent;
+import com.ftn.sbnz.model.procedure.IntraOperative;
 
 rule "Controlled DM by SIB"
     when
@@ -66,7 +66,7 @@ rule "High risk operation"
     lock-on-active true
     when 
         $p: Patient()
-        $proc: Procedure(patientId == $p.getId(), risk == Procedure.Risk.HIGH)
+        $proc: Procedure(patientId == $p.getId(), risk == Procedure.OperationRisk.HIGH)
     then
         modify($p){
             setRCRIScore($p.getRCRIScore() + 1);
@@ -204,7 +204,7 @@ end
 rule "ASA I and ASA II start operation"
     when
         $patient : Patient(asa == Patient.ASA.I || asa == Patient.ASA.II)
-        $procedure: Procedure(patientId == $patient.getId(), $preOp: preOperative)
+        $procedure: Procedure(patientId == $patient.getId(), $preOp : preOperative)
     then
         modify($preOp){
             setShouldContinueProcedure(true);
@@ -214,7 +214,7 @@ end
 rule "ASA III start operation"
     when
         $patient : Patient(asa == Patient.ASA.III)
-        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.Urgency.IMMEDIATE || urgency == Procedure.Urgency.URGENT || urgency == Procedure.Urgency.TIME_SENSITIVE), $preOp: preOperative)
+        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.ProcedureUrgency.IMMEDIATE || urgency == Procedure.ProcedureUrgency.URGENT || urgency == Procedure.ProcedureUrgency.TIME_SENSITIVE), $preOp : preOperative)
     then
         modify($preOp){
             setShouldContinueProcedure(true);
@@ -224,7 +224,7 @@ end
 rule "ASA III postpone operation"
     when
         $patient : Patient(asa == Patient.ASA.III)
-        $procedure: Procedure(patientId == $patient.getId(), urgency == Procedure.Urgency.ELECTIVE, $preOp: preOperative)
+        $procedure: Procedure(patientId == $patient.getId(), urgency == Procedure.ProcedureUrgency.ELECTIVE, $preOp : preOperative)
     then
         // postpone operation
         modify($preOp){
@@ -235,7 +235,7 @@ end
 rule "ASA IV start operation"
     when
         $patient : Patient(asa == Patient.ASA.IV)
-        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.Urgency.IMMEDIATE || urgency == Procedure.Urgency.URGENT), $preOp: preOperative)
+        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.ProcedureUrgency.IMMEDIATE || urgency == Procedure.ProcedureUrgency.URGENT), $preOp : preOperative)
     then
         // start operation
         modify($preOp){
@@ -246,7 +246,7 @@ end
 rule "ASA IV postpone operation"
     when
         $patient : Patient(asa == Patient.ASA.IV)
-        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.Urgency.TIME_SENSITIVE || urgency == Procedure.Urgency.ELECTIVE), $preOp: preOperative)
+        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.ProcedureUrgency.TIME_SENSITIVE || urgency == Procedure.ProcedureUrgency.ELECTIVE), $preOp : preOperative)
     then
         // postpone operation
         modify($preOp){
@@ -310,31 +310,44 @@ end
 rule "noninvasive monitoring - low and medium risk patient"
     when
         $patient: Patient(risk == Patient.PatientRisk.LOW || risk == Patient.PatientRisk.MEDIUM)
-        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.Risk.LOW || risk == Procedure.Risk.MEDIUM)
+        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.LOW || risk == Procedure.OperationRisk.MEDIUM)
     then
+        modify($procedure){
+            setIntraOperative(new IntraOperative());
+        }
+
         System.out.println("noninvasive monitoring SAP, three-lead ECG");
 end
 
 rule "noninvasive monitoring - high risk patient"
     when
         $patient: Patient(risk == Patient.PatientRisk.HIGH)
-        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.Risk.LOW)
+        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.LOW)
     then
+        modify($procedure){
+            setIntraOperative(new IntraOperative());
+        }
         System.out.println("noninvasive monitoring SAP, three-lead ECG");
 end
 
 rule "invasive monitoring - high risk patient"
     when
         $patient: Patient(risk == Patient.PatientRisk.HIGH)
-        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.Risk.HIGH || risk == Procedure.Risk.MEDIUM)
+        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.HIGH || risk == Procedure.OperationRisk.MEDIUM)
     then
+        modify($procedure){
+            setIntraOperative(new IntraOperative());
+        }
         System.out.println("invasive monitoring, five-lead ECG");
 end
 
 rule "invasive monitoring - low and medium risk patient"
     when
         $patient: Patient(risk == Patient.PatientRisk.LOW || risk == Patient.PatientRisk.MEDIUM)
-        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.Risk.HIGH)
+        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.HIGH)
     then
+        modify($procedure){
+            setIntraOperative(new IntraOperative());
+        }
         System.out.println("invasive monitoring, five-lead ECG");
 end
