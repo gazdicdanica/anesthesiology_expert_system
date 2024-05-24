@@ -2,7 +2,10 @@ package diagnosis;
 
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.Procedure;
+import com.ftn.sbnz.model.events.SymptomEvent;
 
 rule "Pulmonary tromboembolism"
     when
         $p : Patient($id: id)
+        $procedure: Procedure(patientId == $id)
+        exists(SymptomEvent(patientId == $id, symptom == SymptomEvent.Symptom.Dyspnea))

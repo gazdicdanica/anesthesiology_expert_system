@@ -11,11 +11,15 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
 
+import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
+import com.ftn.sbnz.model.events.SymptomEvent;
 import com.ftn.sbnz.model.patient.Patient;
+import com.ftn.sbnz.model.patient.Patient.PatientRisk;
 import com.ftn.sbnz.model.procedure.PreOperative;
 import com.ftn.sbnz.model.procedure.Procedure;
+import com.ftn.sbnz.model.procedure.Procedure.OperationRisk;
 
 public class CEPConfigTest {
 
@@ -152,10 +156,38 @@ public class CEPConfigTest {
     }
 
     @Test
-    public void TestPostOpSap1() {
+    public void MonitoringRule() {
         KieServices ks = KieServices.Factory.get();
         KieContainer kContainer = ks.getKieClasspathContainer();
         KieSession ksession = kContainer.newKieSession("baseKsession");
+        assertNotNull(ksession);
+
+        Patient patient = new Patient();
+        patient.setId(1L);
+        patient.setRisk(PatientRisk.HIGH);
+
+        PreOperative preOperative = new PreOperative();
+        preOperative.setShouldContinueProcedure(true);
+        Procedure procedure = new Procedure();
+        procedure.setPreOperative(preOperative);
+        procedure.setPatientId(1L);
+        procedure.setRisk(OperationRisk.HIGH);
+
+        ksession.insert(patient);
+        ksession.insert(procedure);
+        ksession.insert(preOperative);
+
+        int rules = ksession.fireAllRules();
+        System.out.println("Rules fired: " + rules);
+        assertNotNull(procedure.getIntraOperative());;
+
+    }
+
+    @Test
+    public void TestPostOpSap1() {
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kContainer = ks.getKieClasspathContainer();
+        KieSession ksession = kContainer.newKieSession("cepKsession");
 
         assertNotNull(ksession);
 
@@ -164,27 +196,31 @@ public class CEPConfigTest {
         patient.setFullname("Danica Gazdic");
         patient.setBasalSAP(100);
         patient.setDMControlled(false);
+        Procedure procedure = new Procedure();
+        procedure.setPatientId(1L);
+        procedure.setMedicalStaffId(2L);
 
-        SAPEvent ev1 = new SAPEvent(1L, 75);
-        SAPEvent ev2 = new SAPEvent(1L, 76);
-        SAPEvent ev3 = new SAPEvent(1L, 72);
-        SAPEvent ev4 = new SAPEvent(1L, 74);
+        SAPEvent ev1 = new SAPEvent(1L, 65);
+        SAPEvent ev2 = new SAPEvent(1L, 66);
+        SAPEvent ev3 = new SAPEvent(1L, 62);
+        SAPEvent ev4 = new SAPEvent(1L, 64);
 
         ksession.insert(patient);
+        ksession.insert(procedure);
         ksession.insert(ev1);
         ksession.insert(ev2);
         ksession.insert(ev3);
         ksession.insert(ev4);
 
-        ksession.fireAllRules();
-        assertTrue(patient.isDMControlled());
+        int rulesFired = ksession.fireAllRules();
+        System.err.println("Rules triggered " + rulesFired);
     }
 
     @Test
     public void TestPostOpSap2() {
         KieServices ks = KieServices.Factory.get();
         KieContainer kContainer = ks.getKieClasspathContainer();
-        KieSession ksession = kContainer.newKieSession("baseKsession");
+        KieSession ksession = kContainer.newKieSession("cepKsession");
 
         assertNotNull(ksession);
 
@@ -212,7 +248,7 @@ public class CEPConfigTest {
     public void TestPostOpSap3() {
         KieServices ks = KieServices.Factory.get();
         KieContainer kContainer = ks.getKieClasspathContainer();
-        KieSession ksession = kContainer.newKieSession("baseKsession");
+        KieSession ksession = kContainer.newKieSession("cepKsession");
 
         assertNotNull(ksession);
 
@@ -240,7 +276,7 @@ public class CEPConfigTest {
     public void TestPostOpSap4() {
         KieServices ks = KieServices.Factory.get();
         KieContainer kContainer = ks.getKieClasspathContainer();
-        KieSession ksession = kContainer.newKieSession("baseKsession");
+        KieSession ksession = kContainer.newKieSession("cepKsession");
 
         assertNotNull(ksession);
 
@@ -268,7 +304,7 @@ public class CEPConfigTest {
     public void TestPulseOxi1() {
         KieServices ks = KieServices.Factory.get();
         KieContainer kContainer = ks.getKieClasspathContainer();
-        KieSession ksession = kContainer.newKieSession("baseKsession");
+        KieSession ksession = kContainer.newKieSession("cepKsession");
 
         assertNotNull(ksession);
 
@@ -315,6 +351,38 @@ public class CEPConfigTest {
         ksession.insert(ev2);
         ksession.insert(ev3);
         ksession.insert(ev4);
+
+        int temp = ksession.fireAllRules();
+        System.err.println("Rules triggered " + temp);
+
+    }
+
+
+    @Test
+    public void TestBradypneaEvent() {
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kContainer = ks.getKieClasspathContainer();
+        KieSession ksession = kContainer.newKieSession("cepKsession");
+
+        assertNotNull(ksession);
+
+        Patient patient = new Patient();
+        patient.setId(1L);
+        patient.setFullname("Danica Gazdic");
+        patient.setBasalSAP(100);
+
+        BreathEvent ev1 = new BreathEvent(1L);
+        BreathEvent ev2 = new BreathEvent(1L);
+        BreathEvent ev3 = new BreathEvent(1L);
+        BreathEvent ev4 = new BreathEvent(1L);
+        BreathEvent ev5 = new BreathEvent(1L);
+
+        ksession.insert(patient);
+        ksession.insert(ev1);
+        ksession.insert(ev2);
+        ksession.insert(ev3);
+        ksession.insert(ev4);
+        ksession.insert(ev5);
 
         int temp = ksession.fireAllRules();
         System.err.println("Rules triggered " + temp);

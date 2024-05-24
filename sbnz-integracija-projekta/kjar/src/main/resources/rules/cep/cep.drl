@@ -7,7 +7,7 @@ import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
 
-import com.ftn.cbnz.model.events.SymptomEvent;
+import com.ftn.sbnz.model.events.SymptomEvent;
 
 
 declare Alarm
@@ -34,6 +34,7 @@ rule "exstrasystole rule"
         eval($count >= 25)
     then
         //предиктор срчаних компликација, алармирај лекара
+        System.out.println("Patient " + $patient.getFullname() + ": Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible.");
         insert(new Alarm($id, $doctorId, "Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible."));
 end
 
@@ -56,6 +57,7 @@ rule "tachycardia alarm"
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
         exists(SymptomEvent(patientId == $id, symptom == SymptomEvent.Symptom.Tachycardia))
     then
+        System.out.println("Patient " + $patient.getFullname() + ": Detected tachycardia.");
         insert(new Alarm($id, $doctorId, "Detected tachycardia."));
 end
 
@@ -66,9 +68,10 @@ rule "bradycardia rule"
             $heartBeat: HeartBeatEvent(patientId == $id)
             over window: time(1m), count($heartBeat)
         )
-        eval($count < 60)
+        eval($count < 60 && $count > 0)
     then
         //bradikardija
+        System.out.println("Bradycardia detected.");
         insert(new SymptomEvent($id, SymptomEvent.Symptom.Bradycardia));    
 end
 
@@ -78,6 +81,7 @@ rule "bradycardia alarm"
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
         exists(SymptomEvent(patientId == $id, symptom == SymptomEvent.Symptom.Bradycardia))
     then
+        System.out.println("Patient " + $patient.getFullname() + ": Detected bradycardia.");
         insert(new Alarm($id, $doctorId, "Detected bradycardia."));
 end
 
@@ -99,6 +103,7 @@ rule "hypertension alarm rule"
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
         exists(SymptomEvent(patientId == $id, symptom == SymptomEvent.Symptom.Hypertension))
     then
+        System.out.println("Patient " + $patient.getFullname() + ": Detected hypertension.");
         insert(new Alarm($id, $doctorId, "Detected hypertension."));
 end
 
@@ -109,8 +114,9 @@ rule "hypotension rule"
             $sap: SAPEvent(patientId == $id)
             over window: time(5m), average($sap.getValue())
         )
-        eval($averageVal < 80 || ($averageVal < ($patient.getBasalSAP() * 0.8)))
+        eval(($averageVal < 80 && $averageVal > 0) || ($averageVal < ($patient.getBasalSAP() * 0.8)))
     then
+        System.out.println("Hypotension detected.");
         insert(new SymptomEvent($id, SymptomEvent.Symptom.Hypotension));
 end
 
@@ -123,6 +129,7 @@ rule "hypotension alarm rule"
         )
         eval($count == 2)
     then
+        System.out.println("Patient " + $patient.getFullname() + ": Detected hypotension. Cardiovascular complications are possible.");
         insert(new Alarm($id, $doctorId, "Detected hypotension. Cardiovascular complications are possible."));
 end
 
@@ -212,7 +219,7 @@ rule "hypoxemia rule"
             $pulseOximetry: PulseOximetryEvent(patientId == $id)
             over window: time(5m), average($pulseOximetry.getValue())
         )
-        eval($count < 92.0)
+        eval($count < 92.0 && $count > 0.0)
     then
         System.out.println("Hypoxemia detected.");
         insert(new SymptomEvent($id, SymptomEvent.Symptom.Hypoxemia));
@@ -227,8 +234,9 @@ rule "hypoxemia alarm rule"
             $pulseOximetry: PulseOximetryEvent(patientId == $id)
             over window: time(5m), average($pulseOximetry.getValue())
         )
-        eval($count < 90.0)
+        eval($count < 90.0 && $count > 0.0)
     then
+        System.out.println("Patient " + $patient.getFullname() + ": Connect patient to ventilator.");
         insert(new Alarm($id, $doctorId, "Connect patient to ventilator."));
 end
 
@@ -239,7 +247,7 @@ rule "cyanosis rule"
             $pulseOximetry: PulseOximetryEvent(patientId == $id)
             over window: time(5m), average($pulseOximetry.getValue())  
         )
-        eval($count < 67.0)
+        eval($count < 67.0 && $count > 0.0)
     then
         System.out.println("Cyanosis detected.");
         insert(new SymptomEvent($id, SymptomEvent.Symptom.Cyanosis));
@@ -265,7 +273,7 @@ rule "Breath frequency - bradypnea"
             $e: BreathEvent(patientId == $id)
             over window: time(1m), count($e)
         )
-        eval($count < 12)
+        eval($count < 12 && $count > 0)
     then
         System.out.println("Patient " + $patient.getFullname() + ": Bradypnea detected.");
         insert(new SymptomEvent($id, SymptomEvent.Symptom.Bradypnea));
