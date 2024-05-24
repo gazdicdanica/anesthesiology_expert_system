@@ -133,6 +133,50 @@ public class CEPConfigTest {
     }
 
     @Test
+    public void TestAsa3Echocardiography() {
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kContainer = ks.getKieClasspathContainer();
+        KieSession ksession = kContainer.newKieSession("baseKsession");
+
+        assertNotNull(ksession);
+
+        Patient patient = new Patient();
+        patient.setId(1L);
+        patient.setHasDiabetes(true);
+        patient.setPregnant(false);
+        patient.setAddictions(true);
+        patient.setHasHypertension(true);
+        patient.setHasHypertension(true);
+        patient.setControlledHypertension(false);
+        patient.setHasDiabetes(true);
+        patient.setDMControlled(false);
+        patient.setBMI(45);
+
+        Procedure procedure = new Procedure();
+        procedure.setId(1L);
+        procedure.setPatientId(1L);
+        procedure.setMedicalStaffId(2L);
+        procedure.setUrgency(Procedure.ProcedureUrgency.ELECTIVE);
+        procedure.setRisk(Procedure.OperationRisk.HIGH);
+        PreOperative preOperative = new PreOperative();
+        preOperative.setShouldContinueProcedure(true);
+        procedure.setPreOperative(preOperative);
+
+
+        ksession.insert(patient);
+        ksession.insert(procedure);
+        ksession.insert(preOperative);
+
+        int rules = ksession.fireAllRules();
+        System.out.println("Rules fired: " + rules);
+
+        assertEquals(patient.getAsa(), Patient.ASA.III);
+        ksession.dispose();
+
+
+    }
+
+    @Test
     public void TestAsa4() {
         KieServices ks = KieServices.Factory.get();
         KieContainer kContainer = ks.getKieClasspathContainer();

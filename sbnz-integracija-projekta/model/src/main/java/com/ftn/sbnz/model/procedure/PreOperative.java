@@ -2,8 +2,11 @@ package com.ftn.sbnz.model.procedure;
 
 import javax.persistence.*;
 
+import org.kie.api.definition.type.PropertyReactive;
+
 @Entity
 @Table(name = "pre_operative_procedures")
+@PropertyReactive
 public class PreOperative {
     private boolean shouldContinueProcedure = true;
 
