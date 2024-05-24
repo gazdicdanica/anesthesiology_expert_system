@@ -4,8 +4,147 @@ import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.model.events.SymptomEvent;
 
+
+
+rule "Bronchospasm"
+    when
+        $p : Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Dyspnea))
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Wheezing))
+    then
+        System.out.println("Bronchospasm detected");
+end
+
+rule "Pneumonia"
+    when
+        $p : Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Dyspnea))
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId,symptom == SymptomEvent.Symptom.Hypoxemia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Fever))
+    then
+        System.out.println("Pneumonia detected");
+end
+
+rule "Tension pneumothorax"
+    when
+        $p : Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Dyspnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension))
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.AbsentBreathSounds))
+    then
+        System.out.println("Tension pneumothorax detected");
+end
+
 rule "Pulmonary tromboembolism"
     when
         $p : Patient($id: id)
-        $procedure: Procedure(patientId == $id)
-        exists(SymptomEvent(patientId == $id, symptom == SymptomEvent.Symptom.Dyspnea))
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Dyspnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Cyanosis))
+    then
+        System.out.println("Pulmonary tromboembolism detected");
+end
+
+
+rule "Heart failure - hypotension"
+    when
+        $p : Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Dyspnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.PulmonaryEdema))
+    then
+        System.out.println("Heart failure detected");
+
+        modify($p) {
+            setHasHearthFailure(true);
+        }
+end
+
+rule "Heart failure - hypertension"
+    when
+        $p : Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Dyspnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.PulmonaryEdema))
+    then
+        System.out.println("Heart failure detected");
+        modify($p) {
+            setHasHearthFailure(true);
+        }
+end
+
+rule "Myocardial infarction - hypotension"
+    when
+        $p : Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Dyspnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.ChestPain))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Arythmia))
+
+    then
+        System.out.println("Myocardial infarction detected");
+
+        modify($p) {
+            setHadHearthAttack(true);
+        }
+end
+
+rule "Myocardial infarction - hypertension"
+    when
+        $p : Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Dyspnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.ChestPain))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Arythmia))
+
+    then
+        System.out.println("Myocardial infarction detected");
+        modify($p) {
+            setHadHearthAttack(true);
+        }
+end
+
+rule "Respiratory insuficiency"
+     when
+        $p : Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Dyspnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradypnea))
+    then
+        System.out.println("Respiratory insuficiency detected");
+
+end
+
+

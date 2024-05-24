@@ -324,6 +324,9 @@ rule "noninvasive monitoring - high risk patient"
         $patient: Patient(risk == Patient.PatientRisk.HIGH)
         $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.LOW)
     then
+        modify($procedure){
+            setIntraOperative(new IntraOperative());
+        }
         System.out.println("noninvasive monitoring SAP, three-lead ECG");
 end
 
@@ -332,6 +335,9 @@ rule "invasive monitoring - high risk patient"
         $patient: Patient(risk == Patient.PatientRisk.HIGH)
         $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.HIGH || risk == Procedure.OperationRisk.MEDIUM)
     then
+        modify($procedure){
+            setIntraOperative(new IntraOperative());
+        }
         System.out.println("invasive monitoring, five-lead ECG");
 end
 
@@ -340,5 +346,8 @@ rule "invasive monitoring - low and medium risk patient"
         $patient: Patient(risk == Patient.PatientRisk.LOW || risk == Patient.PatientRisk.MEDIUM)
         $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.HIGH)
     then
+        modify($procedure){
+            setIntraOperative(new IntraOperative());
+        }
         System.out.println("invasive monitoring, five-lead ECG");
 end

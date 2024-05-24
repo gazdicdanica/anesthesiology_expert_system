@@ -1,24 +1,61 @@
 package com.ftn.sbnz.model.illness;
 
-import org.kie.api.definition.type.Position;
+import java.util.List;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class Illness {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Position(0)
-    private String symptom;
-    @Position(1)
-    private String name;
-    @Position(2)
-    private String parentSymptom;
+    private IllnessName name;
+    private Long patientId;
+    private Long procedureId;
 
     public Illness() {
     }
 
-    public Illness(Long id, String name, String symptom, String parentSymptom) {
-        this.id = id;
+    public Illness(IllnessName name, Long patientId, Long procedureId) {
         this.name = name;
-        this.symptom = symptom;
-        this.parentSymptom = parentSymptom;
+        this.patientId = patientId;
+        this.procedureId = procedureId;
     }
 
+    public Long getId(){
+        return id;
+    }
+
+    public IllnessName getName() {
+        return name;
+    }
+
+    public void setName(IllnessName name) {
+        this.name = name;
+    }
+
+    public Long getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(Long patientId) {
+        this.patientId = patientId;
+    }
+
+    public Long getProcedureId() {
+        return procedureId;
+    }
+
+    public void setProcedureId(Long procedureId) {
+        this.procedureId = procedureId;
+    }
+
+
+
+    public enum IllnessName{
+        Bronchospasm, Pneumonia, TensionPneumothorax, PulmonaryTromboembolism, HeartFailure, MyocardialInfarction, RespiratoryInsufficiency
+    }
 }

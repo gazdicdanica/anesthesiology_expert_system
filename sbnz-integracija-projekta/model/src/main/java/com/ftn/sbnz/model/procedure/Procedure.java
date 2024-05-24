@@ -6,7 +6,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "procedures")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class Procedure {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,9 +23,6 @@ public class Procedure {
     private PostOperative postOperative;
 
     public Procedure() {
-        preOperative = new PreOperative();
-        intraOperative = new IntraOperative();
-        postOperative = new PostOperative();
     }
 
     public Procedure(Long patientId, Long medicalStaffId, LocalDateTime date, OperationRisk risk, ProcedureUrgency urget,

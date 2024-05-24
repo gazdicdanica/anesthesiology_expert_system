@@ -4,12 +4,17 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
+import java.util.concurrent.TimeUnit;
+
+import org.drools.core.time.SessionPseudoClock;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
+import org.springframework.boot.autoconfigure.web.ServerProperties.Reactive.Session;
 
 import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
@@ -56,6 +61,8 @@ public class CEPConfigTest {
         System.out.println("Rules fired: " + rules);
 
         assertEquals(patient.getAsa(), Patient.ASA.I);
+        ksession.dispose();
+
 
     }
 
@@ -90,6 +97,8 @@ public class CEPConfigTest {
         ksession.fireAllRules();
 
         assertEquals(patient.getAsa(), Patient.ASA.II);
+        ksession.dispose();
+
 
     }
 
@@ -118,6 +127,8 @@ public class CEPConfigTest {
         ksession.fireAllRules();
 
         assertEquals(patient.getAsa(), Patient.ASA.III);
+        ksession.dispose();
+
 
     }
 
@@ -152,6 +163,7 @@ public class CEPConfigTest {
         ksession.fireAllRules();
 
         assertEquals(patient.getAsa(), Patient.ASA.IV);
+        ksession.dispose();
 
     }
 
@@ -169,6 +181,7 @@ public class CEPConfigTest {
         PreOperative preOperative = new PreOperative();
         preOperative.setShouldContinueProcedure(true);
         Procedure procedure = new Procedure();
+        procedure.setId(1L);
         procedure.setPreOperative(preOperative);
         procedure.setPatientId(1L);
         procedure.setRisk(OperationRisk.HIGH);
@@ -197,6 +210,7 @@ public class CEPConfigTest {
         patient.setBasalSAP(100);
         patient.setDMControlled(false);
         Procedure procedure = new Procedure();
+        procedure.setId(1L);
         procedure.setPatientId(1L);
         procedure.setMedicalStaffId(2L);
 
@@ -214,6 +228,8 @@ public class CEPConfigTest {
 
         int rulesFired = ksession.fireAllRules();
         System.err.println("Rules triggered " + rulesFired);
+        ksession.dispose();
+        
     }
 
     @Test
@@ -228,6 +244,10 @@ public class CEPConfigTest {
         patient.setId(1L);
         patient.setFullname("Danica Gazdic");
         patient.setBasalSAP(140);
+        Procedure procedure = new Procedure();
+        procedure.setId(1L);
+        procedure.setPatientId(1L);
+        procedure.setMedicalStaffId(2L);
 
         SAPEvent ev1 = new SAPEvent(1L, 75);
         SAPEvent ev2 = new SAPEvent(1L, 76);
@@ -235,6 +255,7 @@ public class CEPConfigTest {
         SAPEvent ev4 = new SAPEvent(1L, 74);
 
         ksession.insert(patient);
+        ksession.insert(procedure);
         ksession.insert(ev1);
         ksession.insert(ev2);
         ksession.insert(ev3);
@@ -242,6 +263,8 @@ public class CEPConfigTest {
 
         int temp = ksession.fireAllRules();
         System.err.println("Rules triggered " + temp);
+        ksession.dispose();
+
     }
 
     @Test
@@ -256,6 +279,10 @@ public class CEPConfigTest {
         patient.setId(1L);
         patient.setFullname("Danica Gazdic");
         patient.setBasalSAP(140);
+        Procedure procedure = new Procedure();
+        procedure.setId(1L);
+        procedure.setPatientId(1L);
+        procedure.setMedicalStaffId(2L);
 
         SAPEvent ev1 = new SAPEvent(1L, 165);
         SAPEvent ev2 = new SAPEvent(1L, 164);
@@ -263,6 +290,7 @@ public class CEPConfigTest {
         SAPEvent ev4 = new SAPEvent(1L, 164);
 
         ksession.insert(patient);
+        ksession.insert(procedure);
         ksession.insert(ev1);
         ksession.insert(ev2);
         ksession.insert(ev3);
@@ -270,6 +298,8 @@ public class CEPConfigTest {
 
         int temp = ksession.fireAllRules();
         System.err.println("Rules triggered " + temp);
+        ksession.dispose();
+
     }
 
     @Test
@@ -284,6 +314,10 @@ public class CEPConfigTest {
         patient.setId(1L);
         patient.setFullname("Danica Gazdic");
         patient.setBasalSAP(100);
+        Procedure procedure = new Procedure();
+        procedure.setId(1L);
+        procedure.setPatientId(1L);
+        procedure.setMedicalStaffId(2L);
 
         SAPEvent ev1 = new SAPEvent(1L, 175);
         SAPEvent ev2 = new SAPEvent(1L, 176);
@@ -291,6 +325,8 @@ public class CEPConfigTest {
         SAPEvent ev4 = new SAPEvent(1L, 174);
 
         ksession.insert(patient);
+        ksession.insert(procedure);
+
         ksession.insert(ev1);
         ksession.insert(ev2);
         ksession.insert(ev3);
@@ -298,6 +334,8 @@ public class CEPConfigTest {
 
         int temp = ksession.fireAllRules();
         System.err.println("Rules triggered " + temp);
+        ksession.dispose();
+
     }
 
     @Test
@@ -312,6 +350,10 @@ public class CEPConfigTest {
         patient.setId(1L);
         patient.setFullname("Danica Gazdic");
         patient.setBasalSAP(100);
+        Procedure procedure = new Procedure();
+        procedure.setId(1L);
+        procedure.setPatientId(1L);
+        procedure.setMedicalStaffId(2L);
 
         PulseOximetryEvent ev1 = new PulseOximetryEvent(1L, 75);
         PulseOximetryEvent ev2 = new PulseOximetryEvent(1L, 76);
@@ -319,6 +361,8 @@ public class CEPConfigTest {
         PulseOximetryEvent ev4 = new PulseOximetryEvent(1L, 74);
 
         ksession.insert(patient);
+        ksession.insert(procedure);
+
         ksession.insert(ev1);
         ksession.insert(ev2);
         ksession.insert(ev3);
@@ -326,6 +370,8 @@ public class CEPConfigTest {
 
         int temp = ksession.fireAllRules();
         System.err.println("Rules triggered " + temp);
+        ksession.dispose();
+
     }
 
     @Test
@@ -340,6 +386,10 @@ public class CEPConfigTest {
         patient.setId(1L);
         patient.setFullname("Danica Gazdic");
         patient.setBasalSAP(100);
+        Procedure procedure = new Procedure();
+        procedure.setId(1L);
+        procedure.setPatientId(1L);
+        procedure.setMedicalStaffId(2L);
 
         PulseOximetryEvent ev1 = new PulseOximetryEvent(1L, 65);
         PulseOximetryEvent ev2 = new PulseOximetryEvent(1L, 68);
@@ -347,6 +397,8 @@ public class CEPConfigTest {
         PulseOximetryEvent ev4 = new PulseOximetryEvent(1L, 64);
 
         ksession.insert(patient);
+        ksession.insert(procedure);
+
         ksession.insert(ev1);
         ksession.insert(ev2);
         ksession.insert(ev3);
@@ -354,6 +406,8 @@ public class CEPConfigTest {
 
         int temp = ksession.fireAllRules();
         System.err.println("Rules triggered " + temp);
+        ksession.dispose();
+
 
     }
 
@@ -370,6 +424,10 @@ public class CEPConfigTest {
         patient.setId(1L);
         patient.setFullname("Danica Gazdic");
         patient.setBasalSAP(100);
+        Procedure procedure = new Procedure();
+        procedure.setId(1L);
+        procedure.setPatientId(1L);
+        procedure.setMedicalStaffId(2L);
 
         BreathEvent ev1 = new BreathEvent(1L);
         BreathEvent ev2 = new BreathEvent(1L);
@@ -378,6 +436,8 @@ public class CEPConfigTest {
         BreathEvent ev5 = new BreathEvent(1L);
 
         ksession.insert(patient);
+        ksession.insert(procedure);
+
         ksession.insert(ev1);
         ksession.insert(ev2);
         ksession.insert(ev3);
@@ -386,6 +446,60 @@ public class CEPConfigTest {
 
         int temp = ksession.fireAllRules();
         System.err.println("Rules triggered " + temp);
+        ksession.dispose();
+
 
     }
+
+
+    @Test
+    public void testVasopressorsInfusion() {
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kContainer = ks.getKieClasspathContainer();
+        KieSession kSession = kContainer.newKieSession("cepKsession");
+        SessionPseudoClock clock = kSession.getSessionClock();
+        assertNotNull(kSession);
+
+        // Create and set up patient
+        Patient patient = new Patient();
+        patient.setId(1L);
+        patient.setFullname("John Doe");
+        patient.setBasalSAP(120);
+
+        // Create and set up procedure
+        Procedure procedure = new Procedure();
+        procedure.setId(1L);
+        procedure.setPatientId(1L);
+        procedure.setMedicalStaffId(101L);
+
+        // Insert initial facts into the session
+        kSession.insert(patient);
+        kSession.insert(procedure);
+
+        SAPEvent ev1 = new SAPEvent(1L, 60);
+        SAPEvent ev2 = new SAPEvent(1L, 62);
+        SAPEvent ev3 = new SAPEvent(1L, 61);
+        SAPEvent ev4 = new SAPEvent(1L, 59);
+        
+        kSession.insert(ev1);
+        kSession.insert(ev2);
+        kSession.insert(ev3);
+        kSession.insert(ev4);
+
+        kSession.fireAllRules();
+
+        clock.advanceTime(16, TimeUnit.MINUTES);
+        SAPEvent ev5 = new SAPEvent(1L, 59);
+
+        kSession.insert(ev5);
+
+        int rules = kSession.fireAllRules();
+
+        // Fire the rules
+
+        System.out.println("Rules fired: " + rules);
+        // Clean up the session
+        kSession.dispose();
+    }
+
 }

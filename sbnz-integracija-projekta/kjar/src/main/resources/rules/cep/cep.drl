@@ -26,9 +26,9 @@ end
 rule "exstrasystole rule"
     when
         $patient : Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
         Number($count : intValue) from accumulate(
-            $exs: SymptomEvent(patientId == $id, symptom == SymptomEvent.Symptom.Exstrasystole)
+            $exs: SymptomEvent(patientId == $id, $procedureId == procedureId, symptom == SymptomEvent.Symptom.Exstrasystole)
             over window: time(5m), count($exs)
         )
         eval($count >= 25)
@@ -41,6 +41,7 @@ end
 rule "tachycardia rule"
     when
         $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
         Number($count : intValue) from accumulate(
             $heartBeat: HeartBeatEvent(patientId == $id)
             over window: time(1m), count($heartBeat)
@@ -48,14 +49,14 @@ rule "tachycardia rule"
         eval($count > 80)
     then
         //tahikardija
-        insert(new SymptomEvent($id, SymptomEvent.Symptom.Tachycardia));
+        insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Tachycardia));
 end
 
 rule "tachycardia alarm"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
-        exists(SymptomEvent(patientId == $id, symptom == SymptomEvent.Symptom.Tachycardia))
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected tachycardia.");
         insert(new Alarm($id, $doctorId, "Detected tachycardia."));
@@ -64,6 +65,7 @@ end
 rule "bradycardia rule"
     when
         $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
         Number($count : intValue) from accumulate(
             $heartBeat: HeartBeatEvent(patientId == $id)
             over window: time(1m), count($heartBeat)
@@ -72,14 +74,14 @@ rule "bradycardia rule"
     then
         //bradikardija
         System.out.println("Bradycardia detected.");
-        insert(new SymptomEvent($id, SymptomEvent.Symptom.Bradycardia));    
+        insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Bradycardia));    
 end
 
 rule "bradycardia alarm"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
-        exists(SymptomEvent(patientId == $id, symptom == SymptomEvent.Symptom.Bradycardia))
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradycardia))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected bradycardia.");
         insert(new Alarm($id, $doctorId, "Detected bradycardia."));
@@ -88,20 +90,21 @@ end
 rule "hypertension rule"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
         Number($count : doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
         eval($count > 130 || $count > ($basalSAP * 1.2))
     then
         //hipertenzija
-        insert(new SymptomEvent($id, SymptomEvent.Symptom.Hypertension));
+        insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Hypertension));
 end
 
 rule "hypertension alarm rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
-        exists(SymptomEvent(patientId == $id, symptom == SymptomEvent.Symptom.Hypertension))
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypertension.");
         insert(new Alarm($id, $doctorId, "Detected hypertension."));
@@ -110,6 +113,7 @@ end
 rule "hypotension rule"
     when
         $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
         Number($averageVal : doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id)
             over window: time(5m), average($sap.getValue())
@@ -117,15 +121,15 @@ rule "hypotension rule"
         eval(($averageVal < 80 && $averageVal > 0) || ($averageVal < ($patient.getBasalSAP() * 0.8)))
     then
         System.out.println("Hypotension detected.");
-        insert(new SymptomEvent($id, SymptomEvent.Symptom.Hypotension));
+        insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Hypotension));
 end
 
 rule "hypotension alarm rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
         Number($count: intValue) from accumulate(
-            $hypotension: SymptomEvent(patientId == $id, symptom == SymptomEvent.Symptom.Hypotension) over window: time(10m), count($hypotension)
+            $hypotension: SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension) over window: time(10m), count($hypotension)
         )
         eval($count == 2)
     then
@@ -178,7 +182,7 @@ end
 rule "Hemoglobin results"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative.getHemoglobin() < 70 && postOperative.getHemoglobin() > 0)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, postOperative.getHemoglobin() < 70 && postOperative.getHemoglobin() > 0)
     then
         System.out.println("Patient " + $patient.getFullname() + ": give blood transfusion.");
         insert(new Alarm($id, $doctorId, "Give patient blood transfusion."));
@@ -215,6 +219,7 @@ end
 rule "hypoxemia rule"
     when
         $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
         Number($count : doubleValue) from accumulate(
             $pulseOximetry: PulseOximetryEvent(patientId == $id)
             over window: time(5m), average($pulseOximetry.getValue())
@@ -222,14 +227,14 @@ rule "hypoxemia rule"
         eval($count < 92.0 && $count > 0.0)
     then
         System.out.println("Hypoxemia detected.");
-        insert(new SymptomEvent($id, SymptomEvent.Symptom.Hypoxemia));
+        insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Hypoxemia));
 end
 
 rule "hypoxemia alarm rule"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
-        exists(SymptomEvent(patientId == $id, symptom == SymptomEvent.Symptom.Hypoxemia))
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
         Number($count : doubleValue) from accumulate(
             $pulseOximetry: PulseOximetryEvent(patientId == $id)
             over window: time(5m), average($pulseOximetry.getValue())
@@ -243,6 +248,7 @@ end
 rule "cyanosis rule"
     when 
         $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
         Number($count : doubleValue) from accumulate(
             $pulseOximetry: PulseOximetryEvent(patientId == $id)
             over window: time(5m), average($pulseOximetry.getValue())  
@@ -250,12 +256,13 @@ rule "cyanosis rule"
         eval($count < 67.0 && $count > 0.0)
     then
         System.out.println("Cyanosis detected.");
-        insert(new SymptomEvent($id, SymptomEvent.Symptom.Cyanosis));
+        insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Cyanosis));
 end
 
 rule "Breath frequency - tachypnea"
     when
         $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
         Number($count: intValue) from accumulate(
             $e: BreathEvent(patientId == $id)
             over window: time(1m), count($e)
@@ -263,12 +270,13 @@ rule "Breath frequency - tachypnea"
         eval($count > 20)
     then
         System.out.println("Patient " + $patient.getFullname() + ": Tachypnea detected.");
-        insert(new SymptomEvent($id, SymptomEvent.Symptom.Tachypnea));
+        insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Tachypnea));
 end
 
 rule "Breath frequency - bradypnea"
     when
         $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
         Number($count: intValue) from accumulate(
             $e: BreathEvent(patientId == $id)
             over window: time(1m), count($e)
@@ -276,5 +284,5 @@ rule "Breath frequency - bradypnea"
         eval($count < 12 && $count > 0)
     then
         System.out.println("Patient " + $patient.getFullname() + ": Bradypnea detected.");
-        insert(new SymptomEvent($id, SymptomEvent.Symptom.Bradypnea));
+        insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Bradypnea));
 end
