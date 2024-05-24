@@ -1,0 +1,8 @@
+package diagnosis;
+
+import com.ftn.sbnz.model.patient.Patient;
+import com.ftn.sbnz.model.procedure.Procedure;
+
+rule "Pulmonary tromboembolism"
+    when
+        $p : Patient($id: id)

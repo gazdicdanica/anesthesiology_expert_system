@@ -11,7 +11,6 @@ import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
 
-import com.ftn.sbnz.model.events.CyanosisEvent;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.patient.Patient;
