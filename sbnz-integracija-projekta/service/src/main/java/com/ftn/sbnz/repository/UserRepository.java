@@ -7,6 +7,6 @@ import com.google.common.base.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long>{
 
-    Optional<User> findByEmailOptional(Long id);
+    Optional<User> findByEmail(String email);
     
 }

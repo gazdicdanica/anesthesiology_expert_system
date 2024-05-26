@@ -6,6 +6,10 @@ import javax.persistence.*;
 @Table(name = "intra_operative_procedures")
 public class IntraOperative {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     public IntraOperative() {
     }
 }
