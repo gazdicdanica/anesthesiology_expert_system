@@ -141,6 +141,7 @@ rule "Respiratory insuficiency"
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
+        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Cyanosis))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradypnea))
     then
         System.out.println("Respiratory insuficiency detected");

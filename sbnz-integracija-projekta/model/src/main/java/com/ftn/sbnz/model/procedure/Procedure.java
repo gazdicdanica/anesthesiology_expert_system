@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 
 import javax.persistence.*;
 
-import org.kie.api.definition.type.PropertyReactive;
-
 @Entity
 @Table(name = "procedures")
 public class Procedure {
