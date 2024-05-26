@@ -4,6 +4,7 @@ import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.model.procedure.PreOperative;
 import com.ftn.sbnz.model.procedure.IntraOperative;
+import com.ftn.sbnz.model.procedure.Alarm;
 
 rule "Controlled DM by SIB"
     when
@@ -227,6 +228,7 @@ rule "ASA III postpone operation"
         $procedure: Procedure(patientId == $patient.getId(), urgency == Procedure.ProcedureUrgency.ELECTIVE, $preOp : preOperative)
     then
         // postpone operation
+        System.out.println("Postpone operation");
         modify($preOp){
             setShouldContinueProcedure(false);
         }
@@ -256,28 +258,34 @@ end
 
 rule "ASA III echocardiography"
     when
-        $patient : Patient(asa == Patient.ASA.III)
-        $procedure: Procedure(patientId == $patient.getId(), !preOperative.shouldContinueProcedure, risk == Procedure.Risk.HIGH)
+        $patient : Patient(asa == Patient.ASA.III, $id: id)
+        $procedure: Procedure(patientId == $id, risk == Procedure.OperationRisk.HIGH, $doctorId: medicalStaffId) @watch(preOperative)
+        PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
+        System.out.println("Echocardiography");
+        insert(new Alarm($id, $doctorId, "Do echocardiography"));
         // echocardiography
 end
 
 rule "ASA III stres test and echocardiography"
     when
-        $patient : Patient(asa == Patient.ASA.III, risk == Patient.PatientRisk.HIGH, hasCVSFamilyHistory == true)
-        $procedure: Procedure(patientId == $patient.getId(), !preOperative.shouldContinueProcedure)
+        $patient : Patient(asa == Patient.ASA.III, risk == Patient.PatientRisk.HIGH, hasCVSFamilyHistory == true, $id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId) @watch(preOperative)
+        PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
-        System.out.println("Stres test and echocardiography");
-        //•	ако исхемија није изазвана стрес тестом, започни операцију уз периоперативну примену одговарајуће терапије
-        //•	са значајном исхемијом на стрес тесту, упутити кардиохирургу
+        System.out.println("Stress test and echocardiography");
+
+        insert(new Alarm($id, $doctorId, "Do stress test and echocardiography"));
 end
 
 rule "ASA IV tests"
     when
-        $patient : Patient(asa == Patient.ASA.IV, !hasHearthFailure)
-        $procedure: Procedure(patientId == $patient.getId(), !preOperative.shouldContinueProcedure)
+        $patient : Patient(asa == Patient.ASA.IV, !hasHearthFailure, $id: id)
+        $procedure: Procedure(patientId == $id,  $doctorId: medicalStaffId) @watch(preOperative)
+        PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
         System.out.println("Stres test, echocardiography, B-type natriuretic peptide");
+        insert(new Alarm($id, $doctorId, "Do stress test, echocardiography, B-type natriuretic peptide"));
 
 end
 

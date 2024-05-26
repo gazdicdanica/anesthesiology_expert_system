@@ -2,9 +2,7 @@ package com.ftn.sbnz.service.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
-import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
 import org.drools.core.time.SessionPseudoClock;
@@ -12,14 +10,10 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.rule.QueryResults;
-import org.kie.api.runtime.rule.QueryResultsRow;
-import org.springframework.boot.autoconfigure.web.ServerProperties.Reactive.Session;
 
 import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
-import com.ftn.sbnz.model.events.SymptomEvent;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.patient.Patient.PatientRisk;
 import com.ftn.sbnz.model.procedure.PreOperative;
@@ -125,6 +119,50 @@ public class CEPConfigTest {
         ksession.insert(patient);
 
         ksession.fireAllRules();
+
+        assertEquals(patient.getAsa(), Patient.ASA.III);
+        ksession.dispose();
+
+
+    }
+
+    @Test
+    public void TestAsa3Echocardiography() {
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kContainer = ks.getKieClasspathContainer();
+        KieSession ksession = kContainer.newKieSession("baseKsession");
+
+        assertNotNull(ksession);
+
+        Patient patient = new Patient();
+        patient.setId(1L);
+        patient.setHasDiabetes(true);
+        patient.setPregnant(false);
+        patient.setAddictions(true);
+        patient.setHasHypertension(true);
+        patient.setHasHypertension(true);
+        patient.setControlledHypertension(false);
+        patient.setHasDiabetes(true);
+        patient.setDMControlled(false);
+        patient.setBMI(45);
+
+        Procedure procedure = new Procedure();
+        procedure.setId(1L);
+        procedure.setPatientId(1L);
+        procedure.setMedicalStaffId(2L);
+        procedure.setUrgency(Procedure.ProcedureUrgency.ELECTIVE);
+        procedure.setRisk(Procedure.OperationRisk.HIGH);
+        PreOperative preOperative = new PreOperative();
+        preOperative.setShouldContinueProcedure(true);
+        procedure.setPreOperative(preOperative);
+
+
+        ksession.insert(patient);
+        ksession.insert(procedure);
+        ksession.insert(preOperative);
+
+        int rules = ksession.fireAllRules();
+        System.out.println("Rules fired: " + rules);
 
         assertEquals(patient.getAsa(), Patient.ASA.III);
         ksession.dispose();

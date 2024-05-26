@@ -6,15 +6,9 @@ import com.ftn.sbnz.model.events.HeartBeatEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
+import com.ftn.sbnz.model.procedure.Alarm;
 
 import com.ftn.sbnz.model.events.SymptomEvent;
-
-
-declare Alarm
-    patientId: Long
-    doctorId: Long
-    message: String
-end
 
 declare VasopressorIV
     @role(event)
