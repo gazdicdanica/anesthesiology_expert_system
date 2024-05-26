@@ -90,6 +90,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 keyboardType: TextInputType.emailAddress,
               ),
               RoleSelect(
+                validate: () => _validate(context),
                 selectRole: _selectRole,
                 error:
                     (state is AuthValidationFailure) ? state.roleError : null,

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:front/models/user.dart';
 
 class RoleSelect extends StatefulWidget {
-  const RoleSelect({super.key, required this.selectRole, this.error});
+  const RoleSelect({super.key, required this.selectRole, this.error, required this.validate});
 
   final void Function(Role? role) selectRole;
+  final void Function() validate;
   final String? error;
 
   @override
@@ -20,9 +21,6 @@ class RoleSelectState extends State<RoleSelect> {
       style: Theme.of(context).textTheme.bodyLarge,
       isExpanded: true,
       isDense: true,
-      onTap: () {
-        
-      },
       decoration: InputDecoration(
         prefixIcon: const Icon(Icons.medical_information_outlined),
         prefixIconColor: Colors.blue, 
@@ -43,6 +41,7 @@ class RoleSelectState extends State<RoleSelect> {
       ],
       onChanged: (value) {
         widget.selectRole(value);
+        widget.validate();
         setState(() {
           _selectedLicense = value!;
         });
