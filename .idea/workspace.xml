@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="282fb88b-e9e0-449a-80ad-5efe2a5a4c24" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../front/lib/models/user.dart" beforeDir="false" afterPath="$PROJECT_DIR$/../front/lib/models/user.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/src/main/java/com/ftn/sbnz/service/SampleAppController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/src/main/java/com/ftn/sbnz/service/SampleAppService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/src/main/java/com/ftn/sbnz/service/SampleHomeController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/service/src/main/java/com/ftn/sbnz/service/ServiceApplication.java" beforeDir="false" />
+    <list default="true" id="057efc0e-8634-4bc6-9287-ac7c94b5a21a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/front/lib/models/user.dart" beforeDir="false" afterPath="$PROJECT_DIR$/front/lib/models/user.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sbnz-integracija-projekta/service/src/main/java/com/ftn/sbnz/service/SampleAppController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sbnz-integracija-projekta/service/src/main/java/com/ftn/sbnz/service/SampleAppService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sbnz-integracija-projekta/service/src/main/java/com/ftn/sbnz/service/SampleHomeController.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/sbnz-integracija-projekta/service/src/main/java/com/ftn/sbnz/service/ServiceApplication.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,18 +17,12 @@
     <option name="done" value="true" />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
-  </component>
-  <component name="MarkdownSettingsMigration">
-    <option name="stateVersion" value="1" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="2" />
   </component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 2
-}</component>
-  <component name="ProjectId" id="2gQga1K1c5I9nhkTZ1Ba6TKXQ0A" />
+  <component name="ProjectId" id="2h0UtAg5100Jn8g1A7mYwpA8kTK" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -38,21 +32,18 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "model",
-    "vue.rearranger.settings.migration": "true"
+    "dart.analysis.tool.window.visible": "false"
   }
 }]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="282fb88b-e9e0-449a-80ad-5efe2a5a4c24" name="Changes" comment="" />
-      <created>1715635277216</created>
+      <changelist id="057efc0e-8634-4bc6-9287-ac7c94b5a21a" name="Changes" comment="" />
+      <created>1716730700261</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1715635277216</updated>
-      <workItem from="1715635279674" duration="61000" />
-      <workItem from="1716730727329" duration="34000" />
+      <updated>1716730700261</updated>
+      <workItem from="1716730701638" duration="12000" />
     </task>
     <servers />
   </component>
