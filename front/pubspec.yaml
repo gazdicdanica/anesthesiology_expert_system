@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.6
   flutter_bloc: ^8.1.5
   http: ^1.2.1
+  equatable: ^2.0.5
+  lottie: ^3.1.2
 
 dev_dependencies:
   flutter_test:
@@ -82,6 +84,7 @@ flutter:
   assets:
     - assets/images/Doctor-bro.png
     - assets/images/Doctors-bro.png
+    - assets/lottie/loading.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

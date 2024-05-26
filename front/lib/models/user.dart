@@ -6,7 +6,7 @@ class User {
   final String fullname;
   final String email;
   final String licenseNumber;
-  final String role;
+  final Role role;
   final String password;
 
   User({
@@ -37,7 +37,7 @@ class User {
       fullname: map['name'] as String,
       email: map['email'] as String,
       licenseNumber: map['licenseNumber'] as String,
-      role: map['role'] as String,
+      role: map['role'],
       password: map['password'] as String,
     );
   }

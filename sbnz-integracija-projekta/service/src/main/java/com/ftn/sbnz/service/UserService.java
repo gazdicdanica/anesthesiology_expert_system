@@ -1,5 +1,8 @@
 package com.ftn.sbnz.service;
 
+import com.ftn.sbnz.exception.BadRequestException;
+import com.ftn.sbnz.model.dto.RegisterDTO;
+import com.ftn.sbnz.model.user.User;
 import com.ftn.sbnz.repository.UserRepository;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
@@ -26,7 +29,15 @@ public class UserService implements IUserService{
 	}
 
 	@Override
-	public void register() {
-
+	public void register(RegisterDTO registerDTO) {
+		if(userRepository.findByEmail(registerDTO.getEmail()).isPresent()){
+			throw new BadRequestException("Email adresa je povezana sa postojećim nalogom.");
+		}
+		User user = new User();
+		user.setEmail(registerDTO.getEmail());
+		user.setPassword(registerDTO.getPassword());
+		user.setFullname(registerDTO.getFullname());
+		user.setRole(registerDTO.getRole());
+		this.userRepository.save(user);
 	}
 }

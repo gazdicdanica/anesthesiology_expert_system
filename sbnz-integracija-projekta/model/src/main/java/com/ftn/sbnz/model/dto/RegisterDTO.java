@@ -3,7 +3,6 @@ package com.ftn.sbnz.model.dto;
 import com.ftn.sbnz.model.user.User.Role;
 
 public class RegisterDTO {
-
     private String email;
     private String password;
     private String fullname;
@@ -60,5 +59,11 @@ public class RegisterDTO {
 
     public void setLicenseNumber(String licenseNumber) {
         this.licenseNumber = licenseNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "RegisterDTO [email=" + email + ", fullname=" + fullname + ", licenseNumber=" + licenseNumber + ", password="
+                + password + ", role=" + role + "]";
     }
 }
