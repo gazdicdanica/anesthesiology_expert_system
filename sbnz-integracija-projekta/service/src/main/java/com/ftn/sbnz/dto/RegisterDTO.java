@@ -1,4 +1,4 @@
-package com.ftn.sbnz.model.dto;
+package com.ftn.sbnz.dto;
 
 import com.ftn.sbnz.model.user.User.Role;
 

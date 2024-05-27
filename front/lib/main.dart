@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/auth_bloc/auth_bloc.dart';
 import 'package:front/data/auth/data_provider/auth_data_provider.dart';
 import 'package:front/data/auth/repository/auth_repository.dart';
-import 'package:front/presentation/screens/auth/auth_screen.dart';
+import 'package:front/presentation/screens/auth_screen.dart';
 import 'package:front/theme.dart';
 
 void main() {
