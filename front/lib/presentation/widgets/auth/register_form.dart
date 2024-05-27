@@ -18,6 +18,7 @@ class RegisterForm extends StatefulWidget {
 class _RegisterFormState extends State<RegisterForm> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   final fullnameController = TextEditingController();
   final licenseNumberController = TextEditingController();
   Role? selectedRole;
@@ -136,10 +137,11 @@ class _RegisterFormState extends State<RegisterForm> {
               ),
               TextFormField(
                 onChanged: (value) => _validate(context),
+                controller: confirmPasswordController,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.lock),
                   prefixIconColor: seedColor,
-                  labelText: 'Potvrdi lozinku',
+                  labelText: 'Potvrdite lozinku',
                   errorText: (state is AuthValidationFailure &&
                           state.confirmPasswordError != null)
                       ? state.confirmPasswordError
@@ -199,7 +201,7 @@ class _RegisterFormState extends State<RegisterForm> {
         licenseNumberController.text.trim(),
         selectedRole,
         passwordController.text.trim(),
-        passwordController.text.trim(),
+        confirmPasswordController.text.trim(),
       ),
     );
   }

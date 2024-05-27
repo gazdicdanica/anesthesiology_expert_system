@@ -53,7 +53,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     return null;
   }
 
-  bool _isRequiredFieldValid(String? value){
+  String? _validateLicenseNumber(String? licenseNumber){
+    if (licenseNumber == null || licenseNumber.isEmpty) {
+      return 'Broj licence je obavezan';
+    }else if(!RegExp(r'^\d{6}$').hasMatch(licenseNumber)){
+      return 'Broj licence nije ispravnog formata';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? password){
+    if (password == null || password.isEmpty) {
+      return 'Lozinka je obavezna';
+    }else if(password.length < 6){
+      return 'Lozinka mora imati najmanje 6 karaktera';
+    }
+    return null;
+  }
+
+  bool _validateRequiredField(String? value){
     if (value == null || value.isEmpty) {
       return false;
     }
@@ -69,11 +87,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     String? confirmPasswordError;
 
     emailError = _validateEmail(event.email);
-    fullnameError = _isRequiredFieldValid(event.fullname) ? null : 'Ime i prezime su obavezni';
-    licenseNumberError = _isRequiredFieldValid(event.licenseNumber) ? null : 'Broj licence je obavezan';
+    fullnameError = _validateRequiredField(event.fullname) ? null : 'Ime i prezime su obavezni';
+    licenseNumberError = _validateLicenseNumber(event.licenseNumber);
     roleError = event.role != null ? null : 'Tip licence je obavezan';
-    passwordError = _isRequiredFieldValid(event.password) ? null : 'Lozinka je obavezna';
+    passwordError = _validatePassword(event.password);
     confirmPasswordError = _validateConfirmPassword(event.password, event.confirmPassword);
+
+    print(event.password != event.confirmPassword);
     
     if (emailError != null || passwordError != null || fullnameError != null || licenseNumberError != null || roleError != null || confirmPasswordError != null) {
       emit(AuthValidationFailure(
