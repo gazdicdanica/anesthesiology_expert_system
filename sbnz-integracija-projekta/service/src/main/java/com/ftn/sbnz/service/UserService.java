@@ -15,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -58,10 +59,14 @@ public class UserService implements IUserService {
 	public String login(LoginDTO loginDTO) {
 		User user = userRepository.findByEmail(loginDTO.getEmail())
 				.orElseThrow(() -> new BadRequestException("Pogrešna email adresa ili lozinka."));
-		Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+		try{
+			Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
 				loginDTO.getEmail(), loginDTO.getPassword()));
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+		}catch(AuthenticationException e){
+			throw new BadRequestException("Pogrešna email adresa ili lozinka.");
+		}
+	
 		String jwt = JwtUtil.generateToken(user.getUsername());
 
 		return jwt;

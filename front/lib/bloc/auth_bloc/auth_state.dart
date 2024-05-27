@@ -55,7 +55,21 @@ final class AuthFailure extends AuthState {
   List<Object?> get props => [message];
 }
 
+final class CredentialsFailure extends AuthState {
+  final String message;
+
+  CredentialsFailure(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
+
 final class RegisterSuccess extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
+
+final class LoginSuccess extends AuthState {
   @override
   List<Object?> get props => [];
 }

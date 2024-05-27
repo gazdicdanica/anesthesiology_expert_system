@@ -11,13 +11,50 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _repository;
 
   AuthBloc(this._repository) : super(AuthInitial()) {
+    on<ResetForm>(_resetForm);
+    on<LoginEvent>(_login);
+    on<ValidateLoginForm>(_validateLoginForm);
     on<RegisterEvent>(_register);
     on<ValidateRegisterForm>(_validateRegisterForm);
   }
 
+  void _resetForm(ResetForm event, emit) {
+    emit(AuthInitial());
+  }
+
+  void _login(LoginEvent event, emit) async{
+    emit(AuthLoading());
+
+    try {
+      final token = await _repository.login(event.email, event.password);
+      print(token);
+      // await Future.delayed(const Duration(milliseconds: 500));
+      emit(LoginSuccess());
+    } on CustomException catch (e) {
+      emit(CredentialsFailure(e.toString()));
+    }catch(e){
+      emit(AuthFailure("Došlo je do greške prilikom prijave. Molimo pokušajte ponovo kasnije."));
+    }
+  }
+
+
+  void _validateLoginForm(ValidateLoginForm event, emit) async{
+    String? emailError;
+    String? passwordError;
+
+    emailError = _validateRequiredField(event.email) ? null : 'Email je obavezan';
+    passwordError = _validateRequiredField(event.password) ? null : 'Lozinka je obavezna';
+
+    if (emailError != null || passwordError != null) {
+      emit(AuthValidationFailure(emailError: emailError, passwordError: passwordError));
+    } 
+    else {
+      emit(AuthValidationSuccess());
+    }
+  }
+
   void _register(RegisterEvent event, emit) async {
     emit(AuthLoading());
-    await Future.delayed(const Duration(seconds: 1));
     try {
       await _repository.register(
         event.email,
@@ -26,12 +63,46 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         event.licenseNumber,
         event.fullname,
       );
+      await Future.delayed(const Duration(milliseconds: 500));
       emit(RegisterSuccess());
     } on CustomException catch (e) {
       emit(AuthValidationFailure(emailError:  e.toString()));
     }catch(e){
-      emit(AuthValidationFailure(emailError: "Došlo je do greške prilikom registracije. Molimo pokušajte ponovo kasnije."));
+      emit(AuthFailure("Došlo je do greške prilikom registracije. Molimo pokušajte ponovo kasnije."));
     }
+  }
+
+  void _validateRegisterForm(ValidateRegisterForm event, emit) {
+    String? emailError;
+    String? passwordError;
+    String? fullnameError;
+    String? licenseNumberError;
+    String? roleError;
+    String? confirmPasswordError;
+
+    emailError = _validateEmail(event.email);
+    fullnameError = _validateRequiredField(event.fullname) ? null : 'Ime i prezime su obavezni';
+    licenseNumberError = _validateLicenseNumber(event.licenseNumber);
+    roleError = event.role != null ? null : 'Tip licence je obavezan';
+    passwordError = _validatePassword(event.password);
+    confirmPasswordError = _validateConfirmPassword(event.password, event.confirmPassword);
+
+    print(event.password != event.confirmPassword);
+    
+    if (emailError != null || passwordError != null || fullnameError != null || licenseNumberError != null || roleError != null || confirmPasswordError != null) {
+      emit(AuthValidationFailure(
+        emailError: emailError,
+        passwordError: passwordError,
+        fullnameError: fullnameError,
+        licenseNumberError: licenseNumberError,
+        roleError: roleError,
+        confirmPasswordError: confirmPasswordError,
+      ));
+    } 
+    else {
+      emit(AuthValidationSuccess());
+    }
+    
   }
 
   String? _validateEmail(String? email){
@@ -78,36 +149,4 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     return true;
   }
 
-  void _validateRegisterForm(ValidateRegisterForm event, emit) {
-    String? emailError;
-    String? passwordError;
-    String? fullnameError;
-    String? licenseNumberError;
-    String? roleError;
-    String? confirmPasswordError;
-
-    emailError = _validateEmail(event.email);
-    fullnameError = _validateRequiredField(event.fullname) ? null : 'Ime i prezime su obavezni';
-    licenseNumberError = _validateLicenseNumber(event.licenseNumber);
-    roleError = event.role != null ? null : 'Tip licence je obavezan';
-    passwordError = _validatePassword(event.password);
-    confirmPasswordError = _validateConfirmPassword(event.password, event.confirmPassword);
-
-    print(event.password != event.confirmPassword);
-    
-    if (emailError != null || passwordError != null || fullnameError != null || licenseNumberError != null || roleError != null || confirmPasswordError != null) {
-      emit(AuthValidationFailure(
-        emailError: emailError,
-        passwordError: passwordError,
-        fullnameError: fullnameError,
-        licenseNumberError: licenseNumberError,
-        roleError: roleError,
-        confirmPasswordError: confirmPasswordError,
-      ));
-    } 
-    else {
-      emit(AuthValidationSuccess());
-    }
-    
-  }
 }

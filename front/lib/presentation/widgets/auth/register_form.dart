@@ -31,8 +31,15 @@ class _RegisterFormState extends State<RegisterForm> {
           widget.onSwitchAuthMode();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Uspešno ste se registrovali'),
+              content: Text('Registracija uspešna.'),
               backgroundColor: seedColor,
+            ),
+          );
+        }else if(state is AuthFailure){
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.red,
             ),
           );
         }

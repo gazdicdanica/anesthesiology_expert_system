@@ -26,4 +26,21 @@ class AuthDataProvider {
       throw CustomException(res.body);
     }
   }
+
+  Future<String> login(String email, String password) async {
+    final res = await http.post(Uri.parse("${path}user/login"),
+      body: jsonEncode({
+        "email": email,
+        "password": password,
+      }),
+      headers: {"Content-Type": "application/json"},
+    );
+
+    if (res.statusCode == 200) {
+      return Future.value(res.body);
+    } else {
+      print(res.body);
+      throw CustomException(res.body);
+    }
+  }
 }

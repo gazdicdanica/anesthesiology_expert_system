@@ -4,6 +4,8 @@ part of 'auth_bloc.dart';
 sealed class AuthEvent {
 }
 
+class ResetForm extends AuthEvent {}
+
 class ValidateRegisterForm extends AuthEvent {
   final String fullname;
   final String email;
@@ -15,6 +17,13 @@ class ValidateRegisterForm extends AuthEvent {
   ValidateRegisterForm(this.fullname, this.email, this.licenseNumber, this.role, this.password, this.confirmPassword);
 }
 
+class ValidateLoginForm extends AuthEvent {
+  final String email;
+  final String password;
+
+  ValidateLoginForm(this.email, this.password);
+}
+
 class RegisterEvent extends AuthEvent {
   final String fullname;
   final String email;
@@ -23,4 +32,11 @@ class RegisterEvent extends AuthEvent {
   final String password;
 
   RegisterEvent(this.fullname, this.email, this.licenseNumber, this.role, this.password);
+}
+
+class LoginEvent extends AuthEvent{
+  final String email;
+  final String password;
+
+  LoginEvent(this.email, this.password);
 }

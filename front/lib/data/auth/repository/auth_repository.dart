@@ -11,4 +11,8 @@ class AuthRepository{
   Future<void> register(String email, String password, Role role, String licenseNumber, String fullname) async {
     return dataProvider.register(email, password, role, licenseNumber, fullname);
   }
+
+  Future<String> login(String email, String password) async {
+    return dataProvider.login(email, password);
+  }
 }

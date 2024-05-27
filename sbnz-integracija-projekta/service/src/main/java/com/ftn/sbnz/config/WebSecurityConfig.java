@@ -16,6 +16,7 @@ import com.ftn.sbnz.service.CustomUserDetailsService;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
@@ -23,6 +24,9 @@ import org.springframework.security.config.Customizer;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -51,10 +55,12 @@ public class WebSecurityConfig {
         http.sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .addFilterBefore(new TokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .authorizeRequests()
-                .antMatchers("/api/user/login", "/api/user/register").permitAll()
-                .anyRequest().authenticated();
+                .addFilterBefore(new TokenAuthenticationFilter(jwtUtil, userDetailsService()), UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(authorize -> authorize
+                        .antMatchers("/api/user/login").permitAll()
+                        .antMatchers("/api/user/register").permitAll()
+                        .anyRequest().authenticated()
+                );
 
         http.headers(HeadersConfigurer::disable);
         http.authenticationProvider(authenticationProvider());

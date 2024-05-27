@@ -4,9 +4,12 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
 
 import io.jsonwebtoken.*;
+
+@Component
 public class JwtUtil {
     private static final String SECRET = "your-secret-key";
     private static final long EXPIRATION_TIME = 864_000_000; 
