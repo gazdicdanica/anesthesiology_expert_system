@@ -18,8 +18,11 @@ public class Procedure {
     private OperationRisk risk;
     private ProcedureUrgency urgency;
 
+    @OneToOne(cascade = CascadeType.ALL)
     private PreOperative preOperative;
+    @OneToOne(cascade = CascadeType.ALL)
     private IntraOperative intraOperative;
+    @OneToOne(cascade = CascadeType.ALL)
     private PostOperative postOperative;
 
     public Procedure() {

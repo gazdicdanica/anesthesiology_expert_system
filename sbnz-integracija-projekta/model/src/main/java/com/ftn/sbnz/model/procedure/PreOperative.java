@@ -8,6 +8,11 @@ import org.kie.api.definition.type.PropertyReactive;
 @Table(name = "pre_operative_procedures")
 @PropertyReactive
 public class PreOperative {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private boolean shouldContinueProcedure = true;
 
     private double SIB;

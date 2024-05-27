@@ -21,7 +21,7 @@ class _AuthScreenState extends State<AuthScreen> {
               minHeight: constraints.maxHeight,
             ),
             child: AuthWidget(
-              onSwitchAuthMode: _switchAuthMode,
+              onSwitchAuthMode: () {_switchAuthMode(context); },
               isLogin: isLogin,
             ),
           ),
@@ -30,7 +30,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  void _switchAuthMode() {
+  void _switchAuthMode(BuildContext context) {
     setState(() {
       isLogin = !isLogin;
     });
