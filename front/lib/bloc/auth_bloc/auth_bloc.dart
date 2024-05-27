@@ -27,9 +27,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     try {
       final token = await _repository.login(event.email, event.password);
-      print(token);
       // await Future.delayed(const Duration(milliseconds: 500));
-      emit(LoginSuccess());
+      emit(LoginSuccess(token));
     } on CustomException catch (e) {
       emit(CredentialsFailure(e.toString()));
     }catch(e){

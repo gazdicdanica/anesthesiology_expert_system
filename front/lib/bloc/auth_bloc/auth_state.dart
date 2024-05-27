@@ -70,6 +70,10 @@ final class RegisterSuccess extends AuthState {
 }
 
 final class LoginSuccess extends AuthState {
+  final String token;
+
+  LoginSuccess(this.token);
+
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [token];
 }

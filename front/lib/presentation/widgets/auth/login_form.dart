@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/auth_bloc/auth_bloc.dart';
+import 'package:front/data/shared_pref/repository/shared_pref_repository.dart';
 import 'package:front/theme.dart';
 import 'package:lottie/lottie.dart';
 
@@ -22,7 +23,8 @@ class _LoginFormState extends State<LoginForm> {
     return BlocConsumer<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is LoginSuccess) {
-          print("Login success");
+          context.read<SharedPrefRepository>().saveEmail(emailController.text.trim());
+          context.read<SharedPrefRepository>().saveToken(state.token);
           // Navigator.of(context).pushNamed('/home');
         }
 
