@@ -10,6 +10,7 @@ public class Patient {
     private Long id;
 
     private String fullname;
+    private String jmbg;
     private int age;
     private double weight;
     private double height;
@@ -47,13 +48,14 @@ public class Patient {
     public Patient() {
     }
 
-    public Patient(Long id, String fullname, int age, double weight, double height, double BMI, int basalSAP,
+    public Patient(Long id, String fullname, String jmbg, int age, double weight, double height, double BMI, int basalSAP,
             double SIB, double HBA1C, double kreatinin, boolean hasDiabetes, boolean isDMControlled,
             boolean hadHearthAttack, boolean hasHearhFailure, boolean hasHyperTension, boolean controlledHyperTension,
             boolean hadStroke, boolean hasRenalFailure, boolean addictions, boolean smokerOrAlcoholic,
             boolean pregnant, boolean hasCVSFamilyHistory) {
         this.id = id;
         this.fullname = fullname;
+        this.jmbg = jmbg;
         this.age = age;
         this.weight = weight;
         this.height = height;
@@ -72,42 +74,6 @@ public class Patient {
         this.hasCVSFamilyHistory = hasCVSFamilyHistory;
     }
 
-    public boolean isHasCVSFamilyHistory() {
-        return hasCVSFamilyHistory;
-    }
-
-    public void setHasCVSFamilyHistory(boolean hasCVSFamilyHistory) {
-        this.hasCVSFamilyHistory = hasCVSFamilyHistory;
-    }
-
-    public void calculateBMI() {
-        this.BMI = this.weight / (this.height * this.height);
-    }
-
-    public double getBMI() {
-        return BMI;
-    }
-
-    public void setBMI(double BMI) {
-        this.BMI = BMI;
-    }
-
-    public int getRCRIScore() {
-        return RCRIScore;
-    }
-
-    public void setRCRIScore(int RCRIScore) {
-        this.RCRIScore = RCRIScore;
-    }
-
-    public PatientRisk getRisk() {
-        return risk;
-    }
-
-    public void setRisk(PatientRisk risk) {
-        this.risk = risk;
-    }
-
     public Long getId() {
         return id;
     }
@@ -122,6 +88,14 @@ public class Patient {
 
     public void setFullname(String fullname) {
         this.fullname = fullname;
+    }
+
+    public String getJmbg() {
+        return jmbg;
+    }
+
+    public void setJmbg(String jbmg) {
+        this.jmbg = jbmg;
     }
 
     public int getAge() {
@@ -250,5 +224,41 @@ public class Patient {
 
     public void setAsa(ASA asa) {
         this.asa = asa;
+    }
+
+    public boolean isHasCVSFamilyHistory() {
+        return hasCVSFamilyHistory;
+    }
+
+    public void setHasCVSFamilyHistory(boolean hasCVSFamilyHistory) {
+        this.hasCVSFamilyHistory = hasCVSFamilyHistory;
+    }
+
+    public void calculateBMI() {
+        this.BMI = this.weight / (this.height * this.height);
+    }
+
+    public double getBMI() {
+        return BMI;
+    }
+
+    public void setBMI(double BMI) {
+        this.BMI = BMI;
+    }
+
+    public int getRCRIScore() {
+        return RCRIScore;
+    }
+
+    public void setRCRIScore(int RCRIScore) {
+        this.RCRIScore = RCRIScore;
+    }
+
+    public PatientRisk getRisk() {
+        return risk;
+    }
+
+    public void setRisk(PatientRisk risk) {
+        this.risk = risk;
     }
 }

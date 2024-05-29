@@ -3,9 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SharedPrefDataProvider {
   late SharedPreferences _sharedPreferences;
 
-  SharedPrefDataProvider() {
-    init();
-  }
+  SharedPrefDataProvider();
 
   Future<void> init() async {
     _sharedPreferences = await SharedPreferences.getInstance();
@@ -15,7 +13,7 @@ class SharedPrefDataProvider {
     await _sharedPreferences.setString(key, value);
   }
 
-  String? getString(String key) {
-    return _sharedPreferences.getString(key);
+  Future<String?> getString(String key) async{
+    return Future.value(_sharedPreferences.getString(key));
   }
 }

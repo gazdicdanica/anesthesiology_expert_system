@@ -6,14 +6,22 @@ import 'package:front/data/auth/repository/auth_repository.dart';
 import 'package:front/data/shared_pref/data_provider/shared_pref_data_provider.dart';
 import 'package:front/data/shared_pref/repository/shared_pref_repository.dart';
 import 'package:front/presentation/screens/auth_screen.dart';
+import 'package:front/presentation/screens/init_screen.dart';
 import 'package:front/theme.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final sharedPrefDataProvider = SharedPrefDataProvider();
+  await sharedPrefDataProvider.init();
+
+  final sharedPrefRepository = SharedPrefRepository(sharedPrefDataProvider);
+  runApp(MyApp(repository: sharedPrefRepository));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({super.key, required this.repository});
+
+  final SharedPrefRepository repository;
 
   // This widget is the root of your application.
   @override
@@ -26,9 +34,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         RepositoryProvider(
-          create: (context) => SharedPrefRepository(
-            SharedPrefDataProvider(),
-          ),
+          create: (context) => repository,
         ),
       ],
       child: MultiBlocProvider(
@@ -42,7 +48,7 @@ class MyApp extends StatelessWidget {
         child: MaterialApp(
           title: 'Anesthesia Assistant',
           theme: theme,
-          home: const AuthScreen(),
+          home: const InitScreen(),
         ),
       ),
     );
