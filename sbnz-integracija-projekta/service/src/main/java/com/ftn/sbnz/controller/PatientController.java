@@ -3,6 +3,7 @@ package com.ftn.sbnz.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,8 +28,8 @@ public class PatientController {
         return ResponseEntity.ok(patientService.addPatient(addPatientDTO));
     }
 
-    @PostMapping("/find")
-    public ResponseEntity<?> getPatient(@RequestParam(name="jmbg") String jmbg) {
+    @GetMapping("/find")
+    public ResponseEntity<?> findByJmbg(@RequestParam(name="jmbg") String jmbg) {
         return ResponseEntity.ok(patientService.findByJmbg(jmbg));
     }
 }

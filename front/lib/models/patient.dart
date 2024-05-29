@@ -54,6 +54,64 @@ class Patient {
     required this.pregnant,
     required this.asa,
   });
+
+  factory Patient.fromJson(Map<String, dynamic> json) {
+    return Patient(
+      id: json['id'],
+      fullname: json['fullname'],
+      jmbg: json['jmbg'],
+      age: json['age'],
+      weight: json['weight'],
+      height: json['height'],
+      BMI: json['BMI'],
+      basalSAP: json['basalSAP'],
+      RCRIScore: json['RCRIScore'],
+      risk: _parseRisk(json['risk']),
+      hasDiabetes: json['hasDiabetes'],
+      isDMControlled: json['isDMControlled'],
+      hadHearthAttack: json['hadHearthAttack'],
+      hasHearthFailure: json['hasHearthFailure'],
+      hasHypertension: json['hasHypertension'],
+      controlledHypertension: json['controlledHypertension'],
+      hadStroke: json['hadStroke'],
+      hasRenalFailure: json['hasRenalFailure'],
+      hasCVSFamilyHistory: json['hasCVSFamilyHistory'],
+      addictions: json['addictions'],
+      smokerOrAlcoholic: json['smokerOrAlcoholic'],
+      pregnant: json['pregnant'],
+      asa: _parseASA(json['asa']),
+    );
+  }
+
+  static PatientRisk _parseRisk(String risk) {
+    switch (risk) {
+      case 'LOW':
+        return PatientRisk.LOW;
+      case 'MEDIUM':
+        return PatientRisk.MEDIUM;
+      case 'HIGH':
+        return PatientRisk.HIGH;
+      default:
+        throw ArgumentError('Invalid risk value: $risk');
+    }
+  }
+
+  static ASA _parseASA(String asa) {
+    switch (asa) {
+      case 'I':
+        return ASA.I;
+      case 'II':
+        return ASA.II;
+      case 'III':
+        return ASA.III;
+      case 'IV':
+        return ASA.IV;
+      case 'V':
+        return ASA.V;
+      default:
+        throw ArgumentError('Invalid ASA value: $asa');
+    }
+  }
 }
 
 enum ASA { I, II, III, IV, V }
