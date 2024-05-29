@@ -1,0 +1,24 @@
+template header
+ageLower
+ageHigher
+result
+
+package template;
+
+template "bType"
+
+import com.ftn.sbnz.model.patient.Patient;
+import com.ftn.sbnz.model.procedure.Procedure;
+import com.ftn.sbnz.model.procedure.PreOperative;
+
+rule "B-type natriuretic peptide heart failure @{row.rowNumber}"
+    when
+        $patient: Patient($id: id, age >= @{ageLower}, age <= @{ageHigher})
+        $procedure: Procedure(patientId == $id, preOperative.getBnpValue() > @{result})
+    then
+        modify($patient){
+            setHasHearthFailure(true);
+        }
+end
+
+end template

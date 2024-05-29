@@ -289,29 +289,30 @@ rule "ASA IV tests"
 
 end
 
+// converted to template
 // B-type natriuretic peptide
     // •	< 500 pg / ml, онда нема срчану инсуфицијенцију
     // •	> 500 pg / ml, онда има срчану инсуфицијенцију
     // 100-500 pg/ml - дај лекару да унесе да ли има или нема?
-rule "B-type natriuretic peptide heart failure"
-    when
-        $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, preOperative.getBnpValue() > 500)
-    then
-        modify($patient){
-            setHasHearthFailure(true);
-        }
-end
+// rule "B-type natriuretic peptide heart failure"
+//     when
+//         $patient: Patient($id: id)
+//         $procedure: Procedure(patientId == $id, preOperative.getBnpValue() > 500)
+//     then
+//         modify($patient){
+//             setHasHearthFailure(true);
+//         }
+// end
 
-rule "B-type natriuretic peptide no heart failure"
-    when
-        $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, preOperative.getBnpValue() <= 500 && preOperative.getBnpValue() > 0)
-    then
-        modify($patient){
-            setHasHearthFailure(false);
-        }
-end
+// rule "B-type natriuretic peptide no heart failure"
+//     when
+//         $patient: Patient($id: id)
+//         $procedure: Procedure(patientId == $id, preOperative.getBnpValue() <= 500 && preOperative.getBnpValue() > 0)
+//     then
+//         modify($patient){
+//             setHasHearthFailure(false);
+//         }
+// end
 
 
 // monitoring rules

@@ -85,8 +85,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     roleError = event.role != null ? null : 'Tip licence je obavezan';
     passwordError = _validatePassword(event.password);
     confirmPasswordError = _validateConfirmPassword(event.password, event.confirmPassword);
-
-    print(event.password != event.confirmPassword);
     
     if (emailError != null || passwordError != null || fullnameError != null || licenseNumberError != null || roleError != null || confirmPasswordError != null) {
       emit(AuthValidationFailure(
