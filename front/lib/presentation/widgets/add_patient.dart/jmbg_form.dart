@@ -4,7 +4,10 @@ import 'package:front/bloc/patient_bloc/patient_bloc.dart';
 import 'package:front/theme.dart';
 
 class JmbgForm extends StatefulWidget {
-  const JmbgForm({super.key});
+  const JmbgForm({super.key, required this.setJmbg, this.jmbg});
+
+  final void Function(String) setJmbg;
+  final String? jmbg;
 
   @override
   State<JmbgForm> createState() => _JmbgFormState();
@@ -13,6 +16,12 @@ class JmbgForm extends StatefulWidget {
 class _JmbgFormState extends State<JmbgForm> {
   final _formKey = GlobalKey<FormState>();
   final _jmbgController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _jmbgController.text = widget.jmbg ?? '';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,6 +106,7 @@ class _JmbgFormState extends State<JmbgForm> {
   void _fetchPatient(BuildContext context) {
     final state = context.read<PatientBloc>().state;
     if (state is PatientValidationSuccess) {
+      widget.setJmbg(_jmbgController.text.trim());
       BlocProvider.of<PatientBloc>(context).add(
         FetchPatient(
           _jmbgController.text.trim(),

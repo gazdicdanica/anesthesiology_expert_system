@@ -5,8 +5,22 @@ import 'package:front/presentation/widgets/add_patient.dart/jmbg_form.dart';
 import 'package:front/presentation/widgets/add_patient.dart/patient_form.dart';
 import 'package:front/presentation/widgets/loading_widget.dart';
 
-class AddPatientScreen extends StatelessWidget {
+class AddPatientScreen extends StatefulWidget {
   const AddPatientScreen({super.key});
+
+  @override
+  State<AddPatientScreen> createState() => _AddPatientScreenState();
+}
+
+class _AddPatientScreenState extends State<AddPatientScreen> {
+
+  String? jmbg;
+
+  void _setJmbg(String jmbg) {
+    setState(() {
+      this.jmbg = jmbg;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +45,7 @@ class AddPatientScreen extends StatelessWidget {
             );
           }
 
-          return const JmbgForm();
+          return  JmbgForm(setJmbg: _setJmbg, jmbg: jmbg,);
         },
       ),
     );

@@ -7,6 +7,8 @@ sealed class PatientEvent extends Equatable {
   List<Object> get props => [];
 }
 
+final class ResetForm extends PatientEvent {}
+
 final class ValidateJmbg extends PatientEvent {
   final String jmbg;
 

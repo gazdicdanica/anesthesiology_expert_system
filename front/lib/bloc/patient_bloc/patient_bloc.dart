@@ -11,6 +11,9 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
   final PatientRepository _patientRepository;
 
   PatientBloc(this._patientRepository) : super(PatientInitial()) {
+    on<ResetForm>((event, emit) {
+      emit(PatientInitial());
+    });
     on<ValidateJmbg>(_validateJmbg);
     on<FetchPatient>(_fetchPatient);
   }
