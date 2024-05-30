@@ -7,4 +7,6 @@ public interface IPatientService {
     Patient findByJmbg(String jmbg);
 
     Patient addPatient(AddPatientDTO addPatientDTO);
+
+    Patient updatePatient(AddPatientDTO patient);
 }

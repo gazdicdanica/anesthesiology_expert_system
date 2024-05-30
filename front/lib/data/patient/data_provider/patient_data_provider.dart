@@ -20,19 +20,19 @@ class PatientDataProvider {
     });
 
     if (res.statusCode == 200) {
-      print(res.body);
+      // print(res.body);
       return res.body;
     } 
     else if(res.statusCode == 404){
       return Future(() => null);
     } 
     else {
-      print(res.body);
+      // print(res.body);
       throw CustomException(res.body);
     }
   }
 
-  Future<String?> addPatient(AddPatientDTO patient) async {
+  Future<String?> addPatient(PatientDTO patient) async {
     final token = await _sharedPrefRepository.getToken();
     final res = await http.post(Uri.parse("${path}patient"), headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
@@ -40,11 +40,28 @@ class PatientDataProvider {
     }, body: jsonEncode(patient.toJson()));
 
     if (res.statusCode == 200) {
-      print(res.body);  
+      // print(res.body);  
       return res.body;
     } 
     else {
-      print(res.body);
+      // print(res.body);
+      throw CustomException(res.body);
+    }
+  }
+
+  Future<String?> updatePatient(PatientDTO patient) async {
+    final token = await _sharedPrefRepository.getToken();
+    final res = await http.put(Uri.parse("${path}patient"), headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+      "Authorization": "Bearer $token"
+    }, body: jsonEncode(patient.toJson()));
+
+    if (res.statusCode == 200) {
+      // print(res.body);  
+      return res.body;
+    } 
+    else {
+      // print(res.body);
       throw CustomException(res.body);
     }
   }

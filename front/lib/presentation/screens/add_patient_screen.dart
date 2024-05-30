@@ -4,6 +4,7 @@ import 'package:front/bloc/patient_bloc/patient_bloc.dart';
 import 'package:front/presentation/widgets/add_patient.dart/jmbg_form.dart';
 import 'package:front/presentation/widgets/add_patient.dart/patient_form.dart';
 import 'package:front/presentation/widgets/loading_widget.dart';
+import 'package:front/theme.dart';
 
 class AddPatientScreen extends StatefulWidget {
   const AddPatientScreen({super.key});
@@ -35,6 +36,25 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                   backgroundColor: Colors.red,
                 ),
               );
+            }
+
+            if (state is AddPatientSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Pacijent uspešno dodat'),
+                  backgroundColor: seedColor,
+                ),
+              );
+              // context.read<PatientBloc>().add(ResetForm());
+            }
+            if (state is UpdatePatientSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Pacijent uspešno ažuriran'),
+                  backgroundColor: seedColor,
+                ),
+              );
+              // context.read<PatientBloc>().add(ResetForm());
             }
           },
           builder: (context, state) {

@@ -60,7 +60,7 @@ class PatientFormBloc extends Bloc<PatientFormEvent, PatientFormState> {
 
     switch (event.field) {
       case 'fullname':
-      print(event.value.isNotEmpty);
+      // print(event.value.isNotEmpty);
         emit(currentState.copyWith(
             fullName: event.value,
             clearFullNameError: event.value.isNotEmpty,
@@ -85,8 +85,8 @@ class PatientFormBloc extends Bloc<PatientFormEvent, PatientFormState> {
         String? heightError;
         if (event.value.isEmpty) {
           heightError = 'Visina je obavezna';
-        } else if (int.parse(event.value) < 100 ||
-            int.parse(event.value) > 300) {
+        } else if (double.parse(event.value) < 100 ||
+            double.parse(event.value) > 300) {
           heightError = 'Visina mora biti između 100 i 300cm';
         }
         emit(currentState.copyWith(
@@ -98,8 +98,8 @@ class PatientFormBloc extends Bloc<PatientFormEvent, PatientFormState> {
         String? weightError;
         if (event.value.isEmpty) {
           weightError = 'Težina je obavezna';
-        } else if (int.parse(event.value) < 30 ||
-            int.parse(event.value) > 500) {
+        } else if (double.parse(event.value) < 30 ||
+            double.parse(event.value) > 500) {
           weightError = 'Težina mora biti između 30 i 500kg';
         }
         emit(currentState.copyWith(

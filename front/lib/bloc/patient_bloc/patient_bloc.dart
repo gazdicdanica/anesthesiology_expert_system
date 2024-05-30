@@ -17,6 +17,7 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
     on<FetchPatient>(_fetchPatient);
 
     on<AddPatient>(_addPatient);
+    on<UpdatePatient>(_updatePatient);
   }
 
   void _addPatient(AddPatient event, emit) async {
@@ -26,6 +27,16 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
       emit(AddPatientSuccess(patient));
     }).catchError((e) {
       emit(const PatientFailure('Došlo je do greške prilikom dodavanja pacijenta'));
+    });
+  }
+
+  void _updatePatient(UpdatePatient event, emit) async {
+    emit(PatientLoading());
+
+    await _patientRepository.updatePatient(event.patient).then((patient) {
+      emit(UpdatePatientSuccess(patient));
+    }).catchError((e) {
+      emit(const PatientFailure('Došlo je do greške prilikom ažuriranja pacijenta'));
     });
   }
 

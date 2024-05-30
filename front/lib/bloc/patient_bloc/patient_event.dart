@@ -29,9 +29,18 @@ final class FetchPatient extends PatientEvent {
 
 
 final class AddPatient extends PatientEvent {
-  final AddPatientDTO patient;
+  final PatientDTO patient;
 
   const AddPatient(this.patient);
+
+  @override
+  List<Object> get props => [patient];
+}
+
+final class UpdatePatient extends PatientEvent {
+  final PatientDTO patient;
+
+  const UpdatePatient(this.patient);
 
   @override
   List<Object> get props => [patient];

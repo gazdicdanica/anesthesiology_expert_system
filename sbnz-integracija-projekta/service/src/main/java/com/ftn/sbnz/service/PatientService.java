@@ -23,6 +23,7 @@ public class PatientService implements IPatientService{
     @Override
     public Patient findByJmbg(String jmbg) {
         Patient patient = patientRepository.findByJmbg(jmbg).orElseThrow(() -> new EntityNotFoundException("Pacijent nije pronadjen"));
+        System.out.println(patient);
         return patient;
     }
 
@@ -34,6 +35,27 @@ public class PatientService implements IPatientService{
         Patient patient = modelMapper.map(addPatientDTO, Patient.class);
         patient.calculateBMI();
         return patientRepository.save(patient);
+    }
+
+    @Override
+    public Patient updatePatient(AddPatientDTO patient) {
+        Patient oldPatient = patientRepository.findByJmbg(patient.getJmbg()).orElseThrow(() -> new EntityNotFoundException("Pacijent nije pronadjen"));
+        oldPatient.setAge(patient.getAge());
+        oldPatient.setFullname(patient.getFullname());
+        oldPatient.setHeight(patient.getHeight());
+        oldPatient.setWeight(patient.getWeight());
+        oldPatient.calculateBMI();
+        oldPatient.setPregnant(patient.isPregnant());
+        oldPatient.setHasDiabetes(patient.isHasDiabetes());
+        oldPatient.setAddictions(patient.isAddictions());
+        oldPatient.setSmokerOrAlcoholic(patient.isSmokerOrAlcoholic());
+        oldPatient.setHasHypertension(patient.isHasHypertension());
+        oldPatient.setControlledHypertension(patient.isControlledHypertension());
+        oldPatient.setHadHearthAttack(patient.isHadHearthAttack());
+        oldPatient.setHadStroke(patient.isHadStroke());
+        oldPatient.setHasHearthFailure(patient.isHasHearthFailure());
+        oldPatient.setHasRenalFailure(patient.isHasRenalFailure());
+        return patientRepository.save(oldPatient);
     }
     
 }

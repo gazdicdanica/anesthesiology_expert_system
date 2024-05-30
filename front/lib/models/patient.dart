@@ -120,7 +120,7 @@ enum ASA { I, II, III, IV, V }
 
 enum PatientRisk { LOW, MEDIUM, HIGH }
 
-class AddPatientDTO {
+class PatientDTO {
   final String fullname;
   final String jmbg;
   final int age;
@@ -139,7 +139,7 @@ class AddPatientDTO {
 
   bool pregnant;
 
-  AddPatientDTO({
+  PatientDTO({
     required this.fullname,
     required this.jmbg,
     required this.age,
