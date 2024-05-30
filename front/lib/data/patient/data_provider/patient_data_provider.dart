@@ -11,7 +11,7 @@ class PatientDataProvider {
 
   Future<String?> findByJmbg(String jmbg) async {
     final token = await _sharedPrefRepository.getToken();
-    final res = await http.get(Uri.parse("${path}patient/find?$jmbg"), headers: <String, String>{
+    final res = await http.get(Uri.parse("${path}patient/find?jmbg=$jmbg"), headers: <String, String>{
       'Content-Type': 'application/json; charset=UTF-8',
       "Authorization": "Bearer $token"
     });

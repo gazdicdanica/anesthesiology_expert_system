@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/auth_bloc/auth_bloc.dart';
+import 'package:front/bloc/patient_bloc/patient_bloc.dart';
 import 'package:front/data/auth/data_provider/auth_data_provider.dart';
 import 'package:front/data/auth/repository/auth_repository.dart';
 import 'package:front/data/patient/data_provider/patient_data_provider.dart';
@@ -49,7 +50,11 @@ class MyApp extends StatelessWidget {
             create: (context) => AuthBloc(
               context.read<AuthRepository>(),
             ),
-          )
+          ),
+          BlocProvider(
+              create: (context) => PatientBloc(
+                    context.read<PatientRepository>(),
+                  )),
         ],
         child: MaterialApp(
           title: 'Anesthesia Assistant',
