@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/auth_bloc/auth_bloc.dart';
 import 'package:front/data/shared_pref/repository/shared_pref_repository.dart';
 import 'package:front/presentation/widgets/bottom_navigation.dart';
+import 'package:front/presentation/widgets/loading_widget.dart';
 import 'package:front/theme.dart';
-import 'package:lottie/lottie.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -40,15 +40,7 @@ class _LoginFormState extends State<LoginForm> {
       },
       builder: (context, state) {
         if (state is AuthLoading) {
-          return Center(
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: Center(
-                child: Lottie.asset('assets/lottie/loading.json'),
-              ),
-            ),
-          );
+          return const LoadingWidget();
         }
         return Form(
           key: formKey,

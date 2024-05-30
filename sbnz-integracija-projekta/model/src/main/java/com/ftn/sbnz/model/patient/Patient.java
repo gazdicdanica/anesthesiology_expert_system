@@ -235,7 +235,8 @@ public class Patient {
     }
 
     public void calculateBMI() {
-        this.BMI = this.weight / (this.height * this.height);
+        double heightInM = height / 100;
+        this.BMI = this.weight / (heightInM * heightInM);
     }
 
     public double getBMI() {

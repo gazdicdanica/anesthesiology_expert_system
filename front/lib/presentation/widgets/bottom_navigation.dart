@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:front/presentation/screens/add_patient_screen.dart';
 
 class CustomBottomNavigation extends StatefulWidget{
   const CustomBottomNavigation({super.key});
@@ -13,7 +14,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
 
   final List<Widget> _widgetOptions = <Widget>[
     const Text('Index 0: Procedures'),
-    const Text('Index 1: Add patient'),
+    const AddPatientScreen(),
     const Text('Index 2: Profile?'),
   ];
 

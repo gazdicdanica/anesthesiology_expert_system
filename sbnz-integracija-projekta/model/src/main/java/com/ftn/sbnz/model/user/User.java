@@ -19,6 +19,8 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String fullname;
+    private String licenseNumber;
+    @Enumerated(EnumType.STRING)
     private Role role;
 
     public enum Role {
@@ -29,12 +31,13 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(Long id, String email, String password, String fullname, Role role) {
+    public User(Long id, String email, String password, String fullname, String licenseNumber, Role role) {
         this.id = id;
         this.username = email;
         this.email = email;
         this.password = password;
         this.fullname = fullname;
+        this.licenseNumber = licenseNumber;
         this.role = role;
     }
 
@@ -76,6 +79,14 @@ public class User implements UserDetails {
 
     public void setFullname(String fullname) {
         this.fullname = fullname;
+    }
+
+    public String getLicenseNumber() {
+        return licenseNumber;
+    }
+
+    public void setLicenseNumber(String licenceNumber) {
+        this.licenseNumber = licenceNumber;
     }
 
     public Role getRole() {
