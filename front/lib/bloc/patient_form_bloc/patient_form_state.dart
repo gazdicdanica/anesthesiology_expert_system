@@ -13,8 +13,8 @@ final class PatientFormValuesState extends PatientFormState {
   final String height;
   final String weight;
   final bool hasDiabetes;
-  final bool hadHeartAttack;
-  final bool hasHeartFailure;
+  final bool hadHearthAttack;
+  final bool hasHearthFailure;
   final bool hasHypertension;
   final bool controlledHypertension;
   final bool hadStroke;
@@ -34,8 +34,8 @@ final class PatientFormValuesState extends PatientFormState {
     this.height = '',
     this.weight = '',
     this.hasDiabetes = false,
-    this.hadHeartAttack = false,
-    this.hasHeartFailure = false,
+    this.hadHearthAttack = false,
+    this.hasHearthFailure = false,
     this.hasHypertension = false,
     this.controlledHypertension = true,
     this.hadStroke = false,
@@ -81,8 +81,8 @@ final class PatientFormValuesState extends PatientFormState {
       height: height ?? this.height,
       weight: weight ?? this.weight,
       hasDiabetes: hasDiabetes ?? this.hasDiabetes,
-      hadHeartAttack: hadHeartAttack ?? this.hadHeartAttack,
-      hasHeartFailure: hasHeartFailure ?? this.hasHeartFailure,
+      hadHearthAttack: hadHeartAttack ?? hadHearthAttack,
+      hasHearthFailure: hasHeartFailure ?? hasHearthFailure,
       hasHypertension: hasHypertension ?? this.hasHypertension,
       controlledHypertension:
           controlledHypertension ?? this.controlledHypertension,
@@ -107,8 +107,8 @@ final class PatientFormValuesState extends PatientFormState {
         height,
         weight,
         hasDiabetes,
-        hadHeartAttack,
-        hasHeartFailure,
+        hadHearthAttack,
+        hasHearthFailure,
         hasHypertension,
         controlledHypertension,
         hadStroke,
@@ -116,6 +116,15 @@ final class PatientFormValuesState extends PatientFormState {
         hasCVSFamilyHistory,
         addictions,
         smokerOrAlcoholic,
-        pregnant
+        pregnant,
+        fullNameError ?? '',
+        ageError ?? '',
+        heightError ?? '',
+        weightError ??  '',
       ];
+
+  @override
+  String toString() {
+    return 'PatientFormValuesState(fullName: $fullName, age: $age, height: $height, weight: $weight, hasDiabetes: $hasDiabetes, hadHearthAttack: $hadHearthAttack, hasHearthFailure: $hasHearthFailure, hasHypertension: $hasHypertension, controlledHypertension: $controlledHypertension, hadStroke: $hadStroke, hasRenalFailure: $hasRenalFailure, hasCVSFamilyHistory: $hasCVSFamilyHistory, addictions: $addictions, smokerOrAlcoholic: $smokerOrAlcoholic, pregnant: $pregnant, fullNameError: $fullNameError, ageError: $ageError, heightError: $heightError, weightError: $weightError)';
+  }
 }

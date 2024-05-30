@@ -1,5 +1,6 @@
 package com.ftn.sbnz.controller;
 
+import org.apache.catalina.connector.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
 
 import com.ftn.sbnz.dto.AddPatientDTO;
+import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.service.iservice.IPatientService;
 
 @RestController
@@ -24,8 +27,8 @@ public class PatientController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addPatient(@RequestBody AddPatientDTO addPatientDTO) {
-        return ResponseEntity.ok(patientService.addPatient(addPatientDTO));
+    public ResponseEntity<Patient> addPatient(@RequestBody AddPatientDTO addPatientDTO) {
+        return new ResponseEntity<Patient>(patientService.addPatient(addPatientDTO), HttpStatus.OK);
     }
 
     @GetMapping("/find")

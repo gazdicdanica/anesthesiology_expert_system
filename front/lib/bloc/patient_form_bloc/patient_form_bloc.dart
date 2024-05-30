@@ -60,6 +60,7 @@ class PatientFormBloc extends Bloc<PatientFormEvent, PatientFormState> {
 
     switch (event.field) {
       case 'fullname':
+      print(event.value.isNotEmpty);
         emit(currentState.copyWith(
             fullName: event.value,
             clearFullNameError: event.value.isNotEmpty,

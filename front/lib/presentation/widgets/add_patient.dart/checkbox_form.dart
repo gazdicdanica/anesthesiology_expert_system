@@ -76,7 +76,7 @@ class CheckboxForm extends StatelessWidget {
               ),
             CheckboxListTile(
               title: const Text('Infarkt miokarda'),
-              value: state.hadHeartAttack,
+              value: state.hadHearthAttack,
               onChanged: (bool? value) {
                 context
                     .read<PatientFormBloc>()
@@ -85,7 +85,7 @@ class CheckboxForm extends StatelessWidget {
             ),
             CheckboxListTile(
               title: const Text('Srčana insuficijencija'),
-              value: state.hasHeartFailure,
+              value: state.hasHearthFailure,
               onChanged: (bool? value) {
                 context
                     .read<PatientFormBloc>()

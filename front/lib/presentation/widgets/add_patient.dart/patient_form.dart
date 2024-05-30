@@ -27,10 +27,28 @@ class _PatientFormState extends State<PatientForm> {
     super.initState();
 
     context.read<PatientFormBloc>().add(PatientResetForm());
+
+    if(widget.patient!= null){
+      _fullnameController.text = widget.patient!.fullname;
+      _ageController.text = widget.patient!.age.toString();
+      _heightController.text = widget.patient!.height.toString();
+      _weightController.text = widget.patient!.weight.toString();
+      context.read<PatientFormBloc>().add(ToggleCheckbox(field: 'hasDiabetes', value: widget.patient!.hasDiabetes));
+      context.read<PatientFormBloc>().add(ToggleCheckbox(field: 'hadHeartAttack', value: widget.patient!.hadHearthAttack));
+      context.read<PatientFormBloc>().add(ToggleCheckbox(field: 'hasHeartFailure', value: widget.patient!.hasHearthFailure));
+      context.read<PatientFormBloc>().add(ToggleCheckbox(field: 'hasHypertension', value: widget.patient!.hasHypertension));
+      context.read<PatientFormBloc>().add(ToggleCheckbox(field: 'controlledHypertension', value: widget.patient!.controlledHypertension));
+      context.read<PatientFormBloc>().add(ToggleCheckbox(field: 'hadStroke', value: widget.patient!.hadStroke));
+      context.read<PatientFormBloc>().add(ToggleCheckbox(field: 'hasRenalFailure', value: widget.patient!.hasRenalFailure));
+      context.read<PatientFormBloc>().add(ToggleCheckbox(field: 'addictions', value: widget.patient!.addictions));
+      context.read<PatientFormBloc>().add(ToggleCheckbox(field: 'smokerOrAlcoholic', value: widget.patient!.smokerOrAlcoholic));
+      context.read<PatientFormBloc>().add(ToggleCheckbox(field: 'pregnant', value: widget.patient!.pregnant));
+
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext ctx) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -46,12 +64,13 @@ class _PatientFormState extends State<PatientForm> {
           child: SingleChildScrollView(
             child: BlocBuilder<PatientFormBloc, PatientFormState>(
               builder: (context, state) {
+                print(state);
                 return Column(
                   children: [
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'Unesite podatke o pacijentu',
+                        widget.patient == null ? 'Unesite podatke o pacijentu' : 'Izmenite podatke o pacijentu',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ),
@@ -64,7 +83,8 @@ class _PatientFormState extends State<PatientForm> {
                           Icons.person,
                           color: seedColor,
                         ),
-                        errorText: (state as PatientFormValuesState).fullNameError,
+                        errorText:
+                            (state as PatientFormValuesState).fullNameError,
                         suffixIcon: state.fullNameError != null
                             ? const Icon(Icons.error, color: Colors.red)
                             : null,
@@ -116,8 +136,9 @@ class _PatientFormState extends State<PatientForm> {
                                   : null,
                             ),
                             onChanged: (value) {
-                              context.read<PatientFormBloc>().add(TextFieldChanged(
-                                  field: 'height', value: value));
+                              context.read<PatientFormBloc>().add(
+                                  TextFieldChanged(
+                                      field: 'height', value: value));
                             },
                             keyboardType: TextInputType.number,
                           ),
@@ -143,8 +164,9 @@ class _PatientFormState extends State<PatientForm> {
                                   : null,
                             ),
                             onChanged: (value) {
-                              context.read<PatientFormBloc>().add(TextFieldChanged(
-                                  field: 'weight', value: value));
+                              context.read<PatientFormBloc>().add(
+                                  TextFieldChanged(
+                                      field: 'weight', value: value));
                             },
                             keyboardType: TextInputType.number,
                           ),
@@ -156,7 +178,10 @@ class _PatientFormState extends State<PatientForm> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          _validate(context);
+                          _addPatient(context);
+                        },
                         child: const Text('Sačuvaj'),
                       ),
                     ),
@@ -169,5 +194,71 @@ class _PatientFormState extends State<PatientForm> {
         ),
       ),
     );
+  }
+
+  void _validate(BuildContext context) {
+    final bloc = BlocProvider.of<PatientFormBloc>(context);
+    print("full name: ");
+    print(_fullnameController.text.trim());
+    bloc.add(
+      TextFieldChanged(
+        field: 'fullname',
+        value: _fullnameController.text.trim(),
+      ),
+    );
+    bloc.add(
+      TextFieldChanged(
+        field: 'age',
+        value: _ageController.text.trim(),
+      ),
+    );
+    bloc.add(
+      TextFieldChanged(
+        field: 'height',
+        value: _heightController.text.trim(),
+      ),
+    );
+    bloc.add(
+      TextFieldChanged(
+        field: 'weight',
+        value: _weightController.text.trim(),
+      ),
+    );
+  }
+
+  void _addPatient(BuildContext context) {
+    final state =
+        context.read<PatientFormBloc>().state as PatientFormValuesState;
+    print(state);
+    if(state.fullNameError != null || state.ageError != null || state.heightError != null || state.weightError != null){
+      return;
+    }
+    final patient = AddPatientDTO(
+      fullname: _fullnameController.text,
+      jmbg: widget.jmbg,
+      age: int.parse(_ageController.text),
+      height: double.parse(_heightController.text),
+      weight: double.parse(_weightController.text),
+      hasDiabetes: state.hasDiabetes,
+      hadHearthAttack: state.hadHearthAttack,
+      hasHearthFailure: state.hasHearthFailure,
+      hasHypertension: state.hasHypertension,
+      controlledHypertension: state.controlledHypertension,
+      hadStroke: state.hadStroke,
+      hasRenalFailure: state.hasRenalFailure,
+      addictions: state.addictions,
+      smokerOrAlcoholic: state.smokerOrAlcoholic,
+      pregnant: state.pregnant,
+    );
+    context.read<PatientBloc>().add(AddPatient(patient));
+  }
+
+  @override
+  void dispose() {
+    _fullnameController.dispose();
+    _ageController.dispose();
+    _heightController.dispose();
+    _weightController.dispose();
+    super.dispose();
   }
 }

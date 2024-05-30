@@ -15,6 +15,18 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
     });
     on<ValidateJmbg>(_validateJmbg);
     on<FetchPatient>(_fetchPatient);
+
+    on<AddPatient>(_addPatient);
+  }
+
+  void _addPatient(AddPatient event, emit) async {
+    emit(PatientLoading());
+
+    await _patientRepository.addPatient(event.patient).then((patient) {
+      emit(AddPatientSuccess(patient));
+    }).catchError((e) {
+      emit(const PatientFailure('Došlo je do greške prilikom dodavanja pacijenta'));
+    });
   }
 
   void _validateJmbg(ValidateJmbg event, emit) {

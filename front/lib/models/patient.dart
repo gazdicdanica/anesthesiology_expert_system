@@ -11,7 +11,7 @@ class Patient {
   int basalSAP;
 
   int RCRIScore;
-  PatientRisk risk;
+  PatientRisk? risk;
   bool hasDiabetes;
   bool isDMControlled;
   bool hadHearthAttack;
@@ -27,7 +27,7 @@ class Patient {
 
   bool pregnant;
 
-  ASA asa;
+  ASA? asa;
 
   Patient({
     required this.id,
@@ -63,12 +63,12 @@ class Patient {
       age: json['age'],
       weight: json['weight'],
       height: json['height'],
-      BMI: json['BMI'],
+      BMI: json['bmi'],
       basalSAP: json['basalSAP'],
-      RCRIScore: json['RCRIScore'],
+      RCRIScore: json['rcriscore'],
       risk: _parseRisk(json['risk']),
       hasDiabetes: json['hasDiabetes'],
-      isDMControlled: json['isDMControlled'],
+      isDMControlled: json['dmcontrolled'],
       hadHearthAttack: json['hadHearthAttack'],
       hasHearthFailure: json['hasHearthFailure'],
       hasHypertension: json['hasHypertension'],
@@ -83,7 +83,7 @@ class Patient {
     );
   }
 
-  static PatientRisk _parseRisk(String risk) {
+  static PatientRisk? _parseRisk(String? risk) {
     switch (risk) {
       case 'LOW':
         return PatientRisk.LOW;
@@ -92,11 +92,12 @@ class Patient {
       case 'HIGH':
         return PatientRisk.HIGH;
       default:
-        throw ArgumentError('Invalid risk value: $risk');
+        return null;
+        // throw ArgumentError('Invalid risk value: $risk');
     }
   }
 
-  static ASA _parseASA(String asa) {
+  static ASA? _parseASA(String? asa) {
     switch (asa) {
       case 'I':
         return ASA.I;
@@ -109,7 +110,8 @@ class Patient {
       case 'V':
         return ASA.V;
       default:
-        throw ArgumentError('Invalid ASA value: $asa');
+        return null;
+        // throw ArgumentError('Invalid ASA value: $asa');
     }
   }
 }
@@ -117,3 +119,61 @@ class Patient {
 enum ASA { I, II, III, IV, V }
 
 enum PatientRisk { LOW, MEDIUM, HIGH }
+
+class AddPatientDTO {
+  final String fullname;
+  final String jmbg;
+  final int age;
+  final double weight;
+  final double height;
+
+  bool hasDiabetes;
+  bool hadHearthAttack;
+  bool hasHearthFailure;
+  bool hasHypertension;
+  bool controlledHypertension;
+  bool hadStroke;
+  bool hasRenalFailure;
+  bool addictions;
+  bool smokerOrAlcoholic;
+
+  bool pregnant;
+
+  AddPatientDTO({
+    required this.fullname,
+    required this.jmbg,
+    required this.age,
+    required this.weight,
+    required this.height,
+    required this.hasDiabetes,
+    required this.hadHearthAttack,
+    required this.hasHearthFailure,
+    required this.hasHypertension,
+    required this.controlledHypertension,
+    required this.hadStroke,
+    required this.hasRenalFailure,
+    required this.addictions,
+    required this.smokerOrAlcoholic,
+    required this.pregnant,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'fullname': fullname,
+      'jmbg': jmbg,
+      'age': age,
+      'weight': weight,
+      'height': height,
+      'hasDiabetes': hasDiabetes,
+      'hadHearthAttack': hadHearthAttack,
+      'hasHearthFailure': hasHearthFailure,
+      'hasHypertension': hasHypertension,
+      'controlledHypertension': controlledHypertension,
+      'hadStroke': hadStroke,
+      'hasRenalFailure': hasRenalFailure,
+      'addictions': addictions,
+      'smokerOrAlcoholic': smokerOrAlcoholic,
+      'pregnant': pregnant,
+    };
+  }
+}

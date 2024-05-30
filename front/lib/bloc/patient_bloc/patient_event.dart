@@ -26,3 +26,13 @@ final class FetchPatient extends PatientEvent {
   @override
   List<Object> get props => [jmbg];
 }
+
+
+final class AddPatient extends PatientEvent {
+  final AddPatientDTO patient;
+
+  const AddPatient(this.patient);
+
+  @override
+  List<Object> get props => [patient];
+}

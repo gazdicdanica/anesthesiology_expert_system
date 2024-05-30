@@ -31,6 +31,15 @@ final class PatientSuccess extends PatientState {
   List<Object> get props => [];
 }
 
+final class AddPatientSuccess extends PatientState {
+  final Patient patient;
+
+  const AddPatientSuccess(this.patient);
+
+  @override
+  List<Object> get props => [];
+}
+
 final class PatientFailure extends PatientState {
   final String error;
 

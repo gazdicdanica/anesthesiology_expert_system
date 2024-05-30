@@ -17,4 +17,9 @@ class PatientRepository {
     
     return Patient.fromJson(jsonDecode(response));
   }
+
+  Future<Patient> addPatient(AddPatientDTO patient) async {
+    String? response = await _patientDataProvider.addPatient(patient);
+    return Patient.fromJson(jsonDecode(response!));
+  }
 }
