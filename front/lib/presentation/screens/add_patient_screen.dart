@@ -25,28 +25,31 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer<PatientBloc, PatientState>(
-        listener: (context, state) {
-          if (state is PatientFailure) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.error),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        },
-        builder: (context, state) {
-          if (state is PatientLoading) return const LoadingWidget();
-
-          if (state is PatientSuccess) {
-            return PatientForm(
-              patient: state.patient,
-            );
-          }
-
-          return  JmbgForm(setJmbg: _setJmbg, jmbg: jmbg,);
-        },
+      body: SafeArea(
+        child: BlocConsumer<PatientBloc, PatientState>(
+          listener: (context, state) {
+            if (state is PatientFailure) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.error),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is PatientLoading) return const LoadingWidget();
+        
+            if (state is PatientSuccess) {
+              return PatientForm(
+                patient: state.patient,
+                jmbg: jmbg!,
+              );
+            }
+        
+            return  JmbgForm(setJmbg: _setJmbg, jmbg: jmbg,);
+          },
+        ),
       ),
     );
   }

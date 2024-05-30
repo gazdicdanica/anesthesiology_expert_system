@@ -7,7 +7,6 @@ part 'patient_event.dart';
 part 'patient_state.dart';
 
 class PatientBloc extends Bloc<PatientEvent, PatientState> {
-
   final PatientRepository _patientRepository;
 
   PatientBloc(this._patientRepository) : super(PatientInitial()) {
@@ -32,8 +31,8 @@ class PatientBloc extends Bloc<PatientEvent, PatientState> {
     await _patientRepository.findByJmbg(event.jmbg).then((patient) {
       emit(PatientSuccess(patient));
     }).catchError((e) {
-      emit(const PatientFailure('Došlo je do greške prilikom preuzimanja podataka o pacijentu'));
+      emit(const PatientFailure(
+          'Došlo je do greške prilikom preuzimanja podataka o pacijentu'));
     });
-    
   }
 }

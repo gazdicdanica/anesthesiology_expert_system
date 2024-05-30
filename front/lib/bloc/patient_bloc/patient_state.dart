@@ -2,7 +2,7 @@ part of 'patient_bloc.dart';
 
 sealed class PatientState extends Equatable {
   const PatientState();
-  
+
   @override
   List<Object> get props => [];
 }
@@ -28,7 +28,7 @@ final class PatientSuccess extends PatientState {
   const PatientSuccess(this.patient);
 
   @override
-  List<Object> get props => [patient as Object];
+  List<Object> get props => [];
 }
 
 final class PatientFailure extends PatientState {
