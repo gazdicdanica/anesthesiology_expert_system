@@ -4,10 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.drools.core.time.SessionPseudoClock;
-import org.hibernate.mapping.List;
 import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
@@ -540,33 +540,24 @@ public class CEPConfigTest {
     public void testBackward() {
         KieServices ks = KieServices.Factory.get();
         KieContainer kContainer = ks.getKieClasspathContainer();
-        KieSession kSession = kContainer.newKieSession("bwBase");
+        KieSession kSession = kContainer.newKieSession("bwKsession");
         assertNotNull(kSession);
 
-        java.util.List<PatientHistory> patientHistories = new ArrayList<>();
-        patientHistories.add(new PatientHistory(1, 2, 3, false));
-        patientHistories.add(new PatientHistory(2, 4, 5, true)); // Mother with heart problems
-        patientHistories.add(new PatientHistory(3, 6, 7, false));
-        patientHistories.add(new PatientHistory(4, 8, 9, true)); // Grandmother with heart problems
-        patientHistories.add(new PatientHistory(5, 10, 11, false));
+        List<PatientHistory> patientHistories = new ArrayList<>();
+        patientHistories.add(new PatientHistory(1L, 2L, 3L, false));
+        patientHistories.add(new PatientHistory(2L, 4L, 5L, true)); // Mother with heart problems
+        patientHistories.add(new PatientHistory(3L, 6L, 7L, false));
+        patientHistories.add(new PatientHistory(4L, 8L, 9L, true)); // Grandmother with heart problems
+        patientHistories.add(new PatientHistory(5L, 10L, 11L, false));
 
         for (PatientHistory ph : patientHistories) {
             kSession.insert(ph);
         }
 
-        // Run query
-        for (PatientHistory ph : patientHistories) {
-            long id = ph.getIdPatient();
-            QueryResults results = kSession.getQueryResults("familyHasHeartProblems", id);
-
-            if (results.size() > 0) {
-                System.out.println("Patient with ID " + id + " has heart problems in the family.");
-                ph.setHasHeartIssues(true); // Set the hasHeartProblems flag based on query result
-            } else {
-                System.out.println("Patient with ID " + id + " does not have heart problems in the family.");
-            }
-        }
+        kSession.insert("1");
+        kSession.fireAllRules();
 
         kSession.dispose();
     }
+
 }

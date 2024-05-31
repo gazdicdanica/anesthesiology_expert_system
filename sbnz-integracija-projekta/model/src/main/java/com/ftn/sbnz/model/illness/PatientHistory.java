@@ -13,13 +13,13 @@ public class PatientHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 
     @Position(0)
-    private long idPatient;
+    private Long idPatient;
 
     @Position(1)
-    private long motherId;
+    private Long motherId;
 
     @Position(2)
-    private long fatherId;
+    private Long fatherId;
 
     @Position(3)
     private boolean hasHeartIssues;
@@ -27,7 +27,7 @@ public class PatientHistory {
     public PatientHistory() {
     }
 
-    public PatientHistory(long idPatient, long motherId, long fatherId, boolean hasHeartIssues) {
+    public PatientHistory(Long idPatient, Long motherId, Long fatherId, boolean hasHeartIssues) {
         this.idPatient = idPatient;
         this.motherId = motherId;
         this.fatherId = fatherId;
@@ -35,11 +35,11 @@ public class PatientHistory {
     }
 
     // Getters and setters
-    public long getIdPatient() {
+    public Long getIdPatient() {
         return idPatient;
     }
 
-    public void setIdPatient(long id) {
+    public void setIdPatient(Long id) {
         this.idPatient = id;
     }
 

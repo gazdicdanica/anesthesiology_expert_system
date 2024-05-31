@@ -2,17 +2,26 @@ package backward;
 
 import com.ftn.sbnz.model.illness.PatientHistory;
 
-query hasHeartProblems(long id)
-    PatientHistory(idPatient == id, hasHeartIssues == true)
+
+
+query familyHasHeartProblems(Long id, Long mId, Long fId)
+    PatientHistory(id, mId, fId, true;) 
+    or
+    (
+        PatientHistory(mId, mMotherId, mFatherId, mHasHeartIssues;)
+        and familyHasHeartProblems(mId, mMotherId, mFatherId; )
+    )
+    or
+    (
+        PatientHistory(fId, fMotherId, fFatherId, fHasHeartIssues;)
+        and familyHasHeartProblems(fId, fMotherId, fFatherId; )
+    )
 end
 
-query ancestorHasHeartProblems(long id)
-    PatientHistory(idPatient == id, $motherId : idMother, $fatherId : idFather)
-    or ( hasHeartProblems($motherId;) )
-    or ( hasHeartProblems($fatherId;) )
-end
-
-query familyHasHeartProblems(long id)
-    hasHeartProblems(id;)
-    or ( ancestorHasHeartProblems(id;) )
+rule "1"
+when
+    String(this == "1")
+    familyHasHeartProblems(1L, 2L, 3L;)
+then
+    System.out.println("Patient has heart problems");
 end
