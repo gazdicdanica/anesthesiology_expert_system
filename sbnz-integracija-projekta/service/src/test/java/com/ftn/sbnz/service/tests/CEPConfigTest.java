@@ -3,6 +3,8 @@ package com.ftn.sbnz.service.tests;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.drools.core.time.SessionPseudoClock;
@@ -10,10 +12,12 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.QueryResults;
 
 import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
+import com.ftn.sbnz.model.illness.PatientHistory;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.patient.Patient.PatientRisk;
 import com.ftn.sbnz.model.procedure.PreOperative;
@@ -57,7 +61,6 @@ public class CEPConfigTest {
         assertEquals(patient.getAsa(), Patient.ASA.I);
         ksession.dispose();
 
-
     }
 
     @Test
@@ -93,7 +96,6 @@ public class CEPConfigTest {
         assertEquals(patient.getAsa(), Patient.ASA.II);
         ksession.dispose();
 
-
     }
 
     @Test
@@ -122,7 +124,6 @@ public class CEPConfigTest {
 
         assertEquals(patient.getAsa(), Patient.ASA.III);
         ksession.dispose();
-
 
     }
 
@@ -156,7 +157,6 @@ public class CEPConfigTest {
         preOperative.setShouldContinueProcedure(true);
         procedure.setPreOperative(preOperative);
 
-
         ksession.insert(patient);
         ksession.insert(procedure);
         ksession.insert(preOperative);
@@ -166,7 +166,6 @@ public class CEPConfigTest {
 
         assertEquals(patient.getAsa(), Patient.ASA.III);
         ksession.dispose();
-
 
     }
 
@@ -230,7 +229,8 @@ public class CEPConfigTest {
 
         int rules = ksession.fireAllRules();
         System.out.println("Rules fired: " + rules);
-        assertNotNull(procedure.getIntraOperative());;
+        assertNotNull(procedure.getIntraOperative());
+        ;
 
     }
 
@@ -267,7 +267,7 @@ public class CEPConfigTest {
         int rulesFired = ksession.fireAllRules();
         System.err.println("Rules triggered " + rulesFired);
         ksession.dispose();
-        
+
     }
 
     @Test
@@ -446,9 +446,7 @@ public class CEPConfigTest {
         System.err.println("Rules triggered " + temp);
         ksession.dispose();
 
-
     }
-
 
     @Test
     public void TestBradypneaEvent() {
@@ -486,9 +484,7 @@ public class CEPConfigTest {
         System.err.println("Rules triggered " + temp);
         ksession.dispose();
 
-
     }
-
 
     @Test
     public void testVasopressorsInfusion() {
@@ -518,7 +514,7 @@ public class CEPConfigTest {
         SAPEvent ev2 = new SAPEvent(1L, 62);
         SAPEvent ev3 = new SAPEvent(1L, 61);
         SAPEvent ev4 = new SAPEvent(1L, 59);
-        
+
         kSession.insert(ev1);
         kSession.insert(ev2);
         kSession.insert(ev3);
@@ -537,6 +533,30 @@ public class CEPConfigTest {
 
         System.out.println("Rules fired: " + rules);
         // Clean up the session
+        kSession.dispose();
+    }
+
+    @Test
+    public void testBackward() {
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kContainer = ks.getKieClasspathContainer();
+        KieSession kSession = kContainer.newKieSession("bwKsession");
+        assertNotNull(kSession);
+
+        List<PatientHistory> patientHistories = new ArrayList<>();
+        patientHistories.add(new PatientHistory(1L, 2L, 3L, false));
+        patientHistories.add(new PatientHistory(2L, 4L, 5L, true)); // Mother with heart problems
+        patientHistories.add(new PatientHistory(3L, 6L, 7L, false));
+        patientHistories.add(new PatientHistory(4L, 8L, 9L, true)); // Grandmother with heart problems
+        patientHistories.add(new PatientHistory(5L, 10L, 11L, false));
+
+        for (PatientHistory ph : patientHistories) {
+            kSession.insert(ph);
+        }
+
+        kSession.insert("1");
+        kSession.fireAllRules();
+
         kSession.dispose();
     }
 

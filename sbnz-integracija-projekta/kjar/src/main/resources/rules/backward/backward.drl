@@ -1,9 +1,27 @@
 package backward;
 
+import com.ftn.sbnz.model.illness.PatientHistory;
 
 
-query isSymptomContainedIn(String s, String i, String p):
-    Illness(s, i, p; )
-    or 
-    ( Illness(z, i, p; ) and isSymptomContainedIn(z, i, p; ) )
+
+query familyHasHeartProblems(Long id, Long mId, Long fId)
+    PatientHistory(id, mId, fId, true;) 
+    or
+    (
+        PatientHistory(mId, mMotherId, mFatherId, mHasHeartIssues;)
+        and familyHasHeartProblems(mId, mMotherId, mFatherId; )
+    )
+    or
+    (
+        PatientHistory(fId, fMotherId, fFatherId, fHasHeartIssues;)
+        and familyHasHeartProblems(fId, fMotherId, fFatherId; )
+    )
+end
+
+rule "1"
+when
+    String(this == "1")
+    familyHasHeartProblems(1L, 2L, 3L;)
+then
+    System.out.println("Patient has heart problems");
 end
