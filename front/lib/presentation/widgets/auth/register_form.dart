@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/auth_bloc/auth_bloc.dart';
 import 'package:front/models/user.dart';
 import 'package:front/presentation/widgets/auth/role_select.dart';
+import 'package:front/presentation/widgets/loading_widget.dart';
 import 'package:front/theme.dart';
-import 'package:lottie/lottie.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({super.key, required this.onSwitchAuthMode});
@@ -46,15 +46,7 @@ class _RegisterFormState extends State<RegisterForm> {
       },
       builder: (context, state) {
         if (state is AuthLoading) {
-          return Center(
-            child: SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: Center(
-                child: Lottie.asset('assets/lottie/loading.json'),
-              ),
-            ),
-          );
+          return const LoadingWidget();
         }
         
         return Form(
