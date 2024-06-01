@@ -14,7 +14,7 @@ public class Procedure {
     private Long patientId;
     private Long medicalStaffId;
 
-    private LocalDateTime date;
+    // private LocalDateTime date;
     private OperationRisk risk;
     private ProcedureUrgency urgency;
 
@@ -28,11 +28,13 @@ public class Procedure {
     public Procedure() {
     }
 
-    public Procedure(Long patientId, Long medicalStaffId, LocalDateTime date, OperationRisk risk, ProcedureUrgency urget,
+    public Procedure(Long patientId, Long medicalStaffId, 
+    // LocalDateTime date,
+     OperationRisk risk, ProcedureUrgency urget,
             PreOperative preOperative, IntraOperative intraOperative, PostOperative postOperative) {
         this.patientId = patientId;
         this.medicalStaffId = medicalStaffId;
-        this.date = date;
+        // this.date = date;
         this.risk = risk;
         this.urgency = urget;
         this.preOperative = preOperative;
@@ -64,13 +66,13 @@ public class Procedure {
         this.medicalStaffId = medicalStaffId;
     }
 
-    public LocalDateTime getDate() {
-        return date;
-    }
+    // public LocalDateTime getDate() {
+    //     return date;
+    // }
 
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
+    // public void setDate(LocalDateTime date) {
+    //     this.date = date;
+    // }
 
     public OperationRisk getRisk() {
         return risk;

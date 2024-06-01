@@ -7,6 +7,8 @@ import 'package:front/data/auth/data_provider/auth_data_provider.dart';
 import 'package:front/data/auth/repository/auth_repository.dart';
 import 'package:front/data/patient/data_provider/patient_data_provider.dart';
 import 'package:front/data/patient/repository/patient_repository.dart';
+import 'package:front/data/procedure/data_provider/procedure_data_provider.dart';
+import 'package:front/data/procedure/repository/procedure_repository.dart';
 import 'package:front/data/shared_pref/data_provider/shared_pref_data_provider.dart';
 import 'package:front/data/shared_pref/repository/shared_pref_repository.dart';
 import 'package:front/presentation/screens/init_screen.dart';
@@ -43,7 +45,12 @@ class MyApp extends StatelessWidget {
           create: (context) => PatientRepository(
             PatientDataProvider(repository),
           ),
-        )
+        ),
+        RepositoryProvider(
+          create: (context) => ProcedureRepository(
+            ProcedureDataProvider(repository),
+          ),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [

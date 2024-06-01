@@ -7,17 +7,18 @@ import 'package:front/presentation/widgets/loading_widget.dart';
 import 'package:front/theme.dart';
 
 class AddPatientScreen extends StatefulWidget {
-  const AddPatientScreen({super.key});
+  const AddPatientScreen({super.key, required this.onAddPatientTap});
+
+  final void Function(int) onAddPatientTap;
 
   @override
   State<AddPatientScreen> createState() => _AddPatientScreenState();
 }
 
 class _AddPatientScreenState extends State<AddPatientScreen> {
-
   String? jmbg;
 
-  void _setJmbg(String jmbg) {
+  void _setJmbg(String? jmbg) {
     setState(() {
       this.jmbg = jmbg;
     });
@@ -32,20 +33,22 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
             if (state is PatientFailure) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
+                  elevation: 20.0,
                   content: Text(state.error),
                   backgroundColor: Colors.red,
                 ),
               );
             }
-
             if (state is AddPatientSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
+                  elevation: 20.0,
                   content: Text('Pacijent uspešno dodat'),
                   backgroundColor: seedColor,
                 ),
               );
               // context.read<PatientBloc>().add(ResetForm());
+              _navigateToProcedures();
             }
             if (state is UpdatePatientSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -55,22 +58,31 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                 ),
               );
               // context.read<PatientBloc>().add(ResetForm());
+              _navigateToProcedures();
             }
           },
           builder: (context, state) {
             if (state is PatientLoading) return const LoadingWidget();
-        
+
             if (state is PatientSuccess) {
               return PatientForm(
                 patient: state.patient,
                 jmbg: jmbg!,
               );
             }
-        
-            return  JmbgForm(setJmbg: _setJmbg, jmbg: jmbg,);
+
+            return JmbgForm(
+              setJmbg: _setJmbg,
+              jmbg: jmbg,
+            );
           },
         ),
       ),
     );
+  }
+
+  void _navigateToProcedures() {
+    widget.onAddPatientTap(0);
+    _setJmbg(null);
   }
 }

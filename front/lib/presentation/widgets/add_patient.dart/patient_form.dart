@@ -29,33 +29,36 @@ class _PatientFormState extends State<PatientForm> {
     context.read<PatientFormBloc>().add(PatientResetForm());
 
     if (widget.patient != null) {
-      _fullnameController.text = widget.patient!.fullname;
-      _ageController.text = widget.patient!.age.toString();
-      _heightController.text = widget.patient!.height.toString();
-      _weightController.text = widget.patient!.weight.toString();
-      context.read<PatientFormBloc>().add(ToggleCheckbox(
-          field: 'hasDiabetes', value: widget.patient!.hasDiabetes));
-      context.read<PatientFormBloc>().add(ToggleCheckbox(
-          field: 'hadHeartAttack', value: widget.patient!.hadHearthAttack));
-      context.read<PatientFormBloc>().add(ToggleCheckbox(
-          field: 'hasHeartFailure', value: widget.patient!.hasHearthFailure));
-      context.read<PatientFormBloc>().add(ToggleCheckbox(
-          field: 'hasHypertension', value: widget.patient!.hasHypertension));
-      context.read<PatientFormBloc>().add(ToggleCheckbox(
-          field: 'controlledHypertension',
-          value: widget.patient!.controlledHypertension));
-      context.read<PatientFormBloc>().add(
-          ToggleCheckbox(field: 'hadStroke', value: widget.patient!.hadStroke));
-      context.read<PatientFormBloc>().add(ToggleCheckbox(
-          field: 'hasRenalFailure', value: widget.patient!.hasRenalFailure));
-      context.read<PatientFormBloc>().add(ToggleCheckbox(
-          field: 'addictions', value: widget.patient!.addictions));
-      context.read<PatientFormBloc>().add(ToggleCheckbox(
-          field: 'smokerOrAlcoholic',
-          value: widget.patient!.smokerOrAlcoholic));
-      context.read<PatientFormBloc>().add(
-          ToggleCheckbox(field: 'pregnant', value: widget.patient!.pregnant));
+      _setUpView();
     }
+  }
+
+  void _setUpView() {
+    _fullnameController.text = widget.patient!.fullname;
+    _ageController.text = widget.patient!.age.toString();
+    _heightController.text = widget.patient!.height.toString();
+    _weightController.text = widget.patient!.weight.toString();
+    context.read<PatientFormBloc>().add(ToggleCheckbox(
+        field: 'hasDiabetes', value: widget.patient!.hasDiabetes));
+    context.read<PatientFormBloc>().add(ToggleCheckbox(
+        field: 'hadHeartAttack', value: widget.patient!.hadHearthAttack));
+    context.read<PatientFormBloc>().add(ToggleCheckbox(
+        field: 'hasHeartFailure', value: widget.patient!.hasHearthFailure));
+    context.read<PatientFormBloc>().add(ToggleCheckbox(
+        field: 'hasHypertension', value: widget.patient!.hasHypertension));
+    context.read<PatientFormBloc>().add(ToggleCheckbox(
+        field: 'controlledHypertension',
+        value: widget.patient!.controlledHypertension));
+    context.read<PatientFormBloc>().add(
+        ToggleCheckbox(field: 'hadStroke', value: widget.patient!.hadStroke));
+    context.read<PatientFormBloc>().add(ToggleCheckbox(
+        field: 'hasRenalFailure', value: widget.patient!.hasRenalFailure));
+    context.read<PatientFormBloc>().add(
+        ToggleCheckbox(field: 'addictions', value: widget.patient!.addictions));
+    context.read<PatientFormBloc>().add(ToggleCheckbox(
+        field: 'smokerOrAlcoholic', value: widget.patient!.smokerOrAlcoholic));
+    context.read<PatientFormBloc>().add(
+        ToggleCheckbox(field: 'pregnant', value: widget.patient!.pregnant));
   }
 
   @override
@@ -102,8 +105,8 @@ class _PatientFormState extends State<PatientForm> {
                             : null,
                       ),
                       onChanged: (value) {
-                        context.read<PatientFormBloc>().add(
-                            TextFieldChanged(field: 'fullname', value: value.trim()));
+                        context.read<PatientFormBloc>().add(TextFieldChanged(
+                            field: 'fullname', value: value.trim()));
                       },
                     ),
                     TextFormField(
@@ -120,9 +123,8 @@ class _PatientFormState extends State<PatientForm> {
                             : null,
                       ),
                       onChanged: (value) {
-                        context
-                            .read<PatientFormBloc>()
-                            .add(TextFieldChanged(field: 'age', value: value.trim()));
+                        context.read<PatientFormBloc>().add(TextFieldChanged(
+                            field: 'age', value: value.trim()));
                       },
                       keyboardType: TextInputType.number,
                     ),
