@@ -32,7 +32,7 @@ class _RegisterFormState extends State<RegisterForm> {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Registracija uspešna.'),
-              backgroundColor: seedColor,
+              backgroundColor: snackBarColor,
             ),
           );
         }else if(state is AuthFailure){

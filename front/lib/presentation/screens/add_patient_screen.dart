@@ -44,7 +44,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
                 const SnackBar(
                   elevation: 20.0,
                   content: Text('Pacijent uspešno dodat'),
-                  backgroundColor: seedColor,
+                  backgroundColor: snackBarColor,
                 ),
               );
               // context.read<PatientBloc>().add(ResetForm());
@@ -54,7 +54,7 @@ class _AddPatientScreenState extends State<AddPatientScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('Pacijent uspešno ažuriran'),
-                  backgroundColor: seedColor,
+                  backgroundColor: snackBarColor,
                 ),
               );
               // context.read<PatientBloc>().add(ResetForm());

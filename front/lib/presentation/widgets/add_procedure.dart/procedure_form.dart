@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:front/bloc/procedure_bloc/procedure_bloc.dart';
 import 'package:front/data/procedure/repository/procedure_repository.dart';
 import 'package:front/models/patient.dart';
 import 'package:front/models/procedure.dart';
 import 'package:front/presentation/widgets/add_procedure.dart/risk_dropdown.dart';
 import 'package:front/presentation/widgets/add_procedure.dart/urgency_dropdown.dart';
+import 'package:front/theme.dart';
 
 class ProcedureForm extends StatefulWidget {
   const ProcedureForm({super.key, required this.patient});
@@ -20,7 +23,7 @@ class _ProcedureFormState extends State<ProcedureForm> {
   ProcedureUrgency? selectedUrgency;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext ctx) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -35,24 +38,54 @@ class _ProcedureFormState extends State<ProcedureForm> {
             children: [
               Expanded(
                 child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Unesite podatke o operaciji',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      UrgencyDropdown(
-                        selectUrgency: _selectUrgency,
-                      ),
-                      const SizedBox(height: 30),
-                      RiskDropdown(
-                        selectRisk: _selectRisk,
-                      ),
-                    ],
+                  child: BlocConsumer<ProcedureBloc, ProcedureState>(
+                    listener: (context, state) {
+                      if (state is ProcedureSuccess) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Operacija uspešno dodata.'),
+                            backgroundColor: snackBarColor,
+                          ),
+                        );
+                      } else if (state is ProcedureError) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(state.message),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    
+                    },
+                    builder: (context, state) {
+                      return Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'Unesite podatke o operaciji',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          UrgencyDropdown(
+                            validate: _validate,
+                            selectUrgency: _selectUrgency,
+                            error: state is ProcedureFormValuesState
+                                ? state.urgencyError
+                                : null,
+                          ),
+                          const SizedBox(height: 30),
+                          RiskDropdown(
+                            validate: _validate,
+                            selectRisk: _selectRisk,
+                            error: state is ProcedureFormValuesState
+                                ? state.riskError
+                                : null,
+                          ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
@@ -61,6 +94,7 @@ class _ProcedureFormState extends State<ProcedureForm> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
+                    // _validate(context);
                     _addProcedure(context);
                   },
                   child: const Text('Sačuvaj'),
@@ -82,16 +116,18 @@ class _ProcedureFormState extends State<ProcedureForm> {
     selectedRisk = risk;
   }
 
+  void _validate(BuildContext context){
+    
+    // BlocProvider.of<ProcedureBloc>(context).add(
+    //   ValidateProcedureForm(
+    //     selectedUrgency,
+    //     selectedRisk,
+    //   ),
+    // );
+  }
+
   void _addProcedure(BuildContext context) {
-    context
-        .read<ProcedureRepository>()
-        .addProcedure(
-          widget.patient.id,
-          selectedRisk!,
-          selectedUrgency!,
-        )
-        .then(
-          (value) => print(value),
-        );
+    context.read<ProcedureBloc>().add(AddProcedure(widget.patient.id, selectedUrgency!, selectedRisk!));
+    
   }
 }
