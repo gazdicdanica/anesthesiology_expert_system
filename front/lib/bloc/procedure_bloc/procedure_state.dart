@@ -56,10 +56,3 @@ final class ProcedureError extends ProcedureState {
 }
 
 final class ProcedureLoading extends ProcedureState {}
-
-
-final class ProcedurePatientSuccess extends ProcedureState {
-  final Patient patient;
-
-  const ProcedurePatientSuccess(this.patient);
-}

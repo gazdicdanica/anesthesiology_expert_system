@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/procedure_bloc/procedure_bloc.dart';
-import 'package:front/presentation/widgets/procedure/procedure_card.dart';
+import 'package:front/presentation/widgets/procedure/list/procedure_card.dart';
 import 'package:front/presentation/widgets/loading_widget.dart';
 import 'package:front/theme.dart';
 

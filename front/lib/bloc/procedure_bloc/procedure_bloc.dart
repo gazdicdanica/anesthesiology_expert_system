@@ -13,21 +13,12 @@ class ProcedureBloc extends Bloc<ProcedureEvent, ProcedureState> {
   final ProcedureRepository _procedureRepository;
 
   ProcedureBloc(this._procedureRepository) : super(ProcedureInitial()) {
-    // on<ValidateProcedureForm>(_validateForm);
     on<AddProcedure>(_addProcedure);
     on<FetchProcedures>(_fetchProcedures);
     on<OpenProcedure>(_openProcedure);
     on<CloseProcedure>(_closeProcedure);
   }
 
-  // _validateForm(ValidateProcedureForm event, emit) {
-  //   final urgency = event.urgency;
-  //   final risk = event.risk;
-
-  //   final state = this.state as ProcedureFormValuesState;
-
-    
-  // }
   _addProcedure(AddProcedure event, emit) async {
     emit(ProcedureLoading());
     final patientId = event.patientId;

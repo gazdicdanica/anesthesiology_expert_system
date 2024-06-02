@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/patient_bloc/patient_bloc.dart';
 import 'package:front/bloc/procedure_bloc/procedure_bloc.dart';
 import 'package:front/presentation/widgets/add_procedure/procedure_form.dart';
-import 'package:front/presentation/widgets/procedure/procedure_list.dart';
-import 'package:front/presentation/widgets/procedure/procedure_widget.dart';
+import 'package:front/presentation/widgets/procedure/list/procedure_list.dart';
+import 'package:front/presentation/widgets/procedure/single/procedure_widget.dart';
 
 class ProceduresScreen extends StatelessWidget {
   const ProceduresScreen({super.key});

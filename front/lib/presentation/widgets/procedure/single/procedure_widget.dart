@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/patient_bloc/patient_bloc.dart';
 import 'package:front/bloc/procedure_bloc/procedure_bloc.dart';
+import 'package:front/bloc/procedure_single_bloc/procedure_single_bloc.dart';
 import 'package:front/models/patient.dart';
 import 'package:front/models/procedure.dart';
+import 'package:front/presentation/widgets/loading_widget.dart';
+import 'package:front/presentation/widgets/procedure/single/patient_info.dart';
 
 class ProcedureWidget extends StatefulWidget {
   const ProcedureWidget({super.key, required this.procedure});
@@ -20,6 +23,9 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
   @override
   void initState() {
     super.initState();
+
+    BlocProvider.of<ProcedureSingleBloc>(context)
+        .add(FetchProcedurePatient(widget.procedure.id));
   }
 
   @override
@@ -36,7 +42,26 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
       ),
       body: SafeArea(
         child: Center(
-          child: Text(widget.procedure.name),
+          child: BlocBuilder<ProcedureSingleBloc, ProcedureSingleState>(
+            builder: (context, state) {
+              if (state is ProcedureSingleLoading) {
+                return const LoadingWidget();
+              }
+              if (state is ProcedurePatientSuccess) {
+                patient = state.patient;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+                  child: Column(
+                    children: [
+                      PatientInfo(patient: patient),
+                    ],
+                  ),
+                );
+              }
+
+              return const SizedBox();
+            },
+          ),
         ),
       ),
     );
