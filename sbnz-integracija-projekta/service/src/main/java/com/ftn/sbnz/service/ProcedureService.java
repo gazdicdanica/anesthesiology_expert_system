@@ -1,13 +1,19 @@
 package com.ftn.sbnz.service;
 
+import java.io.InputStream;
 import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.kie.api.builder.Message;
+import org.kie.api.builder.Results;
+import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.internal.utils.KieHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.drools.decisiontable.ExternalSpreadsheetCompiler;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
@@ -35,7 +41,6 @@ public class ProcedureService implements IProcedureService {
 
         @Autowired
         private KieContainer kieContainer;
-
 
         @Override
         public Procedure addProcedure(AddProcedureDTO addProcedureDTO, Principal u) {
@@ -86,15 +91,50 @@ public class ProcedureService implements IProcedureService {
                 procedureRepository.save(procedure);
 
                 KieSession kieSession = kieContainer.newKieSession("baseKsession");
-		kieSession.insert(patient);
+                kieSession.insert(patient);
                 kieSession.insert(procedure);
                 kieSession.insert(preOperative);
-		int rules = kieSession.fireAllRules();
-                System.out.println("Rules fired: " + rules);
-		kieSession.dispose();
+
+                kieSession.getAgenda().getAgendaGroup("RCRI").setFocus();
+                int agendaGroupRules = kieSession.fireAllRules();
+                int rules = kieSession.fireAllRules();
+                System.out.println("Rules fired: " + (rules + agendaGroupRules));
+                kieSession.dispose();
+
+                InputStream template = ProcedureService.class.getResourceAsStream("/templatetable/RiskAssesment.drt");
+                InputStream data = ProcedureService.class
+                                .getResourceAsStream("/templatetable/patient_risk_cutoff.xlsx");
+
+                ExternalSpreadsheetCompiler converter = new ExternalSpreadsheetCompiler();
+                String drl = converter.compile(data, template, 7, 6);
+                KieSession ksession = this.createKieSessionFromDRL(drl);
+                ksession.insert(patient);
+                ksession.insert(procedure);
+                ksession.insert(preOperative);
+
+                ksession.fireAllRules();
+                ksession.dispose();
 
                 System.out.println(patient);
                 return procedure;
+        }
+
+        private KieSession createKieSessionFromDRL(String drl) {
+                KieHelper kieHelper = new KieHelper();
+                kieHelper.addContent(drl, ResourceType.DRL);
+
+                Results results = kieHelper.verify();
+
+                if (results.hasMessages(Message.Level.WARNING, Message.Level.ERROR)) {
+                        List<Message> messages = results.getMessages(Message.Level.WARNING, Message.Level.ERROR);
+                        for (Message message : messages) {
+                                System.out.println("Error: " + message.getText());
+                        }
+
+                        throw new IllegalStateException("Compilation errors were found. Check the logs.");
+                }
+
+                return kieHelper.build().newKieSession();
         }
 
 }
