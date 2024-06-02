@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:front/bloc/patient_bloc/patient_bloc.dart';
 import 'package:front/bloc/procedure_bloc/procedure_bloc.dart';
-import 'package:front/data/procedure/repository/procedure_repository.dart';
 import 'package:front/models/patient.dart';
 import 'package:front/models/procedure.dart';
-import 'package:front/presentation/widgets/add_procedure.dart/risk_dropdown.dart';
-import 'package:front/presentation/widgets/add_procedure.dart/urgency_dropdown.dart';
+import 'package:front/presentation/widgets/add_procedure/risk_dropdown.dart';
+import 'package:front/presentation/widgets/add_procedure/urgency_dropdown.dart';
 import 'package:front/theme.dart';
 
 class ProcedureForm extends StatefulWidget {
@@ -22,13 +21,18 @@ class _ProcedureFormState extends State<ProcedureForm> {
   OperationRisk? selectedRisk;
   ProcedureUrgency? selectedUrgency;
 
+  final _procedureNameController = TextEditingController();
+
   @override
   Widget build(BuildContext ctx) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () {
+            BlocProvider.of<PatientBloc>(context).add(ResetForm());
+            BlocProvider.of<ProcedureBloc>(context).add(const CloseProcedure());
+          },
         ),
       ),
       body: SafeArea(
@@ -55,7 +59,6 @@ class _ProcedureFormState extends State<ProcedureForm> {
                           ),
                         );
                       }
-                    
                     },
                     builder: (context, state) {
                       return Column(
@@ -68,6 +71,14 @@ class _ProcedureFormState extends State<ProcedureForm> {
                             ),
                           ),
                           const SizedBox(height: 20),
+                          TextFormField(
+                            controller: _procedureNameController,
+                            decoration: const InputDecoration(
+                              labelText: 'Naziv operacije',
+                              prefixIcon: Icon(Icons.abc, color: seedColor),
+                            ),
+                          ),
+                          const SizedBox(height: 30),
                           UrgencyDropdown(
                             validate: _validate,
                             selectUrgency: _selectUrgency,
@@ -116,8 +127,7 @@ class _ProcedureFormState extends State<ProcedureForm> {
     selectedRisk = risk;
   }
 
-  void _validate(BuildContext context){
-    
+  void _validate(BuildContext context) {
     // BlocProvider.of<ProcedureBloc>(context).add(
     //   ValidateProcedureForm(
     //     selectedUrgency,
@@ -127,7 +137,8 @@ class _ProcedureFormState extends State<ProcedureForm> {
   }
 
   void _addProcedure(BuildContext context) {
-    context.read<ProcedureBloc>().add(AddProcedure(widget.patient.id, selectedUrgency!, selectedRisk!));
-    
+    context.read<ProcedureBloc>().add(AddProcedure(widget.patient.id,
+        selectedUrgency!, selectedRisk!, _procedureNameController.text.trim()));
+    context.read<PatientBloc>().add(ResetForm());
   }
 }

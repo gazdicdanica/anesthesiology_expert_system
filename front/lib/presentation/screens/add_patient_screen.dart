@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/patient_bloc/patient_bloc.dart';
-import 'package:front/presentation/widgets/add_patient.dart/jmbg_form.dart';
-import 'package:front/presentation/widgets/add_patient.dart/patient_form.dart';
+import 'package:front/presentation/widgets/add_patient/jmbg_form.dart';
+import 'package:front/presentation/widgets/add_patient/patient_form.dart';
 import 'package:front/presentation/widgets/loading_widget.dart';
 import 'package:front/theme.dart';
 

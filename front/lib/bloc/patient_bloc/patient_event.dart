@@ -45,12 +45,3 @@ final class UpdatePatient extends PatientEvent {
   @override
   List<Object> get props => [patient];
 }
-
-final class AddProcedure extends PatientEvent {
-  final Patient patient;
-
-  const AddProcedure(this.patient);
-
-  @override
-  List<Object> get props => [patient];
-}

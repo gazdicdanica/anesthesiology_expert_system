@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/patient_bloc/patient_bloc.dart';
-import 'package:front/presentation/widgets/add_procedure.dart/procedure_form.dart';
+import 'package:front/bloc/procedure_bloc/procedure_bloc.dart';
+import 'package:front/presentation/widgets/add_procedure/procedure_form.dart';
+import 'package:front/presentation/widgets/procedure/procedure_list.dart';
+import 'package:front/presentation/widgets/procedure/procedure_widget.dart';
 
 class ProceduresScreen extends StatelessWidget {
   const ProceduresScreen({super.key});
@@ -19,11 +22,14 @@ class ProceduresScreen extends StatelessWidget {
             patient: state.patient,
           );
         }
-
-        return const Center(
-          child: Text('Index 0: Procedures'),
+        return BlocBuilder<ProcedureBloc, ProcedureState>(
+          builder: (context, state) {
+            if(state is ProcedureSuccess){
+              return ProcedureWidget(procedure: state.procedure,);
+            }
+            return const ProcedureList();
+          },
         );
-
       },
     );
   }

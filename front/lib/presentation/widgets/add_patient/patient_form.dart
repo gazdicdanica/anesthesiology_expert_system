@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/patient_bloc/patient_bloc.dart';
 import 'package:front/bloc/patient_form_bloc/patient_form_bloc.dart';
 import 'package:front/models/patient.dart';
-import 'package:front/presentation/widgets/add_patient.dart/checkbox_form.dart';
+import 'package:front/presentation/widgets/add_patient/checkbox_form.dart';
 import 'package:front/theme.dart';
 
 class PatientForm extends StatefulWidget {

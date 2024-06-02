@@ -11,13 +11,15 @@ public class PostOperative {
     private Long id;
 
     private int hemoglobin;
+    private boolean isReleased;
 
 
     public PostOperative() {
     }
 
-    public PostOperative(int hemoglobinValue) {
+    public PostOperative(int hemoglobinValue, boolean isReleased) {
         this.hemoglobin = hemoglobinValue;
+        this.isReleased = isReleased;
     }
 
     public int getHemoglobin() {
@@ -26,5 +28,13 @@ public class PostOperative {
 
     public void setHemoglobin(int hemoglobinValue) {
         this.hemoglobin = hemoglobinValue;
+    }
+
+    public boolean isReleased() {
+        return isReleased;
+    }
+
+    public void setReleased(boolean released) {
+        isReleased = released;
     }
 }

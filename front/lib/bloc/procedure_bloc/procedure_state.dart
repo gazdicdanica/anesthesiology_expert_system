@@ -4,7 +4,7 @@ sealed class ProcedureState {
   const ProcedureState();
 }
 
-// final class ProcedureInitial extends ProcedureState {}
+final class ProcedureInitial extends ProcedureState {}
 
 final class ProcedureFormValuesState extends ProcedureState {
   final ProcedureUrgency? urgency;
@@ -43,6 +43,12 @@ final class ProcedureSuccess extends ProcedureState {
   const ProcedureSuccess(this.procedure);
 }
 
+final class ProceduresSuccess extends ProcedureState {
+  final List<Procedure> procedures;
+
+  const ProceduresSuccess(this.procedures);
+}
+
 final class ProcedureError extends ProcedureState {
   final String message;
 
@@ -50,3 +56,10 @@ final class ProcedureError extends ProcedureState {
 }
 
 final class ProcedureLoading extends ProcedureState {}
+
+
+final class ProcedurePatientSuccess extends ProcedureState {
+  final Patient patient;
+
+  const ProcedurePatientSuccess(this.patient);
+}

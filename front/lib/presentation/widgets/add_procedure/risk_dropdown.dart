@@ -23,7 +23,7 @@ class _RiskDropdownState extends State<RiskDropdown> {
     return DropdownButtonFormField<OperationRisk>(
       style: Theme.of(context).textTheme.bodyLarge,
       decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.error_outline),
+        prefixIcon: const Icon(Icons.priority_high),
         prefixIconColor: Colors.blue,
         labelText: 'Operativni rizik',
         contentPadding:

@@ -28,6 +28,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
         children: widgetOptions,
       ),
       bottomNavigationBar: NavigationBar(
+        elevation: 20,
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onItemTap,
         destinations: const [

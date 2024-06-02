@@ -2,6 +2,7 @@ class Procedure {
   final int id;
   final int patientId;
   final int medicalStaffId;
+  final String name;
   final OperationRisk risk;
   final ProcedureUrgency urgency;
   final PreOperative preOperative;
@@ -11,6 +12,7 @@ class Procedure {
     required this.id,
     required this.patientId,
     required this.medicalStaffId,
+    required this.name,
     required this.risk,
     required this.urgency,
     required this.preOperative,
@@ -22,6 +24,7 @@ class Procedure {
       id: json['id'],
       patientId: json['patientId'],
       medicalStaffId: json['medicalStaffId'],
+      name: json['name'],
       risk: getRisk(json['risk']),
       urgency: getUrgency(json['urgency']),
       preOperative: PreOperative.fromJson(json['preOperative']),
@@ -45,6 +48,19 @@ ProcedureUrgency getUrgency(String urgency) {
   }
 }
 
+String getUrgencyString(ProcedureUrgency urgency) {
+  switch (urgency) {
+    case ProcedureUrgency.IMMEDIATE:
+      return 'Neposredna';
+    case ProcedureUrgency.URGENT:
+      return 'Urgentna';
+    case ProcedureUrgency.TIME_SENSITIVE:
+      return 'Vremenski zavisna';
+    case ProcedureUrgency.ELECTIVE:
+      return 'Elektivna';
+  }
+}
+
 OperationRisk getRisk(String risk) {
   switch (risk) {
     case 'LOW':
@@ -55,6 +71,17 @@ OperationRisk getRisk(String risk) {
       return OperationRisk.HIGH;
     default:
       return OperationRisk.LOW;
+  }
+}
+
+String getRiskString(OperationRisk risk) {
+  switch (risk) {
+    case OperationRisk.LOW:
+      return 'Nizak';
+    case OperationRisk.MEDIUM:
+      return 'Srednji';
+    case OperationRisk.HIGH:
+      return 'Visok';
   }
 }
 
