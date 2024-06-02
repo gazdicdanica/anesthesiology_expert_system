@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:front/models/patient.dart';
+import 'package:front/presentation/widgets/procedure/single/chip.dart';
 import 'package:front/theme.dart';
 
 class PatientInfo extends StatefulWidget {
@@ -14,6 +15,8 @@ class PatientInfo extends StatefulWidget {
 class _PatientInfoState extends State<PatientInfo> {
   bool isExpanded = false;
 
+  final expansionController = ExpansionTileController();
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -22,6 +25,7 @@ class _PatientInfoState extends State<PatientInfo> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: ExpansionTile(
+        controller: expansionController,
         onExpansionChanged: (value) => setState(() {
           isExpanded = value;
         }),
@@ -102,6 +106,90 @@ class _PatientInfoState extends State<PatientInfo> {
                         ),
                       ],
                     ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    if (widget.patient.asa != null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'ASA',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          Text(
+                            'ASA ${widget.patient.asa.toString().split(".")[1]}',
+                            style:
+                                Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: textColor,
+                                    ),
+                          ),
+                        ],
+                      ),
+                    const SizedBox(width: 50),
+                    if(widget.patient.risk != null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Stepen rizika',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                          Text(
+                            getRiskString(widget.patient.risk!),
+                            style:
+                                Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: textColor,
+                                    ),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
+                const Divider(),
+                const SizedBox(height: 8),
+                Wrap(
+                  // crossAxisAlignment: WrapCrossAlignment.center,
+                  alignment: WrapAlignment.spaceBetween,
+                  spacing: 20,
+                  runSpacing: 10,
+                  runAlignment: WrapAlignment.spaceEvenly,
+                  children: [
+                    if (widget.patient.hasDiabetes)
+                      const CustomChip(label: 'Dijabetes'),
+                    if (widget.patient.hasDiabetes &&
+                        widget.patient.isDMControlled)
+                      const CustomChip(label: 'Kontrolisani dijabetes'),
+                    if (widget.patient.hasHypertension)
+                      const CustomChip(label: 'Hipertenzija'),
+                    if (widget.patient.hasHypertension &&
+                        widget.patient.controlledHypertension)
+                      const CustomChip(label: 'Kontrolisana hipertenzija'),
+                    if (widget.patient.hadHearthAttack)
+                      const CustomChip(label: 'Infarkt miokarda'),
+                    if (widget.patient.hasHearthFailure)
+                      const CustomChip(label: 'Srčana insuficijencija'),
+                    if (widget.patient.hadStroke)
+                      const CustomChip(label: 'Moždani udar'),
+                    if (widget.patient.hasRenalFailure)
+                      const CustomChip(label: 'Bubrežna insuficijencija'),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Divider(),
+                const SizedBox(height: 8),
+                Wrap(
+                  children: [
+                    if (widget.patient.pregnant)
+                      const CustomChip(label: 'Trudnoća'),
+                    if (widget.patient.smokerOrAlcoholic)
+                      const CustomChip(label: 'Pušač/alkoholičar'),
+                    if (widget.patient.addictions)
+                      const CustomChip(label: 'Zavisnosti'),
                   ],
                 ),
               ],

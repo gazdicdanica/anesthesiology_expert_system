@@ -61,5 +61,10 @@ public class PatientService implements IPatientService{
         oldPatient.setHasRenalFailure(patient.isHasRenalFailure());
         return patientRepository.save(oldPatient);
     }
+
+    @Override
+    public Patient save(Patient patient) {
+        return patientRepository.save(patient);
+    }
     
 }

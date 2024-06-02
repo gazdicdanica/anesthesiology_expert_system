@@ -4,6 +4,7 @@ import java.security.Principal;
 import java.util.List;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
+import com.ftn.sbnz.dto.PreoperativeDTO;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.Procedure;
 
@@ -14,5 +15,7 @@ public interface IProcedureService {
     List<Procedure> getCurrentProcedures(Principal u);
 
     Patient getPatientByProcedure(Long id);
-    
-} 
+
+    Procedure updatePreoperative(Long id, PreoperativeDTO preoperativeDTO);
+
+}

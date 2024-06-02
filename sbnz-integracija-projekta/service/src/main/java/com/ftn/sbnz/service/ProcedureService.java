@@ -4,10 +4,13 @@ import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
+import com.ftn.sbnz.dto.PreoperativeDTO;
 import com.ftn.sbnz.exception.EntityNotFoundException;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.PreOperative;
@@ -29,6 +32,10 @@ public class ProcedureService implements IProcedureService {
 
         @Autowired
         private IPatientService patientService;
+
+        @Autowired
+        private KieContainer kieContainer;
+
 
         @Override
         public Procedure addProcedure(AddProcedureDTO addProcedureDTO, Principal u) {
@@ -61,6 +68,33 @@ public class ProcedureService implements IProcedureService {
                 Procedure procedure = procedureRepository.findById(id)
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
                 return patientService.findById(procedure.getPatientId());
+        }
+
+        @Override
+        public Procedure updatePreoperative(Long id, PreoperativeDTO preoperativeDTO) {
+                Procedure procedure = procedureRepository.findById(id)
+                                .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
+                PreOperative preOperative = procedure.getPreOperative();
+                preOperative.setSIB(preoperativeDTO.getSIB());
+                preOperative.setHBA1C(preoperativeDTO.getHBA1C());
+                preOperative.setCreatinine(preoperativeDTO.getCreatinine());
+                Patient patient = patientService.findById(procedure.getPatientId());
+                patient.setBasalSAP(preoperativeDTO.getSAP());
+                patientService.save(patient);
+                procedure.setPreOperative(preOperative);
+
+                procedureRepository.save(procedure);
+
+                KieSession kieSession = kieContainer.newKieSession("baseKsession");
+		kieSession.insert(patient);
+                kieSession.insert(procedure);
+                kieSession.insert(preOperative);
+		int rules = kieSession.fireAllRules();
+                System.out.println("Rules fired: " + rules);
+		kieSession.dispose();
+
+                System.out.println(patient);
+                return procedure;
         }
 
 }
