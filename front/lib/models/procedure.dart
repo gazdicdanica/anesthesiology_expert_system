@@ -155,16 +155,19 @@ class PreOperative {
 class PostOperative {
   final int id;
   final int hemoglobin;
+  final bool isReleased;
 
   PostOperative({
     required this.id,
     required this.hemoglobin,
+    required this.isReleased,
   });
 
   factory PostOperative.fromJson(Map<String, dynamic> json) {
     return PostOperative(
       id: json['id'],
       hemoglobin: json['hemoglobin'],
+      isReleased: json['isReleased'],
     );
   }
 
@@ -172,6 +175,7 @@ class PostOperative {
     return {
       'id': id,
       'hemoglobin': hemoglobin,
+      'isReleased': isReleased,
     };
   }
 }
