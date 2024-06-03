@@ -1,6 +1,7 @@
 package com.ftn.sbnz.service.iservice;
 
 import com.ftn.sbnz.dto.AddPatientDTO;
+import com.ftn.sbnz.dto.AncestorHeartProblemsDTO;
 import com.ftn.sbnz.model.patient.Patient;
 
 public interface IPatientService {
@@ -9,4 +10,8 @@ public interface IPatientService {
     Patient addPatient(AddPatientDTO addPatientDTO);
 
     Patient updatePatient(AddPatientDTO patient);
+
+    void generatePatientHistory(Long idPatient, int depth);
+
+    AncestorHeartProblemsDTO ancestorHadhartProbles(Long patientId);
 }

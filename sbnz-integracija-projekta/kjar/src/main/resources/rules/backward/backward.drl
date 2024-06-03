@@ -18,10 +18,14 @@ query familyHasHeartProblems(Long id, Long mId, Long fId)
     )
 end
 
-rule "1"
+rule "Backward chaining - Family has heart problems"
 when
-    String(this == "1")
-    familyHasHeartProblems(1L, 2L, 3L;)
+    $p: Patient($id : id)
+    $ph: PatientHistory(idPatient == $id, $mId : motherId, $fId : fatherId)
+    familyHasHeartProblems($id, $mId, $fId;)
 then
+    modify($p){
+        setHasCVSFamilyHistory(true);
+    }
     System.out.println("Patient has heart problems");
 end
