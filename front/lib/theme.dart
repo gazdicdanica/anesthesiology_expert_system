@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 const textColor = Color.fromARGB(255, 72, 75, 73);
 const seedColor = Color.fromARGB(255, 64, 123, 255);
+const snackBarColor = Color.fromARGB(255, 40,78,162);
 
 final theme = ThemeData.light().copyWith(
   colorScheme:

@@ -12,6 +12,7 @@ rule "Controlled DM by SIB"
         $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
         eval($preOp.getSIB() <= 8) && eval($preOp.getSIB() > 0)
     then
+        System.out.println("Controlled DM by SIB");
         modify($p){
             setDMControlled(true);
         }
@@ -23,6 +24,7 @@ rule "Uncotrolled DM by SIB"
         $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
         eval($preOp.getSIB() > 8)
     then
+        System.out.println("Uncotrolled DM by SIB");
         modify($p){
             setDMControlled(false);
         }
@@ -34,6 +36,7 @@ rule "Controlled DM by HbA1c"
         $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
         eval($preOp.getHBA1C() <= 7) && eval($preOp.getHBA1C() > 0)
     then
+        System.out.println("Controlled DM by HbA1c");
         modify($p){
             setDMControlled(true);
         }
@@ -45,6 +48,7 @@ rule "Uncotrolled DM by HbA1c"
         $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
         eval($preOp.getHBA1C() > 7)
     then
+        System.out.println("Uncotrolled DM by HbA1c");
         modify($p){
             setDMControlled(false);
         }
@@ -56,6 +60,7 @@ rule "Undiagnosed DM"
         $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
         eval($preOp.getSIB() > 6)
     then
+        System.out.println("Undiagnosed DM");
         modify($preOp){
             setShouldContinueProcedure(false);
         }
@@ -69,6 +74,7 @@ rule "High risk operation"
         $p: Patient()
         $proc: Procedure(patientId == $p.getId(), risk == Procedure.OperationRisk.HIGH)
     then
+        System.out.println("High risk operation");
         modify($p){
             setRCRIScore($p.getRCRIScore() + 1);
         }
@@ -81,6 +87,7 @@ rule "Ischemic heart disease"
         $p: Patient(hadHearthAttack == true)
         $proc: Procedure(patientId == $p.getId())
     then
+        System.out.println("Ischemic heart disease");
         modify($p){
             setRCRIScore($p.getRCRIScore() + 1);
         }
@@ -93,6 +100,7 @@ rule "Heart failure"
         $p: Patient(hasHearthFailure == true)
         $proc: Procedure(patientId == $p.getId())
     then
+        System.out.println("Heart failure");
         modify($p){
             setRCRIScore($p.getRCRIScore() + 1);
         }
@@ -105,6 +113,7 @@ rule "Cerebrovascular disease"
         $p: Patient(hadStroke == true)
         $proc: Procedure(patientId == $p.getId())
     then
+        System.out.println("Cerebrovascular disease");
         modify($p){
             setRCRIScore($p.getRCRIScore() + 1);
         }
@@ -117,6 +126,7 @@ rule "Has diabetes"
         $p: Patient(hasDiabetes == true)
         $proc: Procedure(patientId == $p.getId())
     then
+        System.out.println("Has diabetes");
         modify($p){
             setRCRIScore($p.getRCRIScore() + 1);
         }
@@ -126,9 +136,10 @@ rule "Elevated creatinine"
     agenda-group "RCRI"
     lock-on-active true
     when 
-        $p: Patient(hasRenalFailure == true)
+        $p: Patient()
         $proc: Procedure(patientId == $p.getId(), preOperative.creatinine > 2)
     then
+        System.out.println("Elevated creatinine");
         modify($p){
             setRCRIScore($p.getRCRIScore() + 1);
         }
@@ -150,6 +161,7 @@ rule "Classify ASA I"
             !pregnant
         )
     then
+        System.out.println("ASA I");
         modify($patient){
             setAsa(Patient.ASA.I);
             }
@@ -165,6 +177,7 @@ rule "Classify ASA II"
             (BMI >= 30 && BMI < 40)
         )
     then
+        System.out.println("ASA II");
         modify($patient){
             setAsa(Patient.ASA.II);
             }
@@ -183,6 +196,7 @@ rule "Classify ASA III"
             ) 
         )
     then
+        System.out.println("ASA III");
         modify($patient){
             setAsa(Patient.ASA.III);
             }
@@ -197,6 +211,7 @@ rule "Classify ASA IV"
             hasRenalFailure 
         )
     then
+        System.out.println("ASA IV");
         modify($patient){
             setAsa(Patient.ASA.IV);
             }
@@ -207,6 +222,7 @@ rule "ASA I and ASA II start operation"
         $patient : Patient(asa == Patient.ASA.I || asa == Patient.ASA.II)
         $procedure: Procedure(patientId == $patient.getId(), $preOp : preOperative)
     then
+        System.out.println("ASA I and ASA II start operation");
         modify($preOp){
             setShouldContinueProcedure(true);
         }
@@ -217,6 +233,7 @@ rule "ASA III start operation"
         $patient : Patient(asa == Patient.ASA.III)
         $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.ProcedureUrgency.IMMEDIATE || urgency == Procedure.ProcedureUrgency.URGENT || urgency == Procedure.ProcedureUrgency.TIME_SENSITIVE), $preOp : preOperative)
     then
+        System.out.println("ASA III start operation");
         modify($preOp){
             setShouldContinueProcedure(true);
         }
@@ -228,7 +245,7 @@ rule "ASA III postpone operation"
         $procedure: Procedure(patientId == $patient.getId(), urgency == Procedure.ProcedureUrgency.ELECTIVE, $preOp : preOperative)
     then
         // postpone operation
-        System.out.println("Postpone operation");
+        System.out.println("ASA III Postpone operation");
         modify($preOp){
             setShouldContinueProcedure(false);
         }
@@ -240,6 +257,7 @@ rule "ASA IV start operation"
         $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.ProcedureUrgency.IMMEDIATE || urgency == Procedure.ProcedureUrgency.URGENT), $preOp : preOperative)
     then
         // start operation
+        System.out.println("ASA IV start operation");
         modify($preOp){
             setShouldContinueProcedure(true);
         }
@@ -251,6 +269,7 @@ rule "ASA IV postpone operation"
         $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.ProcedureUrgency.TIME_SENSITIVE || urgency == Procedure.ProcedureUrgency.ELECTIVE), $preOp : preOperative)
     then
         // postpone operation
+        System.out.println("ASA IV Postpone operation");
         modify($preOp){
             setShouldContinueProcedure(false);
         }
@@ -317,6 +336,7 @@ end
 
 // monitoring rules
 rule "noninvasive monitoring - low and medium risk patient"
+activation-group "monitoring"
     when
         $patient: Patient(risk == Patient.PatientRisk.LOW || risk == Patient.PatientRisk.MEDIUM)
         $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.LOW || risk == Procedure.OperationRisk.MEDIUM)
@@ -325,10 +345,11 @@ rule "noninvasive monitoring - low and medium risk patient"
             setIntraOperative(new IntraOperative());
         }
 
-        System.out.println("noninvasive monitoring SAP, three-lead ECG");
+        System.err.println("noninvasive monitoring SAP, three-lead ECG");
 end
 
 rule "noninvasive monitoring - high risk patient"
+activation-group "monitoring"
     when
         $patient: Patient(risk == Patient.PatientRisk.HIGH)
         $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.LOW)
@@ -340,6 +361,7 @@ rule "noninvasive monitoring - high risk patient"
 end
 
 rule "invasive monitoring - high risk patient"
+activation-group "monitoring"
     when
         $patient: Patient(risk == Patient.PatientRisk.HIGH)
         $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.HIGH || risk == Procedure.OperationRisk.MEDIUM)
@@ -351,6 +373,7 @@ rule "invasive monitoring - high risk patient"
 end
 
 rule "invasive monitoring - low and medium risk patient"
+activation-group "monitoring"
     when
         $patient: Patient(risk == Patient.PatientRisk.LOW || risk == Patient.PatientRisk.MEDIUM)
         $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.HIGH)

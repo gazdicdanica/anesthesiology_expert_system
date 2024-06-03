@@ -213,7 +213,7 @@ public class CEPConfigTest {
 
         Patient patient = new Patient();
         patient.setId(1L);
-        patient.setRisk(PatientRisk.HIGH);
+        patient.setRisk(PatientRisk.LOW);
 
         PreOperative preOperative = new PreOperative();
         preOperative.setShouldContinueProcedure(true);
@@ -221,7 +221,7 @@ public class CEPConfigTest {
         procedure.setId(1L);
         procedure.setPreOperative(preOperative);
         procedure.setPatientId(1L);
-        procedure.setRisk(OperationRisk.HIGH);
+        procedure.setRisk(OperationRisk.LOW);
 
         ksession.insert(patient);
         ksession.insert(procedure);

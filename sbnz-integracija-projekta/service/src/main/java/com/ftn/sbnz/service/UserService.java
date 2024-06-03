@@ -6,6 +6,9 @@ import com.ftn.sbnz.dto.RegisterDTO;
 import com.ftn.sbnz.exception.BadRequestException;
 import com.ftn.sbnz.model.user.User;
 import com.ftn.sbnz.repository.UserRepository;
+
+import java.util.Optional;
+
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.slf4j.Logger;
@@ -70,5 +73,10 @@ public class UserService implements IUserService {
 		String jwt = JwtUtil.generateToken(user.getUsername());
 
 		return jwt;
+	}
+
+	@Override
+	public Optional<User> findByUsername(String username) {
+		return userRepository.findByUsername(username);
 	}
 }

@@ -27,6 +27,10 @@ public class PatientService implements IPatientService{
         return patient;
     }
 
+    public Patient findById(Long id){
+        return patientRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Pacijent nije pronadjen"));
+    }
+
     @Override
     public Patient addPatient(AddPatientDTO addPatientDTO) {
         if(patientRepository.findByJmbg(addPatientDTO.getJmbg()).isPresent()){
@@ -56,6 +60,11 @@ public class PatientService implements IPatientService{
         oldPatient.setHasHearthFailure(patient.isHasHearthFailure());
         oldPatient.setHasRenalFailure(patient.isHasRenalFailure());
         return patientRepository.save(oldPatient);
+    }
+
+    @Override
+    public Patient save(Patient patient) {
+        return patientRepository.save(patient);
     }
     
 }
