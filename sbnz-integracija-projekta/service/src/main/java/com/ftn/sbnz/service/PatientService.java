@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.kie.api.runtime.KieSession;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import com.ftn.sbnz.model.illness.PatientHistory;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.repository.PatientHistoryRepository;
 import com.ftn.sbnz.repository.PatientRepository;
+import com.ftn.sbnz.service.iservice.IKieService;
 import com.ftn.sbnz.service.iservice.IPatientService;
 
 @Service
@@ -24,6 +26,7 @@ public class PatientService implements IPatientService{
     @Autowired private PatientRepository patientRepository;
     @Autowired private PatientHistoryRepository patientHistoryRepository;
     @Autowired private ModelMapper modelMapper;
+    @Autowired private IKieService kieService;
     
     private Random random = new Random();
 
@@ -32,6 +35,10 @@ public class PatientService implements IPatientService{
         Patient patient = patientRepository.findByJmbg(jmbg).orElseThrow(() -> new EntityNotFoundException("Pacijent nije pronadjen"));
         System.out.println(patient);
         return patient;
+    }
+
+    public Patient findById(Long id){
+        return patientRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Pacijent nije pronadjen"));
     }
 
     @Override
@@ -68,6 +75,11 @@ public class PatientService implements IPatientService{
         oldPatient.setHasRenalFailure(patient.isHasRenalFailure());
         return patientRepository.save(oldPatient);
     }
+
+    @Override
+    public Patient save(Patient patient) {
+        return patientRepository.save(patient);
+    }
     
     @Override
     public void generatePatientHistory(Long idPatient, int depth) {
@@ -93,17 +105,20 @@ public class PatientService implements IPatientService{
 
     @Override
     public AncestorHeartProblemsDTO ancestorHadhartProbles(Long patientId) {
-        AncestorHeartProblemsDTO dto = new AncestorHeartProblemsDTO();
+        KieSession ks = kieService.createKieSession("bwKsession");
+
+        Patient patient = findById(patientId);
+        ks.insert(patient);
 
         List<PatientHistory> ancestorIds = findAncestorIds(patientId);
-
         for (PatientHistory ph : ancestorIds) {
-            if (ph.isHasHeartIssues()) {
-                dto.setAnyoneHadHearthProblems(true);
-                return dto;
-            }
+            ks.insert(ph);
         }
-        dto.setAnyoneHadHearthProblems(false);
+
+        kieService.fireAllRules(ks);
+
+        AncestorHeartProblemsDTO dto = new AncestorHeartProblemsDTO();
+        dto.setAnyoneHadHearthProblems(patient.isHasCVSFamilyHistory());
         return dto;
     }
 

@@ -3,10 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/auth_bloc/auth_bloc.dart';
 import 'package:front/bloc/patient_bloc/patient_bloc.dart';
 import 'package:front/bloc/patient_form_bloc/patient_form_bloc.dart';
+import 'package:front/bloc/procedure_bloc/procedure_bloc.dart';
+import 'package:front/bloc/procedure_single_bloc/procedure_single_bloc.dart';
 import 'package:front/data/auth/data_provider/auth_data_provider.dart';
 import 'package:front/data/auth/repository/auth_repository.dart';
 import 'package:front/data/patient/data_provider/patient_data_provider.dart';
 import 'package:front/data/patient/repository/patient_repository.dart';
+import 'package:front/data/procedure/data_provider/procedure_data_provider.dart';
+import 'package:front/data/procedure/repository/procedure_repository.dart';
 import 'package:front/data/shared_pref/data_provider/shared_pref_data_provider.dart';
 import 'package:front/data/shared_pref/repository/shared_pref_repository.dart';
 import 'package:front/presentation/screens/init_screen.dart';
@@ -43,7 +47,12 @@ class MyApp extends StatelessWidget {
           create: (context) => PatientRepository(
             PatientDataProvider(repository),
           ),
-        )
+        ),
+        RepositoryProvider(
+          create: (context) => ProcedureRepository(
+            ProcedureDataProvider(repository),
+          ),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -58,7 +67,17 @@ class MyApp extends StatelessWidget {
             ),
           ),
           BlocProvider(
+            create: (context) => ProcedureBloc(
+              context.read<ProcedureRepository>(),
+            ),
+          ),
+          BlocProvider(
             create: (context) => PatientFormBloc(),
+          ),
+          BlocProvider(
+            create: (context) => ProcedureSingleBloc(
+              context.read<ProcedureRepository>(),
+            ),
           ),
         ],
         child: MaterialApp(

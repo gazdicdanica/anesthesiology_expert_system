@@ -7,6 +7,8 @@ import com.ftn.sbnz.model.patient.Patient;
 public interface IPatientService {
     Patient findByJmbg(String jmbg);
 
+    Patient findById(Long id);
+
     Patient addPatient(AddPatientDTO addPatientDTO);
 
     Patient updatePatient(AddPatientDTO patient);
@@ -14,4 +16,7 @@ public interface IPatientService {
     void generatePatientHistory(Long idPatient, int depth);
 
     AncestorHeartProblemsDTO ancestorHadhartProbles(Long patientId);
+    
+    Patient save(Patient patient);
+
 }

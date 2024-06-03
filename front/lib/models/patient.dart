@@ -114,11 +114,24 @@ class Patient {
         // throw ArgumentError('Invalid ASA value: $asa');
     }
   }
+
+  toJson() {}
 }
 
 enum ASA { I, II, III, IV, V }
 
 enum PatientRisk { LOW, MEDIUM, HIGH }
+
+String getRiskString(PatientRisk risk) {
+  switch (risk) {
+    case PatientRisk.LOW:
+      return 'Nizak';
+    case PatientRisk.MEDIUM:
+      return 'Srednji';
+    case PatientRisk.HIGH:
+      return 'Visok';
+  }
+}
 
 class PatientDTO {
   final String fullname;

@@ -2,6 +2,7 @@ package com.ftn.sbnz.service.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -213,7 +214,7 @@ public class CEPConfigTest {
 
         Patient patient = new Patient();
         patient.setId(1L);
-        patient.setRisk(PatientRisk.HIGH);
+        patient.setRisk(PatientRisk.LOW);
 
         PreOperative preOperative = new PreOperative();
         preOperative.setShouldContinueProcedure(true);
@@ -221,7 +222,7 @@ public class CEPConfigTest {
         procedure.setId(1L);
         procedure.setPreOperative(preOperative);
         procedure.setPatientId(1L);
-        procedure.setRisk(OperationRisk.HIGH);
+        procedure.setRisk(OperationRisk.LOW);
 
         ksession.insert(patient);
         ksession.insert(procedure);
@@ -543,6 +544,9 @@ public class CEPConfigTest {
         KieSession kSession = kContainer.newKieSession("bwKsession");
         assertNotNull(kSession);
 
+        Patient patient = new Patient();
+        patient.setId(1L);
+        kSession.insert(patient);
         List<PatientHistory> patientHistories = new ArrayList<>();
         patientHistories.add(new PatientHistory(1L, 2L, 3L, false));
         patientHistories.add(new PatientHistory(2L, 4L, 5L, true)); // Mother with heart problems
@@ -558,6 +562,7 @@ public class CEPConfigTest {
         kSession.fireAllRules();
 
         kSession.dispose();
+        assertTrue(patient.isHasCVSFamilyHistory());
     }
 
 }

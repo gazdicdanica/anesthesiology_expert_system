@@ -262,4 +262,18 @@ public class Patient {
     public void setRisk(PatientRisk risk) {
         this.risk = risk;
     }
+
+    @Override
+    public String toString() {
+        return "Patient [id=" + id + ", fullname=" + fullname + ", jmbg=" + jmbg + ", age=" + age + ", weight=" + weight
+                + ", height=" + height + ", BMI=" + BMI + ", basalSAP=" + basalSAP + ", RCRIScore=" + RCRIScore
+                + ", risk=" + risk + ", hasDiabetes=" + hasDiabetes + ", isDMControlled=" + isDMControlled
+                + ", hadHearthAttack=" + hadHearthAttack + ", hasHearthFailure=" + hasHearthFailure
+                + ", hasHypertension=" + hasHypertension + ", controlledHypertension=" + controlledHypertension
+                + ", hadStroke=" + hadStroke + ", hasRenalFailure=" + hasRenalFailure + ", hasCVSFamilyHistory="
+                + hasCVSFamilyHistory + ", addictions=" + addictions + ", smokerOrAlcoholic=" + smokerOrAlcoholic
+                + ", pregnant=" + pregnant + ", asa=" + asa + "]";
+    }
+
+    
 }

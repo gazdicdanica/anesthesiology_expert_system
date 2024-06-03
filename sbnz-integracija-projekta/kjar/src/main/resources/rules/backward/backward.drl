@@ -1,7 +1,7 @@
 package backward;
 
 import com.ftn.sbnz.model.illness.PatientHistory;
-
+import com.ftn.sbnz.model.patient.Patient;
 
 
 query familyHasHeartProblems(Long id, Long mId, Long fId)
