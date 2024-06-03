@@ -81,7 +81,10 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                           alignment: Alignment.topCenter,
                           child: Column(
                             children: [
-                              PatientInfo(patient: patient, expansionController: expansionController,),
+                              PatientInfo(
+                                patient: patient,
+                                expansionController: expansionController,
+                              ),
                               const SizedBox(height: 20),
                               Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -108,7 +111,23 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                                 patient: patient,
                               ),
 
-                              // if(state.procedure?. )
+                              if (patient.risk != null &&
+                                  procedure
+                                      .preOperative.shouldContinueProcedure)
+                                Container(
+                                  padding: const EdgeInsets.only(
+                                      top: 20),
+                                  width: double.infinity,
+                                  child: Directionality(
+                                    textDirection: TextDirection.rtl,
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {
+                                      },
+                                      icon: const Icon(Icons.arrow_back),
+                                      label: const Text('Dalje'),
+                                    ),
+                                  ),
+                                )
                             ],
                           ),
                         ),
@@ -127,7 +146,7 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
     );
   }
 
-  void _openInfo(){
+  void _openInfo() {
     expansionController.expand();
   }
 
