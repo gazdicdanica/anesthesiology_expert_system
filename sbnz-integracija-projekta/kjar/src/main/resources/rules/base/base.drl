@@ -56,15 +56,20 @@ end
 
 rule "Undiagnosed DM"
     when
-        $p: Patient( hasDiabetes == false)
+        $p: Patient(hasDiabetes == false)
         $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
         eval($preOp.getSIB() > 6)
     then
         System.out.println("Undiagnosed DM");
-        modify($preOp){
+        modify($preOp) {
             setShouldContinueProcedure(false);
         }
+        modify($preOp) {
+            setPostponeReason("Pacijent ima povišen šećer u krvi. Odložiti operaciju i poslati pacijenta na dodatne preglede.");
+
+        }
 end
+
 
 // RCRI
 rule "High risk operation"
@@ -279,10 +284,13 @@ rule "ASA III echocardiography"
     when
         $patient : Patient(asa == Patient.ASA.III, $id: id)
         $procedure: Procedure(patientId == $id, risk == Procedure.OperationRisk.HIGH, $doctorId: medicalStaffId) @watch(preOperative)
-        PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
+        $preOp: PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
         System.out.println("Echocardiography");
         insert(new Alarm($id, $doctorId, "Do echocardiography"));
+        modify($preOp){
+            setPostponeReason("Pacijent se podlaže visokorizičnoj elektivnoj operaciji. Odložiti operaciju i uraditi ehokardiografiju.")
+        }
         // echocardiography
 end
 
@@ -290,21 +298,28 @@ rule "ASA III stres test and echocardiography"
     when
         $patient : Patient(asa == Patient.ASA.III, risk == Patient.PatientRisk.HIGH, hasCVSFamilyHistory == true, $id: id)
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId) @watch(preOperative)
-        PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
+        $preOp: PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
         System.out.println("Stress test and echocardiography");
 
         insert(new Alarm($id, $doctorId, "Do stress test and echocardiography"));
+        modify($preOp){
+            setPostponeReason("Pacijent ima istoriju kardiovaskularnih bolesti i visokorizičan je. Potrebno je odložiti operaciju i uraditi ehokardiografiju i stres test.")
+        }
 end
 
 rule "ASA IV tests"
     when
         $patient : Patient(asa == Patient.ASA.IV, !hasHearthFailure, $id: id)
         $procedure: Procedure(patientId == $id,  $doctorId: medicalStaffId) @watch(preOperative)
-        PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
+        $preOp: PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
         System.out.println("Stres test, echocardiography, B-type natriuretic peptide");
         insert(new Alarm($id, $doctorId, "Do stress test, echocardiography, B-type natriuretic peptide"));
+
+        modify($preOp){
+            setPostponeReason("Pacijent je visokorizičan. Odložiti operaciju i uraditi stres test, ehokardiografiju i srčane biomarkere B-tip natriuretskog peptida.")
+        }
 
 end
 
@@ -341,10 +356,6 @@ activation-group "monitoring"
         $patient: Patient(risk == Patient.PatientRisk.LOW || risk == Patient.PatientRisk.MEDIUM)
         $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.LOW || risk == Procedure.OperationRisk.MEDIUM)
     then
-        modify($procedure){
-            setIntraOperative(new IntraOperative());
-        }
-
         System.err.println("noninvasive monitoring SAP, three-lead ECG");
 end
 
@@ -354,9 +365,6 @@ activation-group "monitoring"
         $patient: Patient(risk == Patient.PatientRisk.HIGH)
         $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.LOW)
     then
-        modify($procedure){
-            setIntraOperative(new IntraOperative());
-        }
         System.out.println("noninvasive monitoring SAP, three-lead ECG");
 end
 
@@ -366,9 +374,6 @@ activation-group "monitoring"
         $patient: Patient(risk == Patient.PatientRisk.HIGH)
         $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.HIGH || risk == Procedure.OperationRisk.MEDIUM)
     then
-        modify($procedure){
-            setIntraOperative(new IntraOperative());
-        }
         System.out.println("invasive monitoring, five-lead ECG");
 end
 
@@ -378,8 +383,5 @@ activation-group "monitoring"
         $patient: Patient(risk == Patient.PatientRisk.LOW || risk == Patient.PatientRisk.MEDIUM)
         $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.HIGH)
     then
-        modify($procedure){
-            setIntraOperative(new IntraOperative());
-        }
         System.out.println("invasive monitoring, five-lead ECG");
 end

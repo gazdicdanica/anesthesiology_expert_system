@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.FactHandle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -78,6 +79,9 @@ public class ProcedureService implements IProcedureService {
                 KieSession kieSession = kieService.createKieSession("baseKsession");
 
                 kieSession = kieService.insertKieSession(patient, procedure, procedure.getPreOperative(), kieSession);
+                FactHandle handle = kieSession.getFactHandle(procedure);
+                FactHandle preOpHandle = kieSession.getFactHandle(procedure.getPreOperative());
+
                 kieService.fireAgendaGroupRules(kieSession, "RCRI");
 
                 KieSession templateSession = kieService.createKieSessionFromTemplate(patient, procedure,
@@ -91,6 +95,11 @@ public class ProcedureService implements IProcedureService {
                 procedure = procedureRepository.save(procedure);
 
                 BaseRulesDTO dto = new BaseRulesDTO(patient, procedure);
+
+                if(!procedure.getPreOperative().isShouldContinueProcedure()){
+                        kieSession.delete(handle);
+                        kieSession.delete(preOpHandle);
+                }
 
                 kieSession.dispose();
                 templateSession.dispose();

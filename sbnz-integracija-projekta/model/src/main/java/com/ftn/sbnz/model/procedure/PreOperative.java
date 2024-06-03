@@ -14,6 +14,7 @@ public class PreOperative {
     private Long id;
 
     private boolean shouldContinueProcedure = true;
+    private String postponeReason;
 
     private double SIB;
     private double HBA1C;
@@ -23,11 +24,13 @@ public class PreOperative {
     public PreOperative() {
     }
 
-    public PreOperative(boolean shouldContinueProcedure, double SIB, double HBA1C, double kreatinin) {
+    public PreOperative(boolean shouldContinueProcedure, double SIB, double HBA1C, double kreatinin, double bnpValue, String postponeReason) {
         this.shouldContinueProcedure = shouldContinueProcedure;
         this.SIB = SIB;
         this.HBA1C = HBA1C;
         this.creatinine = kreatinin;
+        this.bnpValue = bnpValue;
+        this.postponeReason = postponeReason;
     }
 
     public double getBnpValue() {
@@ -70,6 +73,14 @@ public class PreOperative {
         this.creatinine = kreatinin;
     }
 
+    public String getPostponeReason() {
+        return postponeReason;
+    }
+
+    public void setPostponeReason(String postponeReason) {
+        this.postponeReason = postponeReason;
+    }
+
     @Override
     public String toString() {
         return "PreOperative{" +
@@ -78,6 +89,7 @@ public class PreOperative {
                 ", HBA1C=" + HBA1C +
                 ", creatinine=" + creatinine +
                 ", bnpValue=" + bnpValue +
+                ", postponeReason='" + postponeReason + 
                 '}';
     }
 }

@@ -35,6 +35,7 @@ class _ProcedureListState extends State<ProcedureList> {
                   color: seedColor,
                   size: 80,
                 ),
+                const SizedBox(height: 20),
                 Text(
                   "Nemate aktuelnih operacija",
                   style: Theme.of(context).textTheme.titleMedium,
@@ -71,9 +72,14 @@ class _ProcedureListState extends State<ProcedureList> {
                 color: seedColor,
                 size: 80,
               ),
-              Text(
-                "Došlo je do greške prilikom učitavanja operacija..",
-                style: Theme.of(context).textTheme.titleMedium,
+              const SizedBox(height: 20),
+              Align(
+                alignment: Alignment.center,
+                child: Text(
+                  textAlign: TextAlign.center,
+                  "Došlo je do greške prilikom učitavanja operacija..",
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
             ],
           ),

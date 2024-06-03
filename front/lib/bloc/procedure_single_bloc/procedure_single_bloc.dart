@@ -1,3 +1,4 @@
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/data/procedure/repository/procedure_repository.dart';
@@ -12,6 +13,7 @@ class ProcedureSingleBloc extends Bloc<ProcedureSingleEvent, ProcedureSingleStat
   final ProcedureRepository _procedureRepository;
 
   ProcedureSingleBloc(this._procedureRepository) : super(ProcedureSingleInitial()) {
+    on<ProcedureSingleEvent>(_handle, transformer: restartable());
     on<FetchProcedurePatient>(_fetchProcedurePatient);
     on<UpdatePreoperative>(_updatePreoperative);
   }
@@ -36,4 +38,13 @@ class ProcedureSingleBloc extends Bloc<ProcedureSingleEvent, ProcedureSingleStat
       emit(const ProcedureSingleError("Greška prilikom ažuriranja"));
     }
   }
+
+   _handle(event, emit) async {
+    if(event is FetchProcedurePatient) {
+      await _fetchProcedurePatient(event, emit);
+    } else if(event is UpdatePreoperative) {
+      await _updatePreoperative(event, emit);
+    }
+  }
+
 }
