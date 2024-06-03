@@ -85,10 +85,7 @@ public class ProcedureService implements IProcedureService {
                 preOperative.setCreatinine(preoperativeDTO.getCreatinine());
                 Patient patient = patientService.findById(procedure.getPatientId());
                 patient.setBasalSAP(preoperativeDTO.getSAP());
-                patientService.save(patient);
                 procedure.setPreOperative(preOperative);
-
-                procedureRepository.save(procedure);
 
                 KieSession kieSession = kieContainer.newKieSession("baseKsession");
                 kieSession.insert(patient);
@@ -114,6 +111,9 @@ public class ProcedureService implements IProcedureService {
 
                 ksession.fireAllRules();
                 ksession.dispose();
+
+                patientService.save(patient);
+                procedureRepository.save(procedure);
 
                 System.out.println(patient);
                 return procedure;

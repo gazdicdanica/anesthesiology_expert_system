@@ -12,7 +12,7 @@ template "riskAssessment"
 
 rule "RA @{row.rowNumber}"
     when 
-        $p: Patient(age >= @{ageLower}, age <= @{ageHigher}, RCRIScore = @{score})
+        $p: Patient(age >= @{ageLower}, age <= @{ageHigher}, RCRIScore == @{score})
     then
         modify($p){
             setRisk(@{risk});
