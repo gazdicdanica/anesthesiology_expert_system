@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:front/data/procedure/data_provider/procedure_data_provider.dart';
+import 'package:front/models/dto/base_rules_dto.dart';
 import 'package:front/models/patient.dart';
 import 'package:front/models/procedure.dart';
 
@@ -30,5 +31,12 @@ class ProcedureRepository {
     String response = await _procedureDataProvider.fetchPatient(id);
     String decodedResponse = utf8.decode(response.runes.toList());
     return Patient.fromJson(jsonDecode(decodedResponse));
+  }
+
+  Future<BaseRulesDTO> updatePreoperative(double sib, double hba1C,
+      double creatinine, int sap, int procedureId) async {
+    String response = await _procedureDataProvider.updatePreoperative(
+        sib, hba1C, creatinine, sap, procedureId);
+    return BaseRulesDTO.fromJson(jsonDecode(response));
   }
 }

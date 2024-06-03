@@ -4,9 +4,10 @@ import 'package:front/presentation/widgets/procedure/single/chip.dart';
 import 'package:front/theme.dart';
 
 class PatientInfo extends StatefulWidget {
-  const PatientInfo({super.key, required this.patient});
+  const PatientInfo({super.key, required this.patient, required this.expansionController});
 
   final Patient patient;
+  final ExpansionTileController expansionController;
 
   @override
   State<PatientInfo> createState() => _PatientInfoState();
@@ -14,8 +15,6 @@ class PatientInfo extends StatefulWidget {
 
 class _PatientInfoState extends State<PatientInfo> {
   bool isExpanded = false;
-
-  final expansionController = ExpansionTileController();
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +24,7 @@ class _PatientInfoState extends State<PatientInfo> {
         borderRadius: BorderRadius.circular(10),
       ),
       child: ExpansionTile(
-        controller: expansionController,
+        controller: widget.expansionController,
         onExpansionChanged: (value) => setState(() {
           isExpanded = value;
         }),

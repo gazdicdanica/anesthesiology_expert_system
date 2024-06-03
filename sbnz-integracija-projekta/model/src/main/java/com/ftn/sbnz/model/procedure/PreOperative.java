@@ -69,4 +69,15 @@ public class PreOperative {
     public void setCreatinine(double kreatinin) {
         this.creatinine = kreatinin;
     }
+
+    @Override
+    public String toString() {
+        return "PreOperative{" +
+                "shouldContinueProcedure=" + shouldContinueProcedure +
+                ", SIB=" + SIB +
+                ", HBA1C=" + HBA1C +
+                ", creatinine=" + creatinine +
+                ", bnpValue=" + bnpValue +
+                '}';
+    }
 }

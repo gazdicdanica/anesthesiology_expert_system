@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:front/presentation/screens/add_patient_screen.dart';
 import 'package:front/presentation/screens/procedures_screen.dart';
+import 'package:front/theme.dart';
 
 class CustomBottomNavigation extends StatefulWidget {
   const CustomBottomNavigation({super.key});
@@ -22,6 +23,8 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
       const Text('Index 2: Profile?'),
     ];
 
+    final indicatorColor = seedColor.withAlpha(30);
+
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
@@ -31,11 +34,10 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
         elevation: 20,
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onItemTap,
+        indicatorColor: indicatorColor,
+
         destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.vaccines),
-            label: 'Procedure',
-          ),
+          NavigationDestination(icon: Icon(Icons.vaccines), label: 'Procedure'),
           NavigationDestination(icon: Icon(Icons.add), label: 'Dodaj pacijenta'),
           NavigationDestination(icon: Icon(Icons.person), label: 'Profile?'),
         ],

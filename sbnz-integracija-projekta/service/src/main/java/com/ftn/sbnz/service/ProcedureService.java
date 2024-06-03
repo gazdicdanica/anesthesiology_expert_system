@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 import org.drools.decisiontable.ExternalSpreadsheetCompiler;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
+import com.ftn.sbnz.dto.BaseRulesDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
 import com.ftn.sbnz.exception.EntityNotFoundException;
 import com.ftn.sbnz.model.patient.Patient;
+import com.ftn.sbnz.model.procedure.IntraOperative;
 import com.ftn.sbnz.model.procedure.PreOperative;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.model.user.User;
@@ -76,7 +78,7 @@ public class ProcedureService implements IProcedureService {
         }
 
         @Override
-        public Procedure updatePreoperative(Long id, PreoperativeDTO preoperativeDTO) {
+        public BaseRulesDTO updatePreoperative(Long id, PreoperativeDTO preoperativeDTO) {
                 Procedure procedure = procedureRepository.findById(id)
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
                 PreOperative preOperative = procedure.getPreOperative();
@@ -94,9 +96,11 @@ public class ProcedureService implements IProcedureService {
 
                 kieSession.getAgenda().getAgendaGroup("RCRI").setFocus();
                 int agendaGroupRules = kieSession.fireAllRules();
-                int rules = kieSession.fireAllRules();
-                System.out.println("Rules fired: " + (rules + agendaGroupRules));
-                kieSession.dispose();
+                // int rules = kieSession.fireAllRules();
+                // System.out.println("Rules fired: " + (rules + agendaGroupRules));
+                // kieSession.dispose();
+
+                System.err.println(patient + "\n" + procedure + "\n" + preOperative);
 
                 InputStream template = ProcedureService.class.getResourceAsStream("/templatetable/RiskAssesment.drt");
                 InputStream data = ProcedureService.class
@@ -105,18 +109,24 @@ public class ProcedureService implements IProcedureService {
                 ExternalSpreadsheetCompiler converter = new ExternalSpreadsheetCompiler();
                 String drl = converter.compile(data, template, 7, 6);
                 KieSession ksession = this.createKieSessionFromDRL(drl);
+                
                 ksession.insert(patient);
                 ksession.insert(procedure);
                 ksession.insert(preOperative);
-
                 ksession.fireAllRules();
                 ksession.dispose();
 
-                patientService.save(patient);
-                procedureRepository.save(procedure);
+                
+                kieSession.fireAllRules();
 
-                System.out.println(patient);
-                return procedure;
+                patient = patientService.save(patient);
+                procedure = procedureRepository.save(procedure);
+
+                BaseRulesDTO dto = new BaseRulesDTO(patient, procedure);
+
+                System.out.println(dto);
+                kieSession.dispose();
+                return dto;
         }
 
         private KieSession createKieSessionFromDRL(String drl) {

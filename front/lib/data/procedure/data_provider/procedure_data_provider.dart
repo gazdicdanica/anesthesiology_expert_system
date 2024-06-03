@@ -31,7 +31,7 @@ class ProcedureDataProvider {
       return res.body;
     } else {
       print(res.body);
-      throw CustomException('Failed to add procedure');
+      throw CustomException('Greška prilikom dodavanja');
     }
   }
 
@@ -48,7 +48,7 @@ class ProcedureDataProvider {
       return res.body;
     } else {
       print(res.body);
-      throw CustomException('Failed to fetch procedures');
+      throw CustomException('Greška prilikom dobavljanja');
     }
   }
 
@@ -66,7 +66,31 @@ class ProcedureDataProvider {
       return res.body;
     } else {
       print(res.body);
-      throw CustomException('Failed to fetch patient');
+      throw CustomException('Greška prilikom dobavljanja pacijenta');
+    }
+  }
+
+
+  Future<String> updatePreoperative(double sib, double hba1c, double creatinine, int sap, int id) async{
+    final token = await _sharedPrefRepository.getToken();
+
+    final res = await http.put(Uri.parse("${path}procedure/$id/preoperative"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token'
+        },
+        body: jsonEncode(<String, dynamic>{
+          'sib': sib,
+          'hba1C': hba1c,
+          'creatinine': creatinine,
+          'sap': sap
+        }));
+
+    if (res.statusCode == 200) {
+      return res.body;
+    } else {
+      print(res.body);
+      throw CustomException('Greška prilikom ažuriranja preoperativnih podataka');
     }
   }
 }

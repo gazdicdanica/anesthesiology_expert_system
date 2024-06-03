@@ -2,7 +2,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/data/procedure/repository/procedure_repository.dart';
-import 'package:front/models/patient.dart';
 import 'package:front/models/procedure.dart';
 
 part 'procedure_event.dart';

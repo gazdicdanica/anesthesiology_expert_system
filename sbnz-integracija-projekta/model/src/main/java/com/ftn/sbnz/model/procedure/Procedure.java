@@ -136,4 +136,11 @@ public class Procedure {
         TIME_SENSITIVE,
         ELECTIVE,
     }
+
+    @Override
+    public String toString() {
+        return "Procedure [id=" + id + ", medicalStaffId=" + medicalStaffId + ", name=" + name + ", patientId="
+                + patientId + ", postOperative=" + postOperative + ", preOperative=" + preOperative + ", intraoperative=" + intraOperative + ", risk=" + risk
+                + ", urgency=" + urgency + "]";
+    }
 }

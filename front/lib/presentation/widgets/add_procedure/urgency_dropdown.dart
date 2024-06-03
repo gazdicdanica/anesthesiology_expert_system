@@ -38,11 +38,11 @@ class _UrgencyDropdownState extends State<UrgencyDropdown> {
           child: Text('Vremenski zavisna operacija'),
         ),
         DropdownMenuItem(
-          value: ProcedureUrgency.IMMEDIATE,
+          value: ProcedureUrgency.URGENT,
           child: Text('Urgentna operacija'),
         ),
         DropdownMenuItem(
-          value: ProcedureUrgency.URGENT,
+          value: ProcedureUrgency.IMMEDIATE,
           child: Text('Neposredna operacija'),
         ),
       ],

@@ -7,6 +7,7 @@ class Procedure {
   final ProcedureUrgency urgency;
   final PreOperative preOperative;
   final PostOperative? postOperative;
+  final IntraOperative? intraOperative;
 
   Procedure({
     required this.id,
@@ -17,6 +18,7 @@ class Procedure {
     required this.urgency,
     required this.preOperative,
     this.postOperative,
+    this.intraOperative,
   });
 
   factory Procedure.fromJson(Map<String, dynamic> json) {
@@ -29,7 +31,22 @@ class Procedure {
       urgency: getUrgency(json['urgency']),
       preOperative: PreOperative.fromJson(json['preOperative']),
       postOperative: json['postOperative'],
+      intraOperative: json['intraOperative'],
     );
+  }
+
+  toJson() {
+    return {
+      'id': id,
+      'patientId': patientId,
+      'medicalStaffId': medicalStaffId,
+      'name': name,
+      'risk': risk.toString().split('.').last,
+      'urgency': urgency.toString().split('.').last,
+      'preOperative': preOperative.toJson(),
+      'postOperative': postOperative,
+      'intraOperative': intraOperative,
+    };
   }
 }
 
@@ -121,6 +138,18 @@ class PreOperative {
       bnpValue: json['bnpValue'],
     );
   }
+
+  toJson() {
+    return {
+      'id': id,
+      'shouldContinueProcedure': shouldContinueProcedure,
+      'sib': SIB,
+      'hba1C': HBA1C,
+      'creatinine': creatinine,
+      'bnpValue': bnpValue,
+    };
+  
+  }
 }
 
 class PostOperative {
@@ -131,4 +160,22 @@ class PostOperative {
     required this.id,
     required this.hemoglobin,
   });
+
+  factory PostOperative.fromJson(Map<String, dynamic> json) {
+    return PostOperative(
+      id: json['id'],
+      hemoglobin: json['hemoglobin'],
+    );
+  }
+
+  toJson() {
+    return {
+      'id': id,
+      'hemoglobin': hemoglobin,
+    };
+  }
+}
+
+class IntraOperative {
+
 }

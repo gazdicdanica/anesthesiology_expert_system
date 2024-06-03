@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/patient_bloc/patient_bloc.dart';
 import 'package:front/bloc/procedure_bloc/procedure_bloc.dart';
@@ -23,6 +21,9 @@ class ProcedureWidget extends StatefulWidget {
 
 class _ProcedureWidgetState extends State<ProcedureWidget> {
   late Patient patient;
+  late Procedure procedure;
+
+  final expansionController = ExpansionTileController();
 
   @override
   void initState() {
@@ -30,6 +31,8 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
 
     BlocProvider.of<ProcedureSingleBloc>(context)
         .add(FetchProcedurePatient(widget.procedure.id));
+
+    procedure = widget.procedure;
   }
 
   @override
@@ -46,57 +49,90 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
       ),
       body: SafeArea(
         child: Center(
-          child: BlocBuilder<ProcedureSingleBloc, ProcedureSingleState>(
+          child: BlocConsumer<ProcedureSingleBloc, ProcedureSingleState>(
+            listener: (context, state) {
+              if (state is ProcedureSingleError) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(state.message),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
             builder: (context, state) {
               if (state is ProcedureSingleLoading) {
                 return const LoadingWidget();
               }
-              if (state is ProcedurePatientSuccess) {
+              if (state is UpdateAndSuccess) {
                 patient = state.patient;
-                return CustomScrollView(slivers: [
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20.0, vertical: 10.0),
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: Column(
-                          children: [
-                            PatientInfo(patient: patient),
-                            const SizedBox(height: 20),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 10.0),
-                              child: Column(
-                                children: [
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Text(
-                                      widget.procedure.name,
-                                      style:
-                                          Theme.of(context).textTheme.titleMedium,
+                if (state.procedure != null) {
+                  procedure = state.procedure!;
+                  _openInfo();
+                }
+
+                return CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20.0, vertical: 10.0),
+                        child: Align(
+                          alignment: Alignment.topCenter,
+                          child: Column(
+                            children: [
+                              PatientInfo(patient: patient, expansionController: expansionController,),
+                              const SizedBox(height: 20),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0),
+                                child: Column(
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        procedure.name,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
                                     ),
-                                  ),
-                                  RiskUrgency(procedure: widget.procedure),
-                                ],
+                                    RiskUrgency(procedure: procedure),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 20),
-                            // const Divider(),
-                            const PreoperativeForm(),
-                          ],
+                              const SizedBox(height: 20),
+                              // const Divider(),
+                              PreoperativeForm(
+                                procedure: procedure,
+                                patient: patient,
+                              ),
+
+                              // if(state.procedure?. )
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ]);
+                  ],
+                );
               }
 
-              return const SizedBox();
+              // return const SizedBox();
+              return const LoadingWidget();
             },
           ),
         ),
       ),
     );
+  }
+
+  void _openInfo(){
+    expansionController.expand();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

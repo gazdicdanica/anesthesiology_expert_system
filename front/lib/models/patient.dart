@@ -114,6 +114,8 @@ class Patient {
         // throw ArgumentError('Invalid ASA value: $asa');
     }
   }
+
+  toJson() {}
 }
 
 enum ASA { I, II, III, IV, V }
