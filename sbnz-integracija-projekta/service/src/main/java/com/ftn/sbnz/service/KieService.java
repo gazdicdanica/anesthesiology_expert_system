@@ -72,7 +72,7 @@ public class KieService implements IKieService {
 
     @Override
     public KieSession createKieSession(String name) {
-        return kieContainer.newKieSession("name");
+        return kieContainer.newKieSession(name);
     }
 
 }

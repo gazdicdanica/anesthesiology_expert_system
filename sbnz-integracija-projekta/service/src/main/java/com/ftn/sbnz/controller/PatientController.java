@@ -40,4 +40,10 @@ public class PatientController {
     public ResponseEntity<?> findByJmbg(@RequestParam(name="jmbg") String jmbg) {
         return ResponseEntity.ok(patientService.findByJmbg(jmbg));
     }
+
+
+    @GetMapping("/ancestor")
+    public ResponseEntity<?> ancestorHadhartProbles(@RequestParam(name="patientId") Long patientId) {
+        return ResponseEntity.ok(patientService.ancestorHadhartProbles(patientId));
+    }
 }
