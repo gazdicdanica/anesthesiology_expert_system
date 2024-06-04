@@ -27,5 +27,15 @@ final class UpdatePreoperative extends ProcedureSingleEvent {
   const UpdatePreoperative(this.sib, this.hba1C, this.creatinine, this.sap, this.procedureId);
 
   @override
-  List<Object> get props => [sib, hba1C, creatinine, sap];
+  List<Object> get props => [sib, hba1C, creatinine, sap, procedureId];
+}
+
+final class UpdateBnp extends ProcedureSingleEvent {
+  final double bnp;
+  final int procedureId;
+
+  const UpdateBnp(this.bnp, this.procedureId);
+
+  @override
+  List<Object> get props => [bnp, procedureId];
 }

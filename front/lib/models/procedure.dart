@@ -124,6 +124,7 @@ class PreOperative {
   final double? creatinine;
   final double? bnpValue;
   final String? postponeReason;
+  final bool doBnp;
 
   PreOperative({
     this.id,
@@ -133,6 +134,7 @@ class PreOperative {
     this.creatinine,
     this.bnpValue,
     this.postponeReason,
+    this.doBnp = false,
   });
 
   factory PreOperative.fromJson(Map<String, dynamic> json) {
@@ -144,6 +146,7 @@ class PreOperative {
       creatinine: json['creatinine'],
       bnpValue: json['bnpValue'],
       postponeReason: json['postponeReason'],
+      doBnp: json['doBnp'],
     );
   }
 
@@ -156,6 +159,7 @@ class PreOperative {
       'creatinine': creatinine,
       'bnpValue': bnpValue,
       'postponeReason': postponeReason,
+      'doBnp': doBnp,
     };
   
   }

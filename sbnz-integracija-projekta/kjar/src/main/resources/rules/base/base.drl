@@ -324,6 +324,12 @@ rule "ASA IV tests"
             setPostponeReason("Pacijent je visokorizi\u010Dan. Odlo\u017Eiti operaciju i uraditi stres test, ehokardiografiju i sr\u010Dane biomarkere B-tip natriuretskog peptida.")
         }
 
+        modify($preOp){
+            setDoBnp(true);
+        }
+
+
+
 end
 
 // converted to template

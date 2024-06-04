@@ -64,7 +64,15 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                     .add(const CloseProcedure());
               }
               if (state is ProcedurePatientSuccess) {
-                if (state.procedure != null && !state.procedure!.preOperative.shouldContinueProcedure) {
+                if(state.procedure != null && state.procedure!.preOperative.bnpValue != 0.0){
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    showMessageDialog(
+                      'Rezulatati',
+                      patient.hasHearthFailure ? 'Testom je utvrdjeno da pacijent ima srčanu insuficijenciju. Dati odgovarajuću terapiju.' : 'Testom je utvrdjeno da pacijent nema srčanu insuficijenciju. Nastaviti sa predviđenom terapijom radi stabilizovanja zdravstvenog stanja.',
+                    );
+                  });
+                }
+                else if (state.procedure != null && !state.procedure!.preOperative.shouldContinueProcedure) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     showMessageDialog(
                       'Odložite operaciju',
@@ -83,10 +91,7 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                 patient = state.patient;
                 if (state.procedure != null && state.procedure!.id == procedure.id) {
                   procedure = state.procedure!;
-                  print(procedure);
                   _openInfo();
-                  // if(procedure.preOperative.SIB != 0.0)
-                  //   {_openInfo();}
                 }
 
                 return CustomScrollView(
@@ -184,7 +189,12 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
       );
 
   void _openInfo() {
+    try{
       expansionController.expand();
+    }
+    catch(e){
+      print(e);
+    }
   }
 
   @override

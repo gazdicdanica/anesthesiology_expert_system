@@ -20,17 +20,19 @@ public class PreOperative {
     private double HBA1C;
     private double creatinine;
     private double bnpValue; // B-type natriuretic peptide
+    private boolean doBnp;
 
     public PreOperative() {
     }
 
-    public PreOperative(boolean shouldContinueProcedure, double SIB, double HBA1C, double kreatinin, double bnpValue, String postponeReason) {
+    public PreOperative(boolean shouldContinueProcedure, double SIB, double HBA1C, double kreatinin, double bnpValue, String postponeReason, boolean doBnp) {
         this.shouldContinueProcedure = shouldContinueProcedure;
         this.SIB = SIB;
         this.HBA1C = HBA1C;
         this.creatinine = kreatinin;
         this.bnpValue = bnpValue;
         this.postponeReason = postponeReason;
+        this.doBnp = doBnp;
     }
 
     public double getBnpValue() {
@@ -81,6 +83,14 @@ public class PreOperative {
         this.postponeReason = postponeReason;
     }
 
+    public boolean isDoBnp() {
+        return doBnp;
+    }
+
+    public void setDoBnp(boolean doBnp) {
+        this.doBnp = doBnp;
+    }
+
     @Override
     public String toString() {
         return "PreOperative{" +
@@ -90,6 +100,7 @@ public class PreOperative {
                 ", creatinine=" + creatinine +
                 ", bnpValue=" + bnpValue +
                 ", postponeReason='" + postponeReason + 
+                ", doBnp=" + doBnp +
                 '}';
     }
 }

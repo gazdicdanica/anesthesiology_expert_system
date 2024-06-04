@@ -41,4 +41,10 @@ class ProcedureRepository {
     String decodedResponse = utf8.decode(response.runes.toList());
     return BaseRulesDTO.fromJson(jsonDecode(decodedResponse));
   }
+
+  Future<BaseRulesDTO> updateBnp(double bnp, int procedureId) async {
+    String response = await _procedureDataProvider.updateBnp(bnp, procedureId);
+    String decodedResponse = utf8.decode(response.runes.toList());
+    return BaseRulesDTO.fromJson(jsonDecode(decodedResponse));
+  }
 }

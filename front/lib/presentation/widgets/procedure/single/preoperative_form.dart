@@ -21,6 +21,8 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
   final creatinineController = TextEditingController();
   final sapController = TextEditingController();
 
+  final bnpController = TextEditingController();
+
   late Procedure procedure;
   late Patient patient;
 
@@ -37,7 +39,9 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
           widget.procedure.preOperative.creatinine.toString();
       sapController.text = widget.patient.basalSAP.toString();
     }
-    
+    if(widget.procedure.preOperative.bnpValue != 0.0) {
+      bnpController.text = widget.procedure.preOperative.bnpValue.toString();
+    }
   }
 
   @override
@@ -55,7 +59,7 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
           child: Form(
             child: BlocBuilder<ProcedureSingleBloc, ProcedureSingleState>(
               builder: (context, state) {
-                if(state is ProcedurePatientSuccess){
+                if (state is ProcedurePatientSuccess) {
                   patient = state.patient;
                   procedure = state.procedure ?? procedure;
                 }
@@ -98,8 +102,7 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
                           child: TextFormField(
                             controller: creatinineController,
                             keyboardType: TextInputType.number,
-                            enabled:
-                              procedure.preOperative.creatinine == 0.0,
+                            enabled: procedure.preOperative.creatinine == 0.0,
                             decoration: InputDecoration(
                               labelText: "Kreatinin",
                               suffix: Text("mg/dl",
@@ -113,8 +116,7 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
                           child: TextFormField(
                             controller: sapController,
                             keyboardType: TextInputType.number,
-                            enabled:
-                                procedure.preOperative.creatinine == 0.0,
+                            enabled: procedure.preOperative.creatinine == 0.0,
                             decoration: InputDecoration(
                               labelText: "SAP",
                               suffix: Text("mmHg",
@@ -125,7 +127,8 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 30),
+                    if (!procedure.preOperative.doBnp && procedure.preOperative.bnpValue == 0.0)
+                      const SizedBox(height: 30),
                     if (procedure.preOperative.SIB == 0.0)
                       Column(
                         children: [
@@ -133,7 +136,7 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: state is ProcedureUpdateLoading
-                                  ? null
+                                  ? () {}
                                   : () {
                                       _update(context);
                                     },
@@ -145,6 +148,53 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
                             ),
                           ),
                           const SizedBox(height: 20),
+                        ],
+                      ),
+                    if (procedure.preOperative.doBnp || procedure.preOperative.bnpValue != 0.0)
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: bnpController,
+                                  enabled:
+                                      procedure.preOperative.bnpValue == 0.0,
+                                  decoration: InputDecoration(
+                                    labelText: "BNP",
+                                    suffix: Text("pg/ml",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelMedium),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 10),
+                              const Expanded(child: SizedBox()),
+                            ],
+                          ),
+                          const SizedBox(height: 30),
+                          if (procedure.preOperative.bnpValue == 0.0)
+                            Column(
+                              children: [
+                                SizedBox(
+                                  width: double.infinity,
+                                  child: ElevatedButton(
+                                    onPressed: state is ProcedureUpdateLoading
+                                        ? () {}
+                                        : () {
+                                            _updateBnp(context);
+                                          },
+                                    child: state is ProcedureUpdateLoading
+                                        ? const CircularProgressIndicator(
+                                            color: Colors.white,
+                                          )
+                                        : const Text('Sačuvaj'),
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                              ],
+                            ),
                         ],
                       ),
                   ],
@@ -162,8 +212,14 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
     final hba1C = double.tryParse(hba1cController.text.trim());
     final creatinine = double.tryParse(creatinineController.text.trim());
     final sap = int.tryParse(sapController.text.trim());
-    context.read<ProcedureSingleBloc>().add(UpdatePreoperative(
-        sib!, hba1C!, creatinine!, sap!, procedure.id));
+    context
+        .read<ProcedureSingleBloc>()
+        .add(UpdatePreoperative(sib!, hba1C!, creatinine!, sap!, procedure.id));
+  }
+
+  void _updateBnp(BuildContext context) {
+    final bnp = double.tryParse(bnpController.text.trim());
+    context.read<ProcedureSingleBloc>().add(UpdateBnp(bnp!, procedure.id));
   }
 
   @override
