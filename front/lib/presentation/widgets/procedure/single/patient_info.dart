@@ -196,8 +196,8 @@ class _PatientInfoState extends State<PatientInfo> {
                       const CustomChip(label: 'Pušač/alkoholičar'),
                     if (widget.patient.addictions)
                       const CustomChip(label: 'Zavisnosti'),
-
-                    // family history
+                    if(widget.patient.hasCVSFamilyHistory)
+                      const CustomChip(label: 'Porodična istorija KVS bolesti')
                   ],
                 ),
               ],
@@ -226,7 +226,8 @@ class _PatientInfoState extends State<PatientInfo> {
   bool _showSecondDivider() {
     if (widget.patient.pregnant ||
         widget.patient.smokerOrAlcoholic ||
-        widget.patient.addictions) {
+        widget.patient.addictions ||
+        widget.patient.hasCVSFamilyHistory) {
       return true;
     }
     return false;
