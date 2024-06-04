@@ -65,7 +65,7 @@ rule "Undiagnosed DM"
             setShouldContinueProcedure(false);
         }
         modify($preOp) {
-            setPostponeReason("Pacijent ima povišen šećer u krvi. Odložiti operaciju i poslati pacijenta na dodatne preglede.");
+            setPostponeReason("Pacijent ima povi\u0161en \u0161e\u0107er u krvi. Odlo\u017Eiti operaciju i poslati pacijenta na dodatne preglede.");
 
         }
 end
@@ -225,7 +225,8 @@ end
 rule "ASA I and ASA II start operation"
     when
         $patient : Patient(asa == Patient.ASA.I || asa == Patient.ASA.II)
-        $procedure: Procedure(patientId == $patient.getId(), $preOp : preOperative)
+        $procedure: Procedure(patientId == $patient.getId())
+        $preOp: PreOperative(shouldContinueProcedure == true) from $procedure.getPreOperative()
     then
         System.out.println("ASA I and ASA II start operation");
         modify($preOp){
@@ -236,7 +237,8 @@ end
 rule "ASA III start operation"
     when
         $patient : Patient(asa == Patient.ASA.III)
-        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.ProcedureUrgency.IMMEDIATE || urgency == Procedure.ProcedureUrgency.URGENT || urgency == Procedure.ProcedureUrgency.TIME_SENSITIVE), $preOp : preOperative)
+        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.ProcedureUrgency.IMMEDIATE || urgency == Procedure.ProcedureUrgency.URGENT || urgency == Procedure.ProcedureUrgency.TIME_SENSITIVE))
+        $preOp: PreOperative(shouldContinueProcedure == true) from $procedure.getPreOperative()
     then
         System.out.println("ASA III start operation");
         modify($preOp){
@@ -259,7 +261,8 @@ end
 rule "ASA IV start operation"
     when
         $patient : Patient(asa == Patient.ASA.IV)
-        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.ProcedureUrgency.IMMEDIATE || urgency == Procedure.ProcedureUrgency.URGENT), $preOp : preOperative)
+        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.ProcedureUrgency.IMMEDIATE || urgency == Procedure.ProcedureUrgency.URGENT))
+        $preOp: PreOperative(shouldContinueProcedure == true) from $procedure.getPreOperative()
     then
         // start operation
         System.out.println("ASA IV start operation");
@@ -289,7 +292,7 @@ rule "ASA III echocardiography"
         System.out.println("Echocardiography");
         insert(new Alarm($id, $doctorId, "Do echocardiography"));
         modify($preOp){
-            setPostponeReason("Pacijent se podlaže visokorizičnoj elektivnoj operaciji. Odložiti operaciju i uraditi ehokardiografiju.")
+            setPostponeReason("Pacijent se podla\u017Ee visokorizi\u010Dnoj elektivnoj operaciji. Odlo\u017Eiti operaciju i uraditi ehokardiografiju.")
         }
         // echocardiography
 end
@@ -304,7 +307,7 @@ rule "ASA III stres test and echocardiography"
 
         insert(new Alarm($id, $doctorId, "Do stress test and echocardiography"));
         modify($preOp){
-            setPostponeReason("Pacijent ima istoriju kardiovaskularnih bolesti i visokorizičan je. Potrebno je odložiti operaciju i uraditi ehokardiografiju i stres test.")
+            setPostponeReason("Pacijent ima istoriju kardiovaskularnih bolesti i visokorizi\u010Dan je. Potrebno je odlo\u017Eiti operaciju i uraditi ehokardiografiju i stres test.")
         }
 end
 
@@ -318,7 +321,7 @@ rule "ASA IV tests"
         insert(new Alarm($id, $doctorId, "Do stress test, echocardiography, B-type natriuretic peptide"));
 
         modify($preOp){
-            setPostponeReason("Pacijent je visokorizičan. Odložiti operaciju i uraditi stres test, ehokardiografiju i srčane biomarkere B-tip natriuretskog peptida.")
+            setPostponeReason("Pacijent je visokorizi\u010Dan. Odlo\u017Eiti operaciju i uraditi stres test, ehokardiografiju i sr\u010Dane biomarkere B-tip natriuretskog peptida.")
         }
 
 end

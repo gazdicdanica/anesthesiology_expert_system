@@ -1,4 +1,4 @@
-import 'package:bloc_concurrency/bloc_concurrency.dart';
+// import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/data/procedure/repository/procedure_repository.dart';
@@ -11,7 +11,7 @@ class ProcedureBloc extends Bloc<ProcedureEvent, ProcedureState> {
   final ProcedureRepository _procedureRepository;
 
   ProcedureBloc(this._procedureRepository) : super(ProcedureInitial()) {
-    on<ProcedureEvent>(_handle, transformer: restartable());
+    on<ProcedureEvent>(_handle);
   }
 
   _addProcedure(AddProcedure event, emit) async {
