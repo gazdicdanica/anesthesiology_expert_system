@@ -11,7 +11,7 @@ class InitScreen extends StatelessWidget{
   Widget build(BuildContext context) {
     final sharedPrefRepository = context.read<SharedPrefRepository>();
     return FutureBuilder<String?>(
-      future: sharedPrefRepository.getToken(), // Assume this is the method to get the token
+      future: sharedPrefRepository.getToken(), 
       builder: (context, snapshot) {
         
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -19,9 +19,9 @@ class InitScreen extends StatelessWidget{
             body: Center(child: CircularProgressIndicator()),
           );
         } else if (snapshot.hasData && snapshot.data != null) {
-          return const CustomBottomNavigation(); // User is authenticated
+          return const CustomBottomNavigation();
         } else {
-          return const AuthScreen(); // User needs to log in
+          return const AuthScreen();
         }
       },
     );

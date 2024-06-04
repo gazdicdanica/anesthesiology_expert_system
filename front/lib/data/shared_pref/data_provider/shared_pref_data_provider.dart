@@ -16,4 +16,8 @@ class SharedPrefDataProvider {
   Future<String?> getString(String key) async{
     return Future.value(_sharedPreferences.getString(key));
   }
+
+  remove(String key) async {
+    await _sharedPreferences.remove(key);
+  }
 }

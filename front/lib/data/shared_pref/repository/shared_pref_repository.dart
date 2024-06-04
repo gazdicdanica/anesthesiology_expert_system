@@ -14,6 +14,10 @@ class SharedPrefRepository {
     return Future.value(token);
   }
 
+  void removeToken() async {
+    await _dataProvider.remove("token");
+  }
+
   void saveEmail(String email) {
     _dataProvider.saveString("email", email);
   }

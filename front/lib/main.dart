@@ -39,12 +39,12 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
-          create: (context) => AuthRepository(
-            AuthDataProvider(),
-          ),
+          create: (context) => repository,
         ),
         RepositoryProvider(
-          create: (context) => repository,
+          create: (context) => AuthRepository(
+            AuthDataProvider(repository),
+          ),
         ),
         RepositoryProvider(
           create: (context) => PatientRepository(

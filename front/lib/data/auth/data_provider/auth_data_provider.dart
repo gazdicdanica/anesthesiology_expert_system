@@ -2,10 +2,16 @@ import 'dart:convert';
 
 import 'package:front/constant.dart';
 import 'package:front/custom_exception.dart';
+import 'package:front/data/shared_pref/repository/shared_pref_repository.dart';
 import 'package:front/models/user.dart';
 import 'package:http/http.dart' as http;
 
 class AuthDataProvider {
+
+  final SharedPrefRepository _sharedPrefRepository;
+
+  AuthDataProvider(this._sharedPrefRepository);
+
   Future<void> register(String email, String password, Role role,
       String licenseNumber, String fullname) async {
     final res = await http.post(
@@ -41,5 +47,10 @@ class AuthDataProvider {
     } else {
       throw CustomException(res.body);
     }
+  }
+
+  Future<void> logout() {
+    _sharedPrefRepository.removeToken();
+    return Future.value();
   }
 }
