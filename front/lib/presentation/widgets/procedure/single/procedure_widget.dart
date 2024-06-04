@@ -33,6 +33,7 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
         .add(FetchProcedurePatient(widget.procedure.id));
 
     procedure = widget.procedure;
+    print(procedure);
   }
 
   @override
@@ -58,6 +59,28 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                     backgroundColor: Colors.red,
                   ),
                 );
+                BlocProvider.of<PatientBloc>(context).add(ResetForm());
+                BlocProvider.of<ProcedureBloc>(context)
+                    .add(const CloseProcedure());
+              }
+              if (state is ProcedurePatientSuccess) {
+                if(state.procedure != null && state.procedure!.preOperative.bnpValue != 0.0){
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    showMessageDialog(
+                      'Rezulatati',
+                      patient.hasHearthFailure ? 'Testom je utvrdjeno da pacijent ima srčanu insuficijenciju. Dati odgovarajuću terapiju.' : 'Testom je utvrdjeno da pacijent nema srčanu insuficijenciju. Nastaviti sa predviđenom terapijom radi stabilizovanja zdravstvenog stanja.',
+                    );
+                  });
+                }
+                else if (state.procedure != null && !state.procedure!.preOperative.shouldContinueProcedure) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    showMessageDialog(
+                      'Odložite operaciju',
+                      procedure.preOperative.postponeReason ??
+                          'Potrebno je odložiti operaciju.',
+                    );
+                  });
+                }
               }
             },
             builder: (context, state) {
@@ -66,7 +89,7 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
               }
               if (state is UpdateAndSuccess) {
                 patient = state.patient;
-                if (state.procedure != null) {
+                if (state.procedure != null && state.procedure!.id == procedure.id) {
                   procedure = state.procedure!;
                   _openInfo();
                 }
@@ -113,16 +136,15 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
 
                               if (patient.risk != null &&
                                   procedure
-                                      .preOperative.shouldContinueProcedure)
+                                      .preOperative.shouldContinueProcedure &&
+                                  procedure.preOperative.SIB != 0.0)
                                 Container(
-                                  padding: const EdgeInsets.only(
-                                      top: 20),
+                                  padding: const EdgeInsets.only(top: 20),
                                   width: double.infinity,
                                   child: Directionality(
                                     textDirection: TextDirection.rtl,
                                     child: ElevatedButton.icon(
-                                      onPressed: () {
-                                      },
+                                      onPressed: () {},
                                       icon: const Icon(Icons.arrow_back),
                                       label: const Text('Dalje'),
                                     ),
@@ -146,8 +168,33 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
     );
   }
 
+  void showMessageDialog(String title, String content) => showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Expanded(
+            child: AlertDialog(
+              title: Text(title),
+              content: Text(content),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Ok'),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+
   void _openInfo() {
-    expansionController.expand();
+    try{
+      expansionController.expand();
+    }
+    catch(e){
+      print(e);
+    }
   }
 
   @override

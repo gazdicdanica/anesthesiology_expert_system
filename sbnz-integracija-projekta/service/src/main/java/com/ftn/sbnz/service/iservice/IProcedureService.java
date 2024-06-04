@@ -19,4 +19,6 @@ public interface IProcedureService {
 
     BaseRulesDTO updatePreoperative(Long id, PreoperativeDTO preoperativeDTO);
 
+    BaseRulesDTO updateBnp(Long id, double bnpValue);
+
 }

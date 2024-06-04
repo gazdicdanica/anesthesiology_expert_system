@@ -14,7 +14,8 @@ class ProcedureRepository {
       ProcedureUrgency urgency, String name) async {
     String response = await _procedureDataProvider.addProcedure(
         patientId, risk, urgency, name);
-    return Procedure.fromJson(jsonDecode(response));
+    String decodedResponse = utf8.decode(response.runes.toList());
+    return Procedure.fromJson(jsonDecode(decodedResponse));
   }
 
   Future<List<Procedure>> fetchProcedures() async {
@@ -37,6 +38,13 @@ class ProcedureRepository {
       double creatinine, int sap, int procedureId) async {
     String response = await _procedureDataProvider.updatePreoperative(
         sib, hba1C, creatinine, sap, procedureId);
-    return BaseRulesDTO.fromJson(jsonDecode(response));
+    String decodedResponse = utf8.decode(response.runes.toList());
+    return BaseRulesDTO.fromJson(jsonDecode(decodedResponse));
+  }
+
+  Future<BaseRulesDTO> updateBnp(double bnp, int procedureId) async {
+    String response = await _procedureDataProvider.updateBnp(bnp, procedureId);
+    String decodedResponse = utf8.decode(response.runes.toList());
+    return BaseRulesDTO.fromJson(jsonDecode(decodedResponse));
   }
 }

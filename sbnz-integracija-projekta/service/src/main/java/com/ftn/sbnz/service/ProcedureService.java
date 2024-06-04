@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.rule.FactHandle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +59,7 @@ public class ProcedureService implements IProcedureService {
                                 .orElseThrow(() -> new EntityNotFoundException("Not authenticated"));
                 List<Procedure> allProcedures = procedureRepository.findByMedicalStaffId(doctor.getId());
                 return allProcedures.stream()
-                                .filter(p -> p.getPreOperative().isShouldContinueProcedure()
+                                .filter(p -> (p.getPreOperative().isShouldContinueProcedure() || (!p.getPreOperative().isShouldContinueProcedure() && p.getPreOperative().isDoBnp()))
                                                 && !(p.getPostOperative() != null && p.getPostOperative().isReleased()))
                                 .collect(Collectors.toList());
         }
@@ -78,6 +79,9 @@ public class ProcedureService implements IProcedureService {
                 KieSession kieSession = kieService.createKieSession("baseKsession");
 
                 kieSession = kieService.insertKieSession(patient, procedure, procedure.getPreOperative(), kieSession);
+                FactHandle handle = kieSession.getFactHandle(procedure);
+                FactHandle preOpHandle = kieSession.getFactHandle(procedure.getPreOperative());
+
                 kieService.fireAgendaGroupRules(kieSession, "RCRI");
 
                 KieSession templateSession = kieService.createKieSessionFromTemplate(patient, procedure,
@@ -91,6 +95,11 @@ public class ProcedureService implements IProcedureService {
                 procedure = procedureRepository.save(procedure);
 
                 BaseRulesDTO dto = new BaseRulesDTO(patient, procedure);
+
+                if(!procedure.getPreOperative().isShouldContinueProcedure()){
+                        kieSession.delete(handle);
+                        kieSession.delete(preOpHandle);
+                }
 
                 kieSession.dispose();
                 templateSession.dispose();
@@ -113,6 +122,35 @@ public class ProcedureService implements IProcedureService {
                 Patient patient = patientService.findById(patientId);
                 patient.setBasalSAP(preoperativeDTO.getSAP());
                 return patient;
+        }
+
+        @Override
+        public BaseRulesDTO updateBnp(Long id, double bnpValue) {
+                Procedure procedure = procedureRepository.findById(id)
+                                .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
+                PreOperative preOperative = procedure.getPreOperative();
+                preOperative.setBnpValue(bnpValue);
+                preOperative.setDoBnp(false);
+                procedure.setPreOperative(preOperative);
+
+                Patient patient = patientService.findById(procedure.getPatientId());
+
+
+                KieSession templateSession = kieService.createKieSessionFromTemplate(patient, procedure,
+                                procedure.getPreOperative(), "/templatetable/B_TypeNatriuretic.drt", 9, 10,
+                                "/templatetable/b_natriuretic_results.XLSX");
+                templateSession = kieService.insertKieSession(patient, procedure, procedure.getPreOperative(),
+                                templateSession);
+                kieService.fireAllRules(templateSession);
+
+                patient = patientService.save(patient);
+                procedure = procedureRepository.save(procedure);
+
+                BaseRulesDTO dto = new BaseRulesDTO(patient, procedure);
+
+                templateSession.dispose();
+
+                return dto;
         }
 
 }

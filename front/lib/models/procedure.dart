@@ -48,6 +48,11 @@ class Procedure {
       'intraOperative': intraOperative,
     };
   }
+
+  @override
+  String toString() {
+    return 'Procedure{id: $id, patientId: $patientId, medicalStaffId: $medicalStaffId, name: $name, risk: $risk, urgency: $urgency, preOperative: $preOperative, postOperative: $postOperative, intraOperative: $intraOperative}';
+  }
 }
 
 ProcedureUrgency getUrgency(String urgency) {
@@ -118,6 +123,8 @@ class PreOperative {
   final double? HBA1C;
   final double? creatinine;
   final double? bnpValue;
+  final String? postponeReason;
+  final bool doBnp;
 
   PreOperative({
     this.id,
@@ -126,6 +133,8 @@ class PreOperative {
     this.HBA1C,
     this.creatinine,
     this.bnpValue,
+    this.postponeReason,
+    this.doBnp = false,
   });
 
   factory PreOperative.fromJson(Map<String, dynamic> json) {
@@ -136,6 +145,8 @@ class PreOperative {
       HBA1C: json['hba1C'],
       creatinine: json['creatinine'],
       bnpValue: json['bnpValue'],
+      postponeReason: json['postponeReason'],
+      doBnp: json['doBnp'],
     );
   }
 
@@ -147,6 +158,8 @@ class PreOperative {
       'hba1C': HBA1C,
       'creatinine': creatinine,
       'bnpValue': bnpValue,
+      'postponeReason': postponeReason,
+      'doBnp': doBnp,
     };
   
   }
