@@ -110,4 +110,24 @@ class ProcedureDataProvider {
       throw CustomException('Greška prilikom ažuriranja vrednosti srčanih markera');
     }
   }
+
+  Future<String> startOperation(int id) async{
+    final token = await _sharedPrefRepository.getToken();
+
+    final res = await http.put(Uri.parse("${path}procedure/$id/start-operation"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token'
+        });
+
+    if (res.statusCode == 200) {
+      print(res.body);
+      print("200");
+      return res.body;
+    } else {
+      print("greska");
+      print(res.body);
+      throw CustomException('Greška prilikom pokretanja operacije');
+    }
+  }
 }

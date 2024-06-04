@@ -14,6 +14,7 @@ import com.ftn.sbnz.dto.BaseRulesDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
 import com.ftn.sbnz.exception.EntityNotFoundException;
 import com.ftn.sbnz.model.patient.Patient;
+import com.ftn.sbnz.model.procedure.IntraOperative;
 import com.ftn.sbnz.model.procedure.PreOperative;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.model.user.User;
@@ -151,6 +152,29 @@ public class ProcedureService implements IProcedureService {
                 templateSession.dispose();
 
                 return dto;
+        }
+
+        @Override
+        public Procedure startOperation(Long id) {
+                Procedure procedure = procedureRepository.findById(id)
+                                .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
+                PreOperative preOperative = procedure.getPreOperative();
+                Patient patient = patientService.findById(procedure.getPatientId());
+
+                procedure.setIntraOperative(new IntraOperative());
+                procedure = procedureRepository.save(procedure);
+
+                KieSession kieSession = kieService.createKieSession("monitoringKsession");
+                kieSession = kieService.insertKieSession(patient, procedure, preOperative, kieSession);
+                kieSession.insert(procedure.getIntraOperative());
+
+                kieService.fireAgendaGroupRules(kieSession, "monitoring");
+                kieService.fireAllRules(kieSession);
+
+                kieSession.dispose();
+
+                return procedureRepository.save(procedure);
+
         }
 
 }

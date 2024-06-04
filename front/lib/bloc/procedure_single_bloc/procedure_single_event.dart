@@ -39,3 +39,12 @@ final class UpdateBnp extends ProcedureSingleEvent {
   @override
   List<Object> get props => [bnp, procedureId];
 }
+
+final class StartOperation extends ProcedureSingleEvent {
+  final int procedureId;
+
+  const StartOperation(this.procedureId);
+
+  @override
+  List<Object> get props => [procedureId];
+}

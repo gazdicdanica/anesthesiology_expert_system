@@ -7,6 +7,7 @@ import 'package:front/models/patient.dart';
 import 'package:front/models/procedure.dart';
 import 'package:front/presentation/widgets/loading_widget.dart';
 import 'package:front/presentation/widgets/procedure/risk_and_urgency.dart';
+import 'package:front/presentation/widgets/procedure/single/intra_operative.dart';
 import 'package:front/presentation/widgets/procedure/single/patient_info.dart';
 import 'package:front/presentation/widgets/procedure/single/preoperative_form.dart';
 import 'package:front/theme.dart';
@@ -34,7 +35,6 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
         .add(FetchProcedurePatient(widget.procedure.id));
 
     procedure = widget.procedure;
-    print(procedure);
   }
 
   @override
@@ -65,16 +65,19 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                     .add(const CloseProcedure());
               }
               if (state is ProcedurePatientSuccess) {
-                if(state.procedure != null && state.procedure!.preOperative.bnpValue != 0.0){
+                if (state.procedure != null &&
+                    state.procedure!.preOperative.bnpValue != 0.0) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     showMessageDialog(
                       context,
                       'Rezultati',
-                      patient.hasHearthFailure ? 'Testom je utvrdjeno da pacijent ima srčanu insuficijenciju. Dati odgovarajuću terapiju.' : 'Testom je utvrdjeno da pacijent nema srčanu insuficijenciju. Nastaviti sa predviđenom terapijom radi stabilizovanja zdravstvenog stanja.',
+                      patient.hasHearthFailure
+                          ? 'Testom je utvrdjeno da pacijent ima srčanu insuficijenciju. Dati odgovarajuću terapiju.'
+                          : 'Testom je utvrdjeno da pacijent nema srčanu insuficijenciju. Nastaviti sa predviđenom terapijom radi stabilizovanja zdravstvenog stanja.',
                     );
                   });
-                }
-                else if (state.procedure != null && !state.procedure!.preOperative.shouldContinueProcedure) {
+                } else if (state.procedure != null &&
+                    !state.procedure!.preOperative.shouldContinueProcedure) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     showMessageDialog(
                       context,
@@ -92,7 +95,8 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
               }
               if (state is UpdateAndSuccess) {
                 patient = state.patient;
-                if (state.procedure != null && state.procedure!.id == procedure.id) {
+                if (state.procedure != null &&
+                    state.procedure!.id == procedure.id) {
                   procedure = state.procedure!;
                   _openInfo();
                 }
@@ -140,19 +144,53 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                               if (patient.risk != null &&
                                   procedure
                                       .preOperative.shouldContinueProcedure &&
-                                  procedure.preOperative.SIB != 0.0)
+                                  procedure.preOperative.SIB != 0.0 &&
+                                  procedure.intraOperative == null)
                                 Container(
                                   padding: const EdgeInsets.only(top: 20),
                                   width: double.infinity,
-                                  child: Directionality(
-                                    textDirection: TextDirection.rtl,
-                                    child: ElevatedButton.icon(
-                                      onPressed: () {},
-                                      icon: const Icon(Icons.arrow_back),
-                                      label: const Text('Dalje'),
-                                    ),
+                                  child: ElevatedButton(
+                                    onPressed: state is ProcedureUpdateLoading
+                                        ? () {}
+                                        : () {
+                                            _startOperation();
+                                          },
+                                    child: state is ProcedureUpdateLoading
+                                        ? const CircularProgressIndicator(
+                                            color: Colors.white,
+                                          )
+                                        : const Text('Započni operaciju'),
                                   ),
-                                )
+                                ),
+                              const SizedBox(height: 20),
+
+                              if (procedure.intraOperative != null)
+                                IntraOperativeWidget(
+                                  procedure: procedure,
+                                ),
+                              if (procedure.intraOperative != null &&
+                                  procedure.postOperative == null)
+                                Column(
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        onPressed:
+                                            state is ProcedureUpdateLoading
+                                                ? () {}
+                                                : () {
+                                                    _startOperation();
+                                                  },
+                                        child: state is ProcedureUpdateLoading
+                                            ? const CircularProgressIndicator(
+                                                color: Colors.white,
+                                              )
+                                            : const Text('Završi operaciju'),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                             ],
                           ),
                         ),
@@ -161,7 +199,6 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                   ],
                 );
               }
-
               // return const SizedBox();
               return const LoadingWidget();
             },
@@ -172,56 +209,61 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
   }
 
   void showMessageDialog(BuildContext context, String title, String content) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            color: seedColor,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
           ),
-        ),
-        content: Text(
-          content,
-          style: const TextStyle(
-            fontSize: 16,
-            color: textColor,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor: seedColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+          title: Text(
+            title,
+            style: const TextStyle(
+              color: seedColor,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
             ),
-            child: const Text('OK'),
           ),
-        ],
-      );
-    },
-  );
-}
+          content: Text(
+            content,
+            style: const TextStyle(
+              fontSize: 16,
+              color: textColor,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: seedColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              ),
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void _openInfo() {
-    try{
+    try {
       expansionController.expand();
-    }
-    catch(e){
+    } catch (e) {
       print(e);
     }
+  }
+
+  void _startOperation() {
+    BlocProvider.of<ProcedureSingleBloc>(context)
+        .add(StartOperation(procedure.id));
   }
 
   @override

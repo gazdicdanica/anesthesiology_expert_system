@@ -1,0 +1,61 @@
+package monitoring;
+
+import com.ftn.sbnz.model.patient.Patient;
+import com.ftn.sbnz.model.procedure.Procedure;
+import com.ftn.sbnz.model.procedure.PreOperative;
+import com.ftn.sbnz.model.procedure.IntraOperative;
+
+rule "noninvasive monitoring - low and medium risk patient"
+agenda-group "monitoring"
+
+    when
+        $patient: Patient(risk == Patient.PatientRisk.LOW || risk == Patient.PatientRisk.MEDIUM)
+        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.LOW || risk == Procedure.OperationRisk.MEDIUM, $intraOp: intraOperative)
+    then
+        System.err.println("noninvasive monitoring SAP, three-lead ECG");
+        modify($intraOp){
+            setMonitoring(IntraOperative.Monitoring.NON_INVASIVE);
+        }
+end
+
+rule "noninvasive monitoring - high risk patient"
+agenda-group "monitoring"
+
+    when
+        $patient: Patient(risk == Patient.PatientRisk.HIGH)
+        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.LOW, $intraOp: intraOperative)
+
+    then
+        System.out.println("noninvasive monitoring SAP, three-lead ECG");
+        modify($intraOp){
+            setMonitoring(IntraOperative.Monitoring.NON_INVASIVE);
+        }
+end
+
+rule "invasive monitoring - high risk patient"
+agenda-group "monitoring"
+
+    when
+        $patient: Patient(risk == Patient.PatientRisk.HIGH)
+        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.HIGH || risk == Procedure.OperationRisk.MEDIUM, $intraOp: intraOperative)
+
+    then
+        System.out.println("invasive monitoring, five-lead ECG");
+        modify($intraOp){
+            setMonitoring(IntraOperative.Monitoring.INVASIVE);
+        }
+end
+
+rule "invasive monitoring - low and medium risk patient"
+agenda-group "monitoring"
+
+    when
+        $patient: Patient(risk == Patient.PatientRisk.LOW || risk == Patient.PatientRisk.MEDIUM)
+        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.HIGH, $intraOp: intraOperative)
+
+    then
+        System.out.println("invasive monitoring, five-lead ECG");
+        modify($intraOp){
+            setMonitoring(IntraOperative.Monitoring.INVASIVE);
+        }
+end

@@ -3,6 +3,7 @@ package com.ftn.sbnz.controller;
 import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
+import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.service.iservice.IProcedureService;
 
 @RestController
@@ -48,6 +50,11 @@ public class ProcedureController {
     @PutMapping(value = "/{id}/bnp")
     public ResponseEntity<?> updateBnp(@PathVariable Long id, @RequestParam(name="bnp") double bnpValue) {
         return ResponseEntity.ok(procedureService.updateBnp(id, bnpValue));
+    }
+
+    @PutMapping(value = "/{id}/start-operation")
+    public ResponseEntity<Procedure> startOperation(@PathVariable Long id) {
+        return new ResponseEntity<Procedure>(procedureService.startOperation(id), HttpStatus.OK);
     }
     
 }
