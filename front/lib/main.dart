@@ -5,7 +5,7 @@ import 'package:front/bloc/patient_bloc/patient_bloc.dart';
 import 'package:front/bloc/patient_form_bloc/patient_form_bloc.dart';
 import 'package:front/bloc/procedure_bloc/procedure_bloc.dart';
 import 'package:front/bloc/procedure_single_bloc/procedure_single_bloc.dart';
-import 'package:front/bloc_observer.dart';
+// import 'package:front/bloc_observer.dart';
 import 'package:front/data/auth/data_provider/auth_data_provider.dart';
 import 'package:front/data/auth/repository/auth_repository.dart';
 import 'package:front/data/patient/data_provider/patient_data_provider.dart';
@@ -22,7 +22,7 @@ void main() async {
   final sharedPrefDataProvider = SharedPrefDataProvider();
   await sharedPrefDataProvider.init();
 
-  Bloc.observer = GlobalBlocObserver();
+  // Bloc.observer = GlobalBlocObserver();
 
   final sharedPrefRepository = SharedPrefRepository(sharedPrefDataProvider);
   runApp(MyApp(repository: sharedPrefRepository));
@@ -39,12 +39,12 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
-          create: (context) => AuthRepository(
-            AuthDataProvider(),
-          ),
+          create: (context) => repository,
         ),
         RepositoryProvider(
-          create: (context) => repository,
+          create: (context) => AuthRepository(
+            AuthDataProvider(repository),
+          ),
         ),
         RepositoryProvider(
           create: (context) => PatientRepository(

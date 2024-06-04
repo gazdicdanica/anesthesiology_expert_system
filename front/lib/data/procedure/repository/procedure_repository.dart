@@ -47,4 +47,17 @@ class ProcedureRepository {
     String decodedResponse = utf8.decode(response.runes.toList());
     return BaseRulesDTO.fromJson(jsonDecode(decodedResponse));
   }
+
+  Future<Procedure> startOperation(int procedureId) async {
+    String response =
+        await _procedureDataProvider.startOperation(procedureId);
+    String decodedResponse = utf8.decode(response.runes.toList());
+    return Procedure.fromJson(jsonDecode(decodedResponse));
+  }
+
+  Future<Procedure> endOperation(int procedureId) async {
+    String response = await _procedureDataProvider.endOperation(procedureId);
+    String decodedResponse = utf8.decode(response.runes.toList());
+    return Procedure.fromJson(jsonDecode(decodedResponse));
+  }
 }

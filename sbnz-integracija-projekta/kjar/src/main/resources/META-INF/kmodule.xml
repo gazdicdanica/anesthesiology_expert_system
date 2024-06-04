@@ -8,4 +8,7 @@
     <kbase name="baseKbase" eventProcessingMode="stream" packages="base">
         <ksession name="baseKsession" clockType="pseudo"/>
     </kbase>
+    <kbase name="monitoringKbase" eventProcessingMode="stream" packages="monitoring">
+        <ksession name="monitoringKsession" clockType="pseudo"/>
+    </kbase>
 </kmodule>

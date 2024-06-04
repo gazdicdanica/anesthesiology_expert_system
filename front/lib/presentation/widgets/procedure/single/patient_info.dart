@@ -4,7 +4,8 @@ import 'package:front/presentation/widgets/procedure/single/chip.dart';
 import 'package:front/theme.dart';
 
 class PatientInfo extends StatefulWidget {
-  const PatientInfo({super.key, required this.patient, required this.expansionController});
+  const PatientInfo(
+      {super.key, required this.patient, required this.expansionController});
 
   final Patient patient;
   final ExpansionTileController expansionController;
@@ -129,7 +130,7 @@ class _PatientInfoState extends State<PatientInfo> {
                         ],
                       ),
                     const SizedBox(width: 50),
-                    if(widget.patient.risk != null)
+                    if (widget.patient.risk != null)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -149,8 +150,11 @@ class _PatientInfoState extends State<PatientInfo> {
                       ),
                   ],
                 ),
-                const Divider(),
-                const SizedBox(height: 8),
+                if (_showFirstDivider())
+                  const Column(children: [
+                    Divider(),
+                    SizedBox(height: 8),
+                  ]),
                 Wrap(
                   // crossAxisAlignment: WrapCrossAlignment.center,
                   alignment: WrapAlignment.spaceBetween,
@@ -178,9 +182,12 @@ class _PatientInfoState extends State<PatientInfo> {
                       const CustomChip(label: 'Bubrežna insuficijencija'),
                   ],
                 ),
-                const SizedBox(height: 8),
-                const Divider(),
-                const SizedBox(height: 8),
+                if (_showSecondDivider())
+                  const Column(children: [
+                    SizedBox(height: 8),
+                    Divider(),
+                    SizedBox(height: 8),
+                  ]),
                 Wrap(
                   children: [
                     if (widget.patient.pregnant)
@@ -189,6 +196,8 @@ class _PatientInfoState extends State<PatientInfo> {
                       const CustomChip(label: 'Pušač/alkoholičar'),
                     if (widget.patient.addictions)
                       const CustomChip(label: 'Zavisnosti'),
+                    if(widget.patient.hasCVSFamilyHistory)
+                      const CustomChip(label: 'Porodična istorija KVS bolesti')
                   ],
                 ),
               ],
@@ -197,5 +206,30 @@ class _PatientInfoState extends State<PatientInfo> {
         ],
       ),
     );
+  }
+
+  bool _showFirstDivider() {
+    if (widget.patient.hasDiabetes ||
+        (widget.patient.hasDiabetes && widget.patient.isDMControlled) ||
+        widget.patient.hasHypertension ||
+        (widget.patient.hasHypertension &&
+            widget.patient.controlledHypertension) ||
+        widget.patient.hadHearthAttack ||
+        widget.patient.hasHearthFailure ||
+        widget.patient.hadStroke ||
+        widget.patient.hasRenalFailure) {
+      return true;
+    }
+    return false;
+  }
+
+  bool _showSecondDivider() {
+    if (widget.patient.pregnant ||
+        widget.patient.smokerOrAlcoholic ||
+        widget.patient.addictions ||
+        widget.patient.hasCVSFamilyHistory) {
+      return true;
+    }
+    return false;
   }
 }

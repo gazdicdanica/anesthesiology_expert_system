@@ -21,4 +21,8 @@ public interface IProcedureService {
 
     BaseRulesDTO updateBnp(Long id, double bnpValue);
 
+    Procedure startOperation(Long id);
+
+    Procedure endOperation(Long id);
+
 }

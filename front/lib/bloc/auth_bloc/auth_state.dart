@@ -77,3 +77,8 @@ final class LoginSuccess extends AuthState {
   @override
   List<Object?> get props => [token];
 }
+
+final class LogoutSuccess extends AuthState {
+  @override
+  List<Object?> get props => [];
+}
