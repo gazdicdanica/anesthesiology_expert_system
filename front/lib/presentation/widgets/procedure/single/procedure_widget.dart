@@ -9,6 +9,7 @@ import 'package:front/presentation/widgets/loading_widget.dart';
 import 'package:front/presentation/widgets/procedure/risk_and_urgency.dart';
 import 'package:front/presentation/widgets/procedure/single/patient_info.dart';
 import 'package:front/presentation/widgets/procedure/single/preoperative_form.dart';
+import 'package:front/theme.dart';
 
 class ProcedureWidget extends StatefulWidget {
   const ProcedureWidget({super.key, required this.procedure});
@@ -67,7 +68,8 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                 if(state.procedure != null && state.procedure!.preOperative.bnpValue != 0.0){
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     showMessageDialog(
-                      'Rezulatati',
+                      context,
+                      'Rezultati',
                       patient.hasHearthFailure ? 'Testom je utvrdjeno da pacijent ima srčanu insuficijenciju. Dati odgovarajuću terapiju.' : 'Testom je utvrdjeno da pacijent nema srčanu insuficijenciju. Nastaviti sa predviđenom terapijom radi stabilizovanja zdravstvenog stanja.',
                     );
                   });
@@ -75,6 +77,7 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                 else if (state.procedure != null && !state.procedure!.preOperative.shouldContinueProcedure) {
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     showMessageDialog(
+                      context,
                       'Odložite operaciju',
                       procedure.preOperative.postponeReason ??
                           'Potrebno je odložiti operaciju.',
@@ -168,25 +171,49 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
     );
   }
 
-  void showMessageDialog(String title, String content) => showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Expanded(
-            child: AlertDialog(
-              title: Text(title),
-              content: Text(content),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('Ok'),
-                ),
-              ],
+  void showMessageDialog(BuildContext context, String title, String content) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.0),
+        ),
+        title: Text(
+          title,
+          style: const TextStyle(
+            color: seedColor,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          content,
+          style: const TextStyle(
+            fontSize: 16,
+            color: textColor,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: seedColor,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             ),
-          );
-        },
+            child: const Text('OK'),
+          ),
+        ],
       );
+    },
+  );
+}
 
   void _openInfo() {
     try{
