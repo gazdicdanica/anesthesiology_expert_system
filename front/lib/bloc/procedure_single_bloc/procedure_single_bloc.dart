@@ -67,6 +67,17 @@ class ProcedureSingleBloc
     }
   }
 
+  _endOperation(EndOperation event, emit) async {
+    final currentState = state as ProcedurePatientSuccess;
+    emit(ProcedureUpdateLoading(currentState.patient, currentState.procedure));
+    try {
+      final procedure = await _procedureRepository.endOperation(event.procedureId);
+      emit(ProcedurePatientSuccess(currentState.patient, procedure));
+    } catch (e) {
+      emit(const ProcedureSingleError("Greška prilikom završetka operacije"));
+    }
+  }
+
   _handle(event, emit) async {
     if (event is FetchProcedurePatient) {
       await _fetchProcedurePatient(event, emit);
@@ -76,6 +87,8 @@ class ProcedureSingleBloc
       await _updateBnp(event, emit);
     }else if(event is StartOperation){
       await _startOperation(event, emit);
+    }else if(event is EndOperation){
+      await _endOperation(event, emit);
     }
   }
 }

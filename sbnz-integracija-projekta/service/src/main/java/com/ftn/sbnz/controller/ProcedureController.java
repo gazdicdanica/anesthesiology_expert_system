@@ -56,5 +56,10 @@ public class ProcedureController {
     public ResponseEntity<Procedure> startOperation(@PathVariable Long id) {
         return new ResponseEntity<Procedure>(procedureService.startOperation(id), HttpStatus.OK);
     }
+
+    @PutMapping(value = "/{id}/end-operation")
+    public ResponseEntity<Procedure> endOperation(@PathVariable Long id) {
+        return new ResponseEntity<Procedure>(procedureService.endOperation(id), HttpStatus.OK);
+    }
     
 }

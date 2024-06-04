@@ -15,6 +15,7 @@ import com.ftn.sbnz.dto.PreoperativeDTO;
 import com.ftn.sbnz.exception.EntityNotFoundException;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.IntraOperative;
+import com.ftn.sbnz.model.procedure.PostOperative;
 import com.ftn.sbnz.model.procedure.PreOperative;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.model.user.User;
@@ -175,6 +176,15 @@ public class ProcedureService implements IProcedureService {
 
                 return procedureRepository.save(procedure);
 
+        }
+
+        @Override
+        public Procedure endOperation(Long id) {
+                Procedure procedure = procedureRepository.findById(id)
+                                .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
+                procedure.setPostOperative(new PostOperative());
+
+                return procedureRepository.save(procedure);
         }
 
 }

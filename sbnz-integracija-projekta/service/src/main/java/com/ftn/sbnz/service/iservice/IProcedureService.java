@@ -23,4 +23,6 @@ public interface IProcedureService {
 
     Procedure startOperation(Long id);
 
+    Procedure endOperation(Long id);
+
 }

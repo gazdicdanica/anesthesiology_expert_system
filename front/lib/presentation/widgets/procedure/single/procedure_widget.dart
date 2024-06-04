@@ -180,7 +180,7 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                                             state is ProcedureUpdateLoading
                                                 ? () {}
                                                 : () {
-                                                    _startOperation();
+                                                    _endOperation();
                                                   },
                                         child: state is ProcedureUpdateLoading
                                             ? const CircularProgressIndicator(
@@ -264,6 +264,11 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
   void _startOperation() {
     BlocProvider.of<ProcedureSingleBloc>(context)
         .add(StartOperation(procedure.id));
+  }
+
+  void _endOperation() {
+    BlocProvider.of<ProcedureSingleBloc>(context)
+        .add(EndOperation(procedure.id));
   }
 
   @override
