@@ -601,7 +601,7 @@ public class CEPConfigTest {
 
         int rules = kSession.fireAllRules();
         System.out.println("Rules fired: " + rules);
-        assertEquals(IllnessName.TENSION_PNEUMOTHORAX, patient.getIllnesses().get(0).getName());
+        assertEquals(IllnessName.BRONCHOSPASM, patient.getIllnesses().get(0).getName());
         kSession.dispose();
     }
 

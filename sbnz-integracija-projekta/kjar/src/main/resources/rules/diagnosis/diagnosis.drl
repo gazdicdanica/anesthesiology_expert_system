@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 
 rule "Bronchospasm"
+    lock-on-active true
     when
         $p : Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id)
@@ -22,6 +23,7 @@ rule "Bronchospasm"
 end
 
 rule "Pneumonia"
+    lock-on-active true
     when
         $p : Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id)
@@ -37,6 +39,7 @@ rule "Pneumonia"
 end
 
 rule "Tension pneumothorax"
+    lock-on-active true
     when
         $p : Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id)
@@ -54,6 +57,7 @@ rule "Tension pneumothorax"
 end
 
 rule "Pulmonary tromboembolism"
+    lock-on-active true
     when
         $p : Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id)
@@ -72,6 +76,7 @@ end
 
 
 rule "Heart failure - hypotension"
+    lock-on-active true
     when
         $p : Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id)
@@ -93,6 +98,7 @@ rule "Heart failure - hypotension"
 end
 
 rule "Heart failure - hypertension"
+    lock-on-active true
     when
         $p : Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id)
@@ -113,6 +119,7 @@ rule "Heart failure - hypertension"
 end
 
 rule "Myocardial infarction - hypotension"
+    lock-on-active true
     when
         $p : Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id)
@@ -136,6 +143,7 @@ rule "Myocardial infarction - hypotension"
 end
 
 rule "Myocardial infarction - hypertension"
+    lock-on-active true
     when
         $p : Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id)
@@ -158,6 +166,7 @@ rule "Myocardial infarction - hypertension"
 end
 
 rule "Respiratory insuficiency"
+    lock-on-active true
      when
         $p : Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id)
