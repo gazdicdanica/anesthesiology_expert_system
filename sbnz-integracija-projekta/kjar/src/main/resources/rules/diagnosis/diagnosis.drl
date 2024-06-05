@@ -3,7 +3,8 @@ package diagnosis;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.model.events.SymptomEvent;
-
+import com.ftn.sbnz.model.illness.Illness;
+import java.time.LocalDateTime;
 
 
 rule "Bronchospasm"
@@ -14,6 +15,9 @@ rule "Bronchospasm"
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Wheezing))
     then
+        modify($p) {
+            addIllness(new Illness(LocalDateTime.now(), Illness.IllnessName.BRONCHOSPASM));
+        }
         System.out.println("Bronchospasm detected");
 end
 
@@ -26,6 +30,9 @@ rule "Pneumonia"
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Fever))
     then
+        modify($p) {
+            addIllness(new Illness(LocalDateTime.now(), Illness.IllnessName.PNEUMONIA));
+        }
         System.out.println("Pneumonia detected");
 end
 
@@ -40,6 +47,9 @@ rule "Tension pneumothorax"
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension))
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.AbsentBreathSounds))
     then
+        modify($p) {
+            addIllness(new Illness(LocalDateTime.now(), Illness.IllnessName.TENSION_PNEUMOTHORAX));
+        }
         System.out.println("Tension pneumothorax detected");
 end
 
@@ -54,6 +64,9 @@ rule "Pulmonary tromboembolism"
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Cyanosis))
     then
+        modify($p) {
+            addIllness(new Illness(LocalDateTime.now(), Illness.IllnessName.PULMONARY_TROMBOEMBOLISM));
+        }
         System.out.println("Pulmonary tromboembolism detected");
 end
 
@@ -72,6 +85,9 @@ rule "Heart failure - hypotension"
         System.out.println("Heart failure detected");
 
         modify($p) {
+            addIllness(new Illness(LocalDateTime.now(), Illness.IllnessName.HEART_FAILURE));
+        }
+        modify($p) {
             setHasHearthFailure(true);
         }
 end
@@ -88,6 +104,9 @@ rule "Heart failure - hypertension"
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.PulmonaryEdema))
     then
         System.out.println("Heart failure detected");
+        modify($p) {
+            addIllness(new Illness(LocalDateTime.now(), Illness.IllnessName.HEART_FAILURE));
+        }
         modify($p) {
             setHasHearthFailure(true);
         }
@@ -109,6 +128,9 @@ rule "Myocardial infarction - hypotension"
         System.out.println("Myocardial infarction detected");
 
         modify($p) {
+            addIllness(new Illness(LocalDateTime.now(), Illness.IllnessName.MYOCARDIAL_INFARCTION));
+        }
+        modify($p) {
             setHadHearthAttack(true);
         }
 end
@@ -128,6 +150,9 @@ rule "Myocardial infarction - hypertension"
     then
         System.out.println("Myocardial infarction detected");
         modify($p) {
+            addIllness(new Illness(LocalDateTime.now(), Illness.IllnessName.MYOCARDIAL_INFARCTION));
+        }
+        modify($p) {
             setHadHearthAttack(true);
         }
 end
@@ -144,6 +169,10 @@ rule "Respiratory insuficiency"
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Cyanosis))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradypnea))
     then
+    
+        modify($p) {
+            addIllness(new Illness(LocalDateTime.now(), Illness.IllnessName.RESPIRATORY_INSUFICIENCY));
+        }
         System.out.println("Respiratory insuficiency detected");
 
 end

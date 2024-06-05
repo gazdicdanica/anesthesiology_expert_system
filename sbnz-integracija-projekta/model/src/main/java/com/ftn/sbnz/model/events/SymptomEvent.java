@@ -49,6 +49,6 @@ public class SymptomEvent {
     }
 
     public enum Symptom{
-        Arythima, Bradycardia, Bradypnea, Cyanosis, Dyspnea, Exstrasystole, Hypertension, Hypotension, Hypoxemia, Tachycardia, Tachypnea, Wheezing, Fever, AbsentBreathSounds, PulmonaryEdema, ChestPain
+        Arythmia, Bradycardia, Bradypnea, Cyanosis, Dyspnea, Exstrasystole, Hypertension, Hypotension, Hypoxemia, Tachycardia, Tachypnea, Wheezing, Fever, AbsentBreathSounds, PulmonaryEdema, ChestPain
     }
 }
