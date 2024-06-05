@@ -42,7 +42,7 @@ public class Patient {
 
     private ASA asa;
 
-
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Illness> illnesses = new ArrayList<>();
 
     public enum ASA {

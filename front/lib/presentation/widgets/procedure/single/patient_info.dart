@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:front/models/patient.dart';
 import 'package:front/presentation/widgets/procedure/single/chip.dart';
 import 'package:front/theme.dart';
@@ -196,10 +197,80 @@ class _PatientInfoState extends State<PatientInfo> {
                       const CustomChip(label: 'Pušač/alkoholičar'),
                     if (widget.patient.addictions)
                       const CustomChip(label: 'Zavisnosti'),
-                    if(widget.patient.hasCVSFamilyHistory)
+                    if (widget.patient.hasCVSFamilyHistory)
                       const CustomChip(label: 'Porodična istorija KVS bolesti')
                   ],
                 ),
+                if (widget.patient.illnesses.isNotEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 8),
+                      const Divider(),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Istorija komplikacija',
+                        style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                          fontSize: 18,
+                          color: textColor,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          maxHeight: 200,
+                        ),
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          physics:
+                              const NeverScrollableScrollPhysics(), // disables scrolling
+                          itemCount: widget.patient.illnesses.length,
+                          itemBuilder: (context, index) {
+                            final illness = widget.patient.illnesses[index];
+                            return Container(
+                             
+                              // padding: const EdgeInsets.all(4.0),
+                              margin: const EdgeInsets.only(top: 8.0),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(8.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.3),
+                                    spreadRadius: 2,
+                                    blurRadius: 5,
+                                    offset: const Offset(
+                                        0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: ListTile(
+                                leading:const Icon(
+                                  Icons.local_hospital,
+                                  color: seedColor,
+                                ),
+                                title: Text(
+                                  illness.illnessName,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16.0,
+                                    color: textColor,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  illness.dateString,
+                                  style: const TextStyle(
+                                    fontSize: 14.0,
+                                    color: textColor,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
