@@ -1,19 +1,28 @@
 package com.ftn.sbnz.service;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
 import com.ftn.sbnz.dto.BaseRulesDTO;
+import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
 import com.ftn.sbnz.exception.EntityNotFoundException;
+import com.ftn.sbnz.model.events.HeartBeatEvent;
+import com.ftn.sbnz.model.events.SAPEvent;
+import com.ftn.sbnz.model.events.SymptomEvent;
+import com.ftn.sbnz.model.events.SymptomEvent.Symptom;
 import com.ftn.sbnz.model.patient.Patient;
+import com.ftn.sbnz.model.procedure.Alarm;
 import com.ftn.sbnz.model.procedure.PreOperative;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.model.user.User;
@@ -153,4 +162,85 @@ public class ProcedureService implements IProcedureService {
                 return dto;
         }
 
+        @Override
+        public List<Alarm> updateIntraOperativeData(Long id, IntraOperativeDataDTO intraOperativeData, int eventType) {
+                if (eventType == 1) {
+                        return updateIntraOperativeBPMData(id, intraOperativeData);
+                } else if (eventType == 2) {
+                        return updateIntraOperativeSAPData(id, intraOperativeData);
+                } else if (eventType == 3) {
+                        return updateIntraOperativeExtrasystoleData(id, intraOperativeData);
+                } else {
+                        throw new EntityNotFoundException("Invalid event type");
+                }
+        }
+
+        private List<Alarm> updateIntraOperativeBPMData(Long patientId, IntraOperativeDataDTO intraOperativeData) {
+                Patient patient = patientService.findById(patientId);
+                Procedure procedure = procedureRepository.findById(intraOperativeData.getProcedureId())
+                                .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
+
+                KieSession kieSession = kieService.createKieSession("cepKsession");
+                kieSession.insert(patient);
+                kieSession.insert(procedure);
+
+                HeartBeatEvent event = new HeartBeatEvent(patientId);
+                kieSession.insert(event);
+                
+                return getAlarmData(kieSession);
+        }
+
+        private List<Alarm> updateIntraOperativeSAPData(Long patientId, IntraOperativeDataDTO intraOperativeData) {
+                Patient patient = patientService.findById(patientId);
+                Procedure procedure = procedureRepository.findById(intraOperativeData.getProcedureId())
+                                .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
+
+                KieSession kieSession = kieService.createKieSession("cepKsession");
+                kieSession.insert(patient);
+                kieSession.insert(procedure);
+
+                SAPEvent event = new SAPEvent(patientId, intraOperativeData.getSap());
+                kieSession.insert(event);
+                
+                return getAlarmData(kieSession);
+        }
+        
+        private List<Alarm> updateIntraOperativeExtrasystoleData(Long patientId, IntraOperativeDataDTO intraOperativeData) {
+                Patient patient = patientService.findById(patientId);
+                Procedure procedure = procedureRepository.findById(intraOperativeData.getProcedureId())
+                                .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
+
+                KieSession kieSession = kieService.createKieSession("cepKsession");
+                kieSession.insert(patient);
+                kieSession.insert(procedure);
+
+                if (intraOperativeData.isExstrasystole()) {
+                        SymptomEvent event = new SymptomEvent(patientId, intraOperativeData.getProcedureId(), Symptom.Exstrasystole);
+                        kieSession.insert(event);
+                }
+                
+                return getAlarmData(kieSession);               
+        }
+
+        private List<Alarm> getAlarmData(KieSession kieSession) {
+                List<Alarm> alarms = new ArrayList<>();
+                QueryResults results = kieSession.getQueryResults("getAlarms");
+                if (results.size() > 0) {
+                        
+                        for (QueryResultsRow row : results) {
+                                Alarm alarm = (Alarm) row.get("alarm");
+                                alarms.add(alarm);
+                        }
+                        return alarms;
+                        
+                } else {
+                        return null;
+                } 
+        }
+
+        @Override
+        public void disposeIntraOperativeKieSession(String kieSessionName) {
+                KieSession kieSession = kieService.createKieSession(kieSessionName);
+                kieSession.dispose();
+        }
 }
