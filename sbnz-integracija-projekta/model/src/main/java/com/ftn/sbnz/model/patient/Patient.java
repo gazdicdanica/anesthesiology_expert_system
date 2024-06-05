@@ -1,6 +1,11 @@
 package com.ftn.sbnz.model.patient;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.*;
+
+import com.ftn.sbnz.model.illness.Illness;
 
 @Entity
 @Table(name = "Patients")
@@ -36,6 +41,9 @@ public class Patient {
     private boolean pregnant;
 
     private ASA asa;
+
+
+    private List<Illness> illnesses = new ArrayList<>();
 
     public enum ASA {
         I, II, III, IV, V
@@ -261,6 +269,18 @@ public class Patient {
 
     public void setRisk(PatientRisk risk) {
         this.risk = risk;
+    }
+
+    public List<Illness> getIllnesses() {
+        return illnesses;
+    }
+
+    public void setIllnesses(List<Illness> illnesses) {
+        this.illnesses = illnesses;
+    }
+
+    public void addIllness(Illness illness) {
+        this.illnesses.add(illness);
     }
 
     @Override

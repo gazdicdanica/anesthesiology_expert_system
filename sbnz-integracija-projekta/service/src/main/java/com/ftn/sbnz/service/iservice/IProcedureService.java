@@ -3,8 +3,6 @@ package com.ftn.sbnz.service.iservice;
 import java.security.Principal;
 import java.util.List;
 
-import org.kie.api.runtime.KieSession;
-
 import com.ftn.sbnz.dto.AddProcedureDTO;
 import com.ftn.sbnz.dto.BaseRulesDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
@@ -25,11 +23,11 @@ public interface IProcedureService {
 
     BaseRulesDTO updateBnp(Long id, double bnpValue);
 
-    Procedure startOperation(Long id);
-
-    Procedure endOperation(Long id);
-
     List<Alarm> updateIntraOperativeData(Long id, IntraOperativeDataDTO intraOperativeData, int eventType);
 
     void disposeIntraOperativeKieSession(String kieSessionName);
+    
+    Procedure startOperation(Long id);
+
+    Procedure endOperation(Long id);
 }
