@@ -16,6 +16,9 @@ declare VasopressorIV
     patientId: Long
 end
 
+query "getAlarms"
+    $alarm : Alarm()
+end
 
 rule "exstrasystole rule"
     when
