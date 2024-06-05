@@ -28,4 +28,9 @@ public interface IProcedureService {
     List<Alarm> updateIntraOperativeData(Long id, IntraOperativeDataDTO intraOperativeData, int eventType);
 
     void disposeIntraOperativeKieSession(String kieSessionName);
+    
+    Procedure startOperation(Long id);
+
+    Procedure endOperation(Long id);
+
 }

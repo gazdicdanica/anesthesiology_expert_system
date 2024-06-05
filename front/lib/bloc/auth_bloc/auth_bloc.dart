@@ -16,6 +16,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<ValidateLoginForm>(_validateLoginForm);
     on<RegisterEvent>(_register);
     on<ValidateRegisterForm>(_validateRegisterForm);
+    on<LogoutEvent>(_logout);
   }
 
   void _resetForm(ResetForm event, emit) {
@@ -144,6 +145,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       return false;
     }
     return true;
+  }
+
+  _logout(LogoutEvent event, emit){
+    _repository.logout();
+    emit(LogoutSuccess());
   }
 
 }

@@ -30,8 +30,8 @@ class Procedure {
       risk: getRisk(json['risk']),
       urgency: getUrgency(json['urgency']),
       preOperative: PreOperative.fromJson(json['preOperative']),
-      postOperative: json['postOperative'],
-      intraOperative: json['intraOperative'],
+      postOperative: json["postOperative"] != null ? PostOperative.fromJson(json['postOperative']) : null,
+      intraOperative: json["intraOperative"] != null ? IntraOperative.fromJson(json['intraOperative']) : null,
     );
   }
 
@@ -44,8 +44,8 @@ class Procedure {
       'risk': risk.toString().split('.').last,
       'urgency': urgency.toString().split('.').last,
       'preOperative': preOperative.toJson(),
-      'postOperative': postOperative,
-      'intraOperative': intraOperative,
+      'postOperative': postOperative == null ? postOperative : postOperative!.toJson(),
+      'intraOperative': intraOperative == null ? intraOperative : intraOperative!.toJson(),
     };
   }
 
@@ -161,7 +161,6 @@ class PreOperative {
       'postponeReason': postponeReason,
       'doBnp': doBnp,
     };
-  
   }
 }
 
@@ -194,5 +193,47 @@ class PostOperative {
 }
 
 class IntraOperative {
+  final int id;
+  final Monitoring monitoring;
 
+  IntraOperative({
+    required this.id,
+    required this.monitoring,
+  });
+
+  factory IntraOperative.fromJson(Map<String, dynamic> json) {
+    return IntraOperative(
+      id: json['id'],
+      monitoring: getMonitoring(json['monitoring']),
+    );
+  }
+
+  toJson() {
+    return {
+      'id': id,
+      'monitoring': monitoring.toString().split('.').last,
+    };
+  }
 }
+
+getMonitoring(String monitoring) {
+  switch (monitoring) {
+    case 'INVASIVE':
+      return Monitoring.INVASIVE;
+    case 'NON_INVASIVE':
+      return Monitoring.NON_INVASIVE;
+    default:
+      return Monitoring.NON_INVASIVE;
+  }
+}
+
+getMonitoringString(Monitoring monitoring) {
+  switch (monitoring) {
+    case Monitoring.INVASIVE:
+      return 'Invazivni monitoring, petokanalni EKG';
+    case Monitoring.NON_INVASIVE:
+      return 'Neinvazivni monitoring, trokanalni EKG';
+  }
+}
+
+enum Monitoring { INVASIVE, NON_INVASIVE }

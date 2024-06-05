@@ -51,6 +51,8 @@ public class PatientService implements IPatientService{
         patient = patientRepository.save(patient);
         if(patient.getId() == 1) {
             generatePatientHistory(1L, 3);
+
+            patient = hasHeartProblems(patient.getId());
         }
         return patient;
     }
@@ -103,6 +105,16 @@ public class PatientService implements IPatientService{
         }
     }
 
+    private Patient hasHeartProblems(Long patientId) {
+        AncestorHeartProblemsDTO dto = ancestorHadhartProbles(patientId);
+        Patient patient = findById(patientId);
+        if(dto.isAnyoneHadHearthProblems()){
+            patient.setHasCVSFamilyHistory(true);
+            return patientRepository.save(patient);
+        }
+        return patient;
+    }
+
     @Override
     public AncestorHeartProblemsDTO ancestorHadhartProbles(Long patientId) {
         KieSession ks = kieService.createKieSession("bwKsession");
@@ -116,6 +128,8 @@ public class PatientService implements IPatientService{
         }
 
         kieService.fireAllRules(ks);
+
+        patientRepository.save(patient);
 
         AncestorHeartProblemsDTO dto = new AncestorHeartProblemsDTO();
         dto.setAnyoneHadHearthProblems(patient.isHasCVSFamilyHistory());

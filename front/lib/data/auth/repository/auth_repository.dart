@@ -15,4 +15,8 @@ class AuthRepository{
   Future<String> login(String email, String password) async {
     return dataProvider.login(email, password);
   }
+
+  Future<void> logout() async {
+    return dataProvider.logout();
+  }
 }

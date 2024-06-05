@@ -21,6 +21,7 @@ import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.illness.PatientHistory;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.patient.Patient.PatientRisk;
+import com.ftn.sbnz.model.procedure.IntraOperative;
 import com.ftn.sbnz.model.procedure.PreOperative;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.model.procedure.Procedure.OperationRisk;
@@ -209,7 +210,7 @@ public class CEPConfigTest {
     public void MonitoringRule() {
         KieServices ks = KieServices.Factory.get();
         KieContainer kContainer = ks.getKieClasspathContainer();
-        KieSession ksession = kContainer.newKieSession("baseKsession");
+        KieSession ksession = kContainer.newKieSession("monitoringKsession");
         assertNotNull(ksession);
 
         Patient patient = new Patient();
@@ -223,14 +224,19 @@ public class CEPConfigTest {
         procedure.setPreOperative(preOperative);
         procedure.setPatientId(1L);
         procedure.setRisk(OperationRisk.LOW);
+        IntraOperative intraOperative = new IntraOperative();
+        procedure.setIntraOperative(intraOperative);
 
         ksession.insert(patient);
         ksession.insert(procedure);
         ksession.insert(preOperative);
+        ksession.insert(intraOperative);
+
+        ksession.getAgenda().getAgendaGroup("monitoring").setFocus();
 
         int rules = ksession.fireAllRules();
         System.out.println("Rules fired: " + rules);
-        assertNotNull(procedure.getIntraOperative());
+        assertEquals(procedure.getIntraOperative().getMonitoring(), IntraOperative.Monitoring.NON_INVASIVE);
         ;
 
     }
