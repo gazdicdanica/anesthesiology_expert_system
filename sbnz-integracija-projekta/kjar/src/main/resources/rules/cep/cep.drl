@@ -6,6 +6,7 @@ import com.ftn.sbnz.model.events.HeartBeatEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
+import com.ftn.sbnz.model.events.ExtrasystoleEvent;
 import com.ftn.sbnz.model.procedure.Alarm;
 
 import com.ftn.sbnz.model.events.SymptomEvent;
@@ -23,7 +24,7 @@ end
 rule "update bpm"
     when
         $patient : Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
+        $procedure: Procedure(patientId == $id, intraOperative != null, $intraOp: intraOperative)
         Number($count : intValue) from accumulate(
             $heartBeat: HeartBeatEvent(patientId == $id)
             over window: time(1m), count($heartBeat)
@@ -32,19 +33,38 @@ rule "update bpm"
        modify($intraOp){
             setBpm($count)
        }
+       System.out.println("BPM::" + $intraOp);
+end
+
+rule "update sap"
+    when
+        $patient : Patient($id: id)
+        $procedure: Procedure(patientId == $id, intraOperative != null, $intraOp: intraOperative)
+        Number($count : doubleValue) from accumulate(
+            $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
+        )
+    then
+       modify($intraOp){
+            setSap($count)
+       }
+       System.out.println("SAP::" + $intraOp);
 end
 
 
 rule "exstrasystole rule"
     when
         $patient : Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, postOperative == null)
+        $procedure: Procedure(patientId == $id, $procedureId: id, $doctorId: medicalStaffId, $intraOp: intraOperative, postOperative == null)
         Number($count : intValue) from accumulate(
-            $exs: SymptomEvent(patientId == $id, $procedureId == procedureId, symptom == SymptomEvent.Symptom.Exstrasystole)
+            $exs: ExtrasystoleEvent(patientId == $id)
             over window: time(5m), count($exs)
         )
         eval($count >= 25)
     then
+        modify($intraOp){
+            setExtrasystoleCounter($count)
+        }
+        System.err.println("EXTRA::" + $intraOp);
         //предиктор срчаних компликација, алармирај лекара
         System.out.println("Patient " + $patient.getFullname() + ": Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible.");
         insert(new Alarm($id, $doctorId, "Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible."));
