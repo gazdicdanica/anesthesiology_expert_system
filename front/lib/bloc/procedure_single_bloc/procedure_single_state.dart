@@ -46,3 +46,12 @@ final class ProcedureSingleError extends ProcedureSingleState {
   @override
   List<Object> get props => [message];
 }
+
+final class DisconnectState extends ProcedureSingleState {
+  final int procedureId;
+
+  const DisconnectState(this.procedureId);
+
+  @override
+  List<Object> get props => [procedureId];
+}

@@ -38,7 +38,7 @@ end
 rule "exstrasystole rule"
     when
         $patient : Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, postOperative == null)
         Number($count : intValue) from accumulate(
             $exs: SymptomEvent(patientId == $id, $procedureId == procedureId, symptom == SymptomEvent.Symptom.Exstrasystole)
             over window: time(5m), count($exs)
@@ -102,7 +102,7 @@ end
 rule "hypertension rule"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $procedureId: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative == null)
         Number($count : doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
@@ -115,7 +115,7 @@ end
 rule "hypertension alarm rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id ,postOperative == null)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypertension.");
@@ -125,7 +125,7 @@ end
 rule "hypotension rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative == null)
         Number($averageVal : doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id)
             over window: time(5m), average($sap.getValue())
@@ -139,7 +139,7 @@ end
 rule "hypotension alarm rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, postOperative == null)
         Number($count: intValue) from accumulate(
             $hypotension: SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension) over window: time(10m), count($hypotension)
         )
@@ -154,7 +154,7 @@ end
 rule "Post op SAP - Crystalloids"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null)
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
@@ -168,7 +168,7 @@ end
 rule "Post op SAP - Vasopressors Infusion"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null)
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
@@ -183,7 +183,7 @@ end
 rule "Post op SAP - Vasopressors IV still low"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null)
         $vasopressorIV: VasopressorIV(patientId == $id)
         $SAPEvent: SAPEvent(this after[15m] $vasopressorIV, patientId == $id, value <= ($basalSAP - 50))
     then
@@ -203,7 +203,7 @@ end
 rule "Post op SAP - Inc"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null)
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
@@ -217,7 +217,7 @@ end
 rule "Post op SAP - Inc 50"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null)
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
@@ -231,7 +231,7 @@ end
 rule "hypoxemia rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative != null)
         Number($count : doubleValue) from accumulate(
             $pulseOximetry: PulseOximetryEvent(patientId == $id)
             over window: time(5m), average($pulseOximetry.getValue())
@@ -245,7 +245,7 @@ end
 rule "hypoxemia alarm rule"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, postOperative != null)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
         Number($count : doubleValue) from accumulate(
             $pulseOximetry: PulseOximetryEvent(patientId == $id)
@@ -260,7 +260,7 @@ end
 rule "cyanosis rule"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative != null)
         Number($count : doubleValue) from accumulate(
             $pulseOximetry: PulseOximetryEvent(patientId == $id)
             over window: time(5m), average($pulseOximetry.getValue())  
@@ -274,7 +274,7 @@ end
 rule "Breath frequency - tachypnea"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative != null)
         Number($count: intValue) from accumulate(
             $e: BreathEvent(patientId == $id)
             over window: time(1m), count($e)
@@ -288,7 +288,7 @@ end
 rule "Breath frequency - bradypnea"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative != null)
         Number($count: intValue) from accumulate(
             $e: BreathEvent(patientId == $id)
             over window: time(1m), count($e)

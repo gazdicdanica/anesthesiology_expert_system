@@ -57,3 +57,12 @@ final class EndOperation extends ProcedureSingleEvent {
   @override
   List<Object> get props => [procedureId];
 }
+
+final class DisconnectStomp extends ProcedureSingleEvent {
+  final int procedureId;
+
+  const DisconnectStomp(this.procedureId);
+
+  @override
+  List<Object> get props => [procedureId];
+}

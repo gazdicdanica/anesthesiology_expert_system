@@ -15,9 +15,6 @@ class ProcedureSingleBloc
   ProcedureSingleBloc(this._procedureRepository)
       : super(ProcedureSingleInitial()) {
     on<ProcedureSingleEvent>(_handle, transformer: restartable());
-    // on<FetchProcedurePatient>(_fetchProcedurePatient);
-    // on<UpdatePreoperative>(_updatePreoperative);
-    // on<UpdateBnp>(_updateBnp);
   }
 
   _fetchProcedurePatient(FetchProcedurePatient event, emit) async {
@@ -78,6 +75,10 @@ class ProcedureSingleBloc
     }
   }
 
+  _disconnectStomp(DisconnectStomp event, emit) async {
+    emit(DisconnectState(event.procedureId));
+  }
+
   _handle(event, emit) async {
     if (event is FetchProcedurePatient) {
       await _fetchProcedurePatient(event, emit);
@@ -89,6 +90,8 @@ class ProcedureSingleBloc
       await _startOperation(event, emit);
     }else if(event is EndOperation){
       await _endOperation(event, emit);
+    }else if(event is DisconnectStomp){
+      await _disconnectStomp(event, emit);
     }
   }
 }

@@ -269,6 +269,8 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
   void _endOperation() {
     BlocProvider.of<ProcedureSingleBloc>(context)
         .add(EndOperation(procedure.id));
+
+    BlocProvider.of<ProcedureSingleBloc>(context).add(DisconnectStomp(procedure.id));
   }
 
   @override
