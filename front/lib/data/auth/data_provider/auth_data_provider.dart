@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:front/constant.dart';
+import 'package:front/server_path.dart';
 import 'package:front/custom_exception.dart';
 import 'package:front/data/shared_pref/repository/shared_pref_repository.dart';
 import 'package:front/models/user.dart';

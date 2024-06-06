@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/procedure_single_bloc/procedure_single_bloc.dart';
 import 'package:front/models/procedure.dart';
+import 'package:front/server_path.dart';
 import 'package:front/theme.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
 
@@ -37,7 +38,7 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
   void connectStomp() {
     stompClient = StompClient(
       config: StompConfig(
-        url: 'http://192.168.0.19:8080/socket',
+        url: socketPath,
         onConnect: onConnectCallback,
         useSockJS: true,
         onWebSocketError: (dynamic error) {
