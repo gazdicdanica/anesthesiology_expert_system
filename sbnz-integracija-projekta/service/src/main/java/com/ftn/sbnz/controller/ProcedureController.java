@@ -25,8 +25,7 @@ import com.ftn.sbnz.service.iservice.IProcedureService;
 @RequestMapping(value = "/api/procedure", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProcedureController {
 
-    @Autowired
-    private IProcedureService procedureService;
+    @Autowired private IProcedureService procedureService;
 
     @PostMapping
     public ResponseEntity<?> addProcedure(@RequestBody AddProcedureDTO addProcedureDTO, Principal u) {
