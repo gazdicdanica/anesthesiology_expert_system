@@ -1,14 +1,19 @@
 package com.ftn.sbnz.service;
 
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.drools.decisiontable.ExternalSpreadsheetCompiler;
+import org.kie.api.KieServices;
 import org.kie.api.builder.Message;
 import org.kie.api.builder.Results;
 import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.KieSessionConfiguration;
+import org.kie.api.runtime.conf.ClockTypeOption;
 import org.kie.internal.utils.KieHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +28,8 @@ public class KieService implements IKieService {
 
     @Autowired
     private KieContainer kieContainer;
+
+    private final Map<Long, KieSession> sessionMap = new HashMap<>();
 
     public KieSession insertKieSession(Patient patient, Procedure procedure, PreOperative preOperative,
             KieSession kieSession) {
@@ -46,6 +53,17 @@ public class KieService implements IKieService {
         ExternalSpreadsheetCompiler converter = new ExternalSpreadsheetCompiler();
         String drl = converter.compile(data, template, row, column);
         return createKieSessionFromDRL(drl);
+    }
+
+    @Override
+    public KieSession getOrCreateKieSession(Long procedureId, String ksessionName) {
+        KieSession kieSession = sessionMap.get(procedureId);
+        if (kieSession == null) {
+            System.err.print("Sesija je null");
+            kieSession = createKieSession(ksessionName);
+            sessionMap.put(procedureId, kieSession);
+        }
+        return kieSession;
     }
 
     public void fireAllRules(KieSession ksession) {
@@ -72,7 +90,23 @@ public class KieService implements IKieService {
 
     @Override
     public KieSession createKieSession(String name) {
-        return kieContainer.newKieSession(name);
+        KieSessionConfiguration conf = KieServices.Factory.get().newKieSessionConfiguration();
+        conf.setOption(ClockTypeOption.get("realtime"));
+        return kieContainer.newKieSession(name, conf);
+    }
+
+    @Override
+    public void disposeKieSession(Long procedureId) {
+        KieSession kieSession = sessionMap.get(procedureId);
+        if (kieSession != null) {
+            kieSession.dispose();
+            sessionMap.remove(procedureId);
+        }
+    }
+
+    @Override
+    public boolean alreadyContainsKieSession(Long procedureId) {
+        return sessionMap.containsKey(procedureId);
     }
 
 }

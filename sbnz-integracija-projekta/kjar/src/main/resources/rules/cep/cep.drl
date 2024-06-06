@@ -23,7 +23,7 @@ end
 rule "update bpm"
     when
         $patient : Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
+        $procedure: Procedure(patientId == $id, intraOperative != null, $intraOp: intraOperative)
         Number($count : intValue) from accumulate(
             $heartBeat: HeartBeatEvent(patientId == $id)
             over window: time(1m), count($heartBeat)
@@ -32,6 +32,21 @@ rule "update bpm"
        modify($intraOp){
             setBpm($count)
        }
+       System.out.println("BPM::" + $intraOp);
+end
+
+rule "update sap"
+    when
+        $patient : Patient($id: id)
+        $procedure: Procedure(patientId == $id, intraOperative != null, $intraOp: intraOperative)
+        Number($count : doubleValue) from accumulate(
+            $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
+        )
+    then
+       modify($intraOp){
+            setSap($count)
+       }
+       System.out.println("SAP::" + $intraOp);
 end
 
 

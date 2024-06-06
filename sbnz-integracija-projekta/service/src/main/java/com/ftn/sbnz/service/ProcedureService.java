@@ -200,13 +200,13 @@ public class ProcedureService implements IProcedureService {
                 return procedureRepository.save(procedure);
         }
 
-        public List<Alarm> updateIntraOperativeData(Long id, IntraOperativeDataDTO intraOperativeData, int eventType) {
+        public List<Alarm> updateIntraOperativeData(Long patientId, IntraOperativeDataDTO intraOperativeData, int eventType) {
                 if (eventType == 1) {
-                        return updateIntraOperativeBPMData(id, intraOperativeData);
+                        return updateIntraOperativeBPMData(patientId, intraOperativeData);
                 } else if (eventType == 2) {
-                        return updateIntraOperativeSAPData(id, intraOperativeData);
+                        return updateIntraOperativeSAPData(patientId, intraOperativeData);
                 } else if (eventType == 3) {
-                        return updateIntraOperativeExtrasystoleData(id, intraOperativeData);
+                        return updateIntraOperativeExtrasystoleData(patientId, intraOperativeData);
                 } else {
                         throw new EntityNotFoundException("Invalid event type");
                 }
@@ -217,17 +217,18 @@ public class ProcedureService implements IProcedureService {
                 Procedure procedure = procedureRepository.findById(intraOperativeData.getProcedureId())
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
 
-                KieSession kieSession = kieService.createKieSession("cepKsession");
-                kieSession.insert(patient);
-                kieSession.insert(procedure);
-                kieSession.insert(procedure.getIntraOperative());
+                boolean alreadyContains = kieService.alreadyContainsKieSession(intraOperativeData.getProcedureId());
+                KieSession kieSession = kieService.getOrCreateKieSession(intraOperativeData.getProcedureId(), "cepKsession");
+                if (!alreadyContains) {
+                        kieSession.insert(patient);
+                        kieSession.insert(procedure);
+                        kieSession.insert(procedure.getIntraOperative());
+                }
 
                 HeartBeatEvent event = new HeartBeatEvent(patientId);
                 kieSession.insert(event);
-
-                System.out.println(procedure.getIntraOperative());
-                
-                return getAlarmData(kieSession);
+                kieSession.fireAllRules();
+                return null;
         }
 
         private List<Alarm> updateIntraOperativeSAPData(Long patientId, IntraOperativeDataDTO intraOperativeData) {
@@ -235,15 +236,19 @@ public class ProcedureService implements IProcedureService {
                 Procedure procedure = procedureRepository.findById(intraOperativeData.getProcedureId())
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
 
-                KieSession kieSession = kieService.createKieSession("cepKsession");
-                // KieSession kieSession2 = kieService.statele("cepKsession");
-                kieSession.insert(patient);
-                kieSession.insert(procedure);
+                boolean alreadyContains = kieService.alreadyContainsKieSession(intraOperativeData.getProcedureId());
+                KieSession kieSession = kieService.getOrCreateKieSession(intraOperativeData.getProcedureId(), "cepKsession");
+                if (!alreadyContains) {
+                        kieSession.insert(patient);
+                        kieSession.insert(procedure);
+                        kieSession.insert(procedure.getIntraOperative());
+                }
 
                 SAPEvent event = new SAPEvent(patientId, intraOperativeData.getSap());
                 kieSession.insert(event);
                 
-                return getAlarmData(kieSession);
+                kieSession.fireAllRules();
+                return null;
         }
         
         private List<Alarm> updateIntraOperativeExtrasystoleData(Long patientId, IntraOperativeDataDTO intraOperativeData) {
@@ -281,8 +286,7 @@ public class ProcedureService implements IProcedureService {
         }
 
         @Override
-        public void disposeIntraOperativeKieSession(String kieSessionName) {
-                KieSession kieSession = kieService.createKieSession(kieSessionName);
-                kieSession.dispose();
+        public void disposeIntraOperativeKieSession(Long procedureId) {
+                kieService.disposeKieSession(procedureId);
         }
 }

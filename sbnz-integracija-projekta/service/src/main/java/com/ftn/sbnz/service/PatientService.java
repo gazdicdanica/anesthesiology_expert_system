@@ -28,7 +28,6 @@ public class PatientService implements IPatientService{
     @Autowired private ModelMapper modelMapper;
     @Autowired private IKieService kieService;
     
-    private Random random = new Random();
 
     @Override
     public Patient findByJmbg(String jmbg) {
@@ -49,11 +48,11 @@ public class PatientService implements IPatientService{
         Patient patient = modelMapper.map(addPatientDTO, Patient.class);
         patient.calculateBMI();
         patient = patientRepository.save(patient);
-        if(patient.getId() == 1) {
-            generatePatientHistory(1L, 3);
+        // if(patient.getId() == 1) {
+            generatePatientHistory(patient.getId(), 2);
 
             patient = hasHeartProblems(patient.getId());
-        }
+        // }
         return patient;
     }
 
@@ -85,11 +84,20 @@ public class PatientService implements IPatientService{
     
     @Override
     public void generatePatientHistory(Long idPatient, int depth) {
-        if (depth < 0) return;
+        if (depth <= 0) return;
 
-        boolean hasHeartIssues = random.nextBoolean();
-        Long motherId = idPatient * 2;
-        Long fatherId = idPatient * 2 + 1;
+        boolean hasHeartIssues = generateHeartIssueProbability();
+
+        Patient parent1 = new Patient();
+        parent1.setJmbg(generateRandomNumberString(13));
+        parent1 = save(parent1);
+
+        Patient parent2 = new Patient();
+        parent2.setJmbg(generateRandomNumberString(13));
+        parent2 = save(parent2);
+        
+        Long motherId = parent1.getId();
+        Long fatherId = parent2.getId();
 
         PatientHistory patientHistory = new PatientHistory();
         patientHistory.setIdPatient(idPatient);
@@ -103,6 +111,25 @@ public class PatientService implements IPatientService{
             generatePatientHistory(motherId, depth - 1);
             generatePatientHistory(fatherId, depth - 1);
         }
+    }
+
+    public boolean generateHeartIssueProbability() {
+        Random random = new Random();
+        int chance = random.nextInt(100);
+        
+        return chance < 10;
+    }
+
+    private String generateRandomNumberString(int length) {
+        StringBuilder sb = new StringBuilder();
+        
+        Random random = new Random();
+        
+        for (int i = 0; i < length; i++) {
+            int digit = random.nextInt(10);
+            sb.append(digit);
+        }
+        return sb.toString();
     }
 
     private Patient hasHeartProblems(Long patientId) {
