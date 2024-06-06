@@ -62,24 +62,24 @@ public class ProcedureController {
         return new ResponseEntity<Procedure>(procedureService.endOperation(id), HttpStatus.OK);
     }
     
-    @PutMapping(value = "/{id}/heartBeat")
-    public ResponseEntity<?> updateIntraOperativeBPMData(@PathVariable Long id, @RequestBody IntraOperativeDataDTO intraOperativeData) {
-        return ResponseEntity.ok(procedureService.updateIntraOperativeData(id, intraOperativeData, 1));
+    @PutMapping(value = "/{patientId}/heartBeat")
+    public ResponseEntity<?> updateIntraOperativeBPMData(@PathVariable Long patientId, @RequestBody IntraOperativeDataDTO intraOperativeData) {
+        return ResponseEntity.ok(procedureService.updateIntraOperativeData(patientId, intraOperativeData, 1));
     }
 
-    @PutMapping(value = "/{id}/sapEvent")
-    public ResponseEntity<?> updateIntraOperativeSAPData(@PathVariable Long id, @RequestBody IntraOperativeDataDTO intraOperativeData) {
-        return ResponseEntity.ok(procedureService.updateIntraOperativeData(id, intraOperativeData, 2));
+    @PutMapping(value = "/{patientId}/sapEvent")
+    public ResponseEntity<?> updateIntraOperativeSAPData(@PathVariable Long patientId, @RequestBody IntraOperativeDataDTO intraOperativeData) {
+        return ResponseEntity.ok(procedureService.updateIntraOperativeData(patientId, intraOperativeData, 2));
     }
 
-    @PutMapping(value = "/{id}/symptomEvent")
-    public ResponseEntity<?> updateIntraOperativeSymptomData(@PathVariable Long id, @RequestBody IntraOperativeDataDTO intraOperativeData) {
-        return ResponseEntity.ok(procedureService.updateIntraOperativeData(id, intraOperativeData, 3));
+    @PutMapping(value = "/{patientId}/symptomEvent")
+    public ResponseEntity<?> updateIntraOperativeSymptomData(@PathVariable Long patientId, @RequestBody IntraOperativeDataDTO intraOperativeData) {
+        return ResponseEntity.ok(procedureService.updateIntraOperativeData(patientId, intraOperativeData, 3));
     }
 
-    @PutMapping(value = "/{id}/dispose")
-    public ResponseEntity<?> disposeIntraOperativeKieSession(@PathVariable Long id) {
-        procedureService.disposeIntraOperativeKieSession(id.toString());
+    @PutMapping(value = "/{procedureId}/dispose")
+    public ResponseEntity<?> disposeIntraOperativeKieSession(@PathVariable Long procedureId) {
+        procedureService.disposeIntraOperativeKieSession(procedureId);
         return ResponseEntity.ok().build();
     }
 }

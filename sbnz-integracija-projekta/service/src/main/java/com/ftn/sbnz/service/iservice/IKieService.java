@@ -20,4 +20,10 @@ public interface IKieService {
     KieSession createKieSessionFromDRL(String drl);
 
     KieSession createKieSession(String name);
+
+    KieSession getOrCreateKieSession(Long procedureId, String ksessionName);
+        
+    void disposeKieSession(Long procedureId);
+
+    boolean alreadyContainsKieSession(Long procedureId);
 }
