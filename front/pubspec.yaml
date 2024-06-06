@@ -41,6 +41,8 @@ dependencies:
   lottie: ^3.1.2
   shared_preferences: ^2.2.3
   bloc_concurrency: ^0.2.5
+  web_socket_channel: ^2.0.0
+  stomp_dart_client: ^2.0.0
 
 dev_dependencies:
   flutter_test:

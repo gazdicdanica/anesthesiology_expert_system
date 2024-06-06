@@ -16,6 +16,24 @@ declare VasopressorIV
     patientId: Long
 end
 
+query "getAlarms"
+    $alarm : Alarm()
+end
+
+rule "update bpm"
+    when
+        $patient : Patient($id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
+        Number($count : intValue) from accumulate(
+            $heartBeat: HeartBeatEvent(patientId == $id)
+            over window: time(1m), count($heartBeat)
+        )
+    then
+       modify($intraOp){
+            setBpm($count)
+       }
+end
+
 
 rule "exstrasystole rule"
     when

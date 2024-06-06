@@ -1,3 +1,5 @@
+import 'package:front/models/illness.dart';
+
 class Patient {
   final int id;
 
@@ -29,6 +31,8 @@ class Patient {
 
   ASA? asa;
 
+  List<Illness> illnesses;
+
   Patient({
     required this.id,
     required this.fullname,
@@ -53,6 +57,7 @@ class Patient {
     required this.smokerOrAlcoholic,
     required this.pregnant,
     required this.asa,
+    required this.illnesses,
   });
 
   factory Patient.fromJson(Map<String, dynamic> json) {
@@ -80,6 +85,7 @@ class Patient {
       smokerOrAlcoholic: json['smokerOrAlcoholic'],
       pregnant: json['pregnant'],
       asa: _parseASA(json['asa']),
+      illnesses: (json['illnesses'] as List).map((e) => Illness.fromJson(e)).toList(),
     );
   }
 

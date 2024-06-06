@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
+import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.service.iservice.IProcedureService;
@@ -24,8 +25,7 @@ import com.ftn.sbnz.service.iservice.IProcedureService;
 @RequestMapping(value = "/api/procedure", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProcedureController {
 
-    @Autowired
-    private IProcedureService procedureService;
+    @Autowired private IProcedureService procedureService;
 
     @PostMapping
     public ResponseEntity<?> addProcedure(@RequestBody AddProcedureDTO addProcedureDTO, Principal u) {
@@ -62,4 +62,24 @@ public class ProcedureController {
         return new ResponseEntity<Procedure>(procedureService.endOperation(id), HttpStatus.OK);
     }
     
+    @PutMapping(value = "/{id}/heartBeat")
+    public ResponseEntity<?> updateIntraOperativeBPMData(@PathVariable Long id, @RequestBody IntraOperativeDataDTO intraOperativeData) {
+        return ResponseEntity.ok(procedureService.updateIntraOperativeData(id, intraOperativeData, 1));
+    }
+
+    @PutMapping(value = "/{id}/sapEvent")
+    public ResponseEntity<?> updateIntraOperativeSAPData(@PathVariable Long id, @RequestBody IntraOperativeDataDTO intraOperativeData) {
+        return ResponseEntity.ok(procedureService.updateIntraOperativeData(id, intraOperativeData, 2));
+    }
+
+    @PutMapping(value = "/{id}/symptomEvent")
+    public ResponseEntity<?> updateIntraOperativeSymptomData(@PathVariable Long id, @RequestBody IntraOperativeDataDTO intraOperativeData) {
+        return ResponseEntity.ok(procedureService.updateIntraOperativeData(id, intraOperativeData, 3));
+    }
+
+    @PutMapping(value = "/{id}/dispose")
+    public ResponseEntity<?> disposeIntraOperativeKieSession(@PathVariable Long id) {
+        procedureService.disposeIntraOperativeKieSession(id.toString());
+        return ResponseEntity.ok().build();
+    }
 }

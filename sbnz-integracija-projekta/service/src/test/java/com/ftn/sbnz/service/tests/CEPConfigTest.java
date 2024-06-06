@@ -18,7 +18,9 @@ import org.kie.api.runtime.rule.QueryResults;
 import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
+import com.ftn.sbnz.model.events.SymptomEvent;
 import com.ftn.sbnz.model.illness.PatientHistory;
+import com.ftn.sbnz.model.illness.Illness.IllnessName;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.patient.Patient.PatientRisk;
 import com.ftn.sbnz.model.procedure.IntraOperative;
@@ -569,6 +571,38 @@ public class CEPConfigTest {
 
         kSession.dispose();
         assertTrue(patient.isHasCVSFamilyHistory());
+    }
+
+    @Test
+    public void testDiagnosis() {
+        KieServices ks = KieServices.Factory.get();
+        KieContainer kContainer = ks.getKieClasspathContainer();
+        KieSession kSession = kContainer.newKieSession("diagnosisKsession");
+        assertNotNull(kSession);
+
+        Patient patient = new Patient();
+        patient.setId(1L);
+        Procedure procedure = new Procedure();
+        procedure.setId(1L);
+        procedure.setPatientId(1L);
+
+        SymptomEvent ev1 = new SymptomEvent(1L, 1L, SymptomEvent.Symptom.Dyspnea);
+        SymptomEvent ev2 = new SymptomEvent(1L, 1L, SymptomEvent.Symptom.Tachypnea);
+        SymptomEvent ev3 = new SymptomEvent(1L, 1L, SymptomEvent.Symptom.Wheezing);
+
+        kSession.insert(patient);
+        kSession.insert(procedure);
+        kSession.insert(ev1);
+        kSession.insert(ev2);
+        kSession.insert(ev3);
+        // kSession.insert(ev4);
+        // kSession.insert(ev5);
+        // kSession.insert(ev6);
+
+        int rules = kSession.fireAllRules();
+        System.out.println("Rules fired: " + rules);
+        assertEquals(IllnessName.BRONCHOSPASM, patient.getIllnesses().get(0).getName());
+        kSession.dispose();
     }
 
 }

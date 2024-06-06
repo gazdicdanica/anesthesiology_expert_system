@@ -12,11 +12,14 @@ public class IntraOperative {
 
     private Monitoring monitoring;
 
+    private int bpm;
+
     public IntraOperative() {
     }
 
-    public IntraOperative(Monitoring monitoring) {
+    public IntraOperative(Monitoring monitoring, int bpm) {
         this.monitoring = monitoring;
+        this.bpm = bpm;
     }
 
     public Long getId() {
@@ -35,7 +38,25 @@ public class IntraOperative {
         this.monitoring = monitoring;
     }
 
+    public int getBpm() {
+        return bpm;
+    }
+
+    public void setBpm(int bpm) {
+        this.bpm = bpm;
+    }
+
     public enum Monitoring {
         INVASIVE, NON_INVASIVE
+    }
+
+
+    @Override
+    public String toString() {
+        return "IntraOperative{" +
+                "id=" + id +
+                ", monitoring=" + monitoring +
+                ", bpm=" + bpm +
+                '}';
     }
 }

@@ -60,6 +60,10 @@ public class WebSecurityConfig {
                         .antMatchers("/api/user/login").permitAll()
                         .antMatchers("/api/user/register").permitAll()
                         .antMatchers("/h2-console/**").permitAll()
+                        .antMatchers("/socket/**").permitAll()
+                        .antMatchers("/api/procedure/*/heartBeat").permitAll()
+                        .antMatchers("/api/procedure/*/sapEvent").permitAll()
+                        .antMatchers("/api/procedure/*/symptomEvent").permitAll()
                         .anyRequest().authenticated()
                 );
 

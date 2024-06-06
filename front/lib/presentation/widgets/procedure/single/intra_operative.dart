@@ -1,11 +1,46 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:front/models/procedure.dart';
 import 'package:front/theme.dart';
+import 'package:stomp_dart_client/stomp_dart_client.dart';
 
-class IntraOperativeWidget extends StatelessWidget {
+class IntraOperativeWidget extends StatefulWidget {
   const IntraOperativeWidget({super.key, required this.procedure});
 
   final Procedure procedure;
+
+  @override
+  State<IntraOperativeWidget> createState() => _IntraOperativeWidgetState();
+}
+
+class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
+  late StompClient stompClient;
+
+  @override
+  void initState() {
+    super.initState();
+    connectStomp();
+  }
+
+  void connectStomp() {
+    stompClient = StompClient(
+      config: StompConfig(
+          url: 'http://localhost:8080/socket', onConnect: onConnectCallback, useSockJS: true),
+    );
+
+    stompClient.activate();
+  }
+
+  void onConnectCallback(StompFrame frame) {
+    stompClient.subscribe(
+      destination: '/heartbeat/${widget.procedure.id}',
+      callback: (frame) {
+        List<dynamic>? result = json.decode(frame.body!);
+        print(result);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +67,7 @@ class IntraOperativeWidget extends StatelessWidget {
               style: Theme.of(context).textTheme.bodyLarge,
             ),
             Text(
-              getMonitoringString(procedure.intraOperative!.monitoring),
+              getMonitoringString(widget.procedure.intraOperative!.monitoring),
               style: Theme.of(context).textTheme.bodyLarge!.copyWith(
                     fontWeight: FontWeight.bold,
                     color: snackBarColor,
@@ -43,5 +78,11 @@ class IntraOperativeWidget extends StatelessWidget {
         const SizedBox(height: 20),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    stompClient.deactivate();
   }
 }

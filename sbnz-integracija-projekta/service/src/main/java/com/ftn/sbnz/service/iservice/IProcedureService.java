@@ -5,8 +5,10 @@ import java.util.List;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
 import com.ftn.sbnz.dto.BaseRulesDTO;
+import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
 import com.ftn.sbnz.model.patient.Patient;
+import com.ftn.sbnz.model.procedure.Alarm;
 import com.ftn.sbnz.model.procedure.Procedure;
 
 public interface IProcedureService {
@@ -21,8 +23,11 @@ public interface IProcedureService {
 
     BaseRulesDTO updateBnp(Long id, double bnpValue);
 
+    List<Alarm> updateIntraOperativeData(Long id, IntraOperativeDataDTO intraOperativeData, int eventType);
+
+    void disposeIntraOperativeKieSession(String kieSessionName);
+    
     Procedure startOperation(Long id);
 
     Procedure endOperation(Long id);
-
 }

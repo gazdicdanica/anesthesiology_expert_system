@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ public class UserController {
 
 	private final IUserService userService;
 
+    @Autowired public SimpMessagingTemplate simpMessagingTemplate;
 	@Autowired
 	public UserController(UserService sampleService) {
 		this.userService = sampleService;
@@ -38,6 +40,7 @@ public class UserController {
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO){
 		log.info("Logging in user");
+        simpMessagingTemplate.convertAndSend("/heartbeat", "Heartbeat");
 		return new ResponseEntity<>(userService.login(loginDTO), HttpStatus.OK);
 	}
 
