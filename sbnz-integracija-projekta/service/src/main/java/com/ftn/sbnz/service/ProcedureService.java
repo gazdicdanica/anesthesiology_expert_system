@@ -18,6 +18,7 @@ import com.ftn.sbnz.dto.BaseRulesDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
 import com.ftn.sbnz.exception.EntityNotFoundException;
+import com.ftn.sbnz.model.events.ExtrasystoleEvent;
 import com.ftn.sbnz.model.events.HeartBeatEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.events.SymptomEvent;
@@ -256,16 +257,22 @@ public class ProcedureService implements IProcedureService {
                 Procedure procedure = procedureRepository.findById(intraOperativeData.getProcedureId())
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
 
-                KieSession kieSession = kieService.createKieSession("cepKsession");
-                kieSession.insert(patient);
-                kieSession.insert(procedure);
+                boolean alreadyContains = kieService.alreadyContainsKieSession(intraOperativeData.getProcedureId());
+                KieSession kieSession = kieService.getOrCreateKieSession(intraOperativeData.getProcedureId(), "cepKsession");
+                if (!alreadyContains) {
+                        kieSession.insert(patient);
+                        kieSession.insert(procedure);
+                        kieSession.insert(procedure.getIntraOperative());
+                }
 
                 if (intraOperativeData.isExstrasystole()) {
-                        SymptomEvent event = new SymptomEvent(patientId, intraOperativeData.getProcedureId(), Symptom.Exstrasystole);
+                        System.out.println("Extrasystole detected");
+                        ExtrasystoleEvent event = new ExtrasystoleEvent(patientId);
                         kieSession.insert(event);
                 }
                 
-                return getAlarmData(kieSession);               
+                kieSession.fireAllRules();
+                return null;               
         }
 
         private List<Alarm> getAlarmData(KieSession kieSession) {

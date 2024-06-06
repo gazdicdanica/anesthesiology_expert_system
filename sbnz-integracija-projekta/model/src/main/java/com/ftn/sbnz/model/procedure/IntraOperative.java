@@ -14,6 +14,7 @@ public class IntraOperative {
 
     private int bpm;
     private int sap;
+    private int extrasystoleCounter;
 
     public IntraOperative() {
     }
@@ -56,6 +57,14 @@ public class IntraOperative {
         this.sap =(int) sap;
     }
 
+    public int getExtrasystoleCounter() {
+        return extrasystoleCounter;
+    }
+
+    public void setExtrasystoleCounter(int extrasystoleCounter) {
+        this.extrasystoleCounter = extrasystoleCounter;
+    }
+
     public enum Monitoring {
         INVASIVE, NON_INVASIVE
     }
@@ -68,6 +77,7 @@ public class IntraOperative {
                 ", monitoring=" + monitoring +
                 ", bpm=" + bpm +
                 ", sap=" + sap +
+                ", extrasystoleCounter=" + extrasystoleCounter +
                 '}';
     }
 }
