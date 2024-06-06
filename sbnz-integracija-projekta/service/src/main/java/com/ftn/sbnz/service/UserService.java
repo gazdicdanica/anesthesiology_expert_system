@@ -8,11 +8,6 @@ import com.ftn.sbnz.model.user.User;
 import com.ftn.sbnz.repository.UserRepository;
 
 import java.util.Optional;
-
-import org.kie.api.runtime.KieContainer;
-import org.kie.api.runtime.KieSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,18 +22,13 @@ import com.ftn.sbnz.service.iservice.IUserService;
 @Service
 public class UserService implements IUserService {
 
-	private static Logger log = LoggerFactory.getLogger(UserService.class);
-
-	private final KieContainer kieContainer;
 	private final UserRepository userRepository;
 	private final AuthenticationManager authenticationManager;
 	private final PasswordEncoder passwordEncoder;
 
 	@Autowired
-	public UserService(KieContainer kieContainer, UserRepository userRepository,
+	public UserService(UserRepository userRepository,
 			AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder) {
-		log.info("Initialising a new example session.");
-		this.kieContainer = kieContainer;
 		this.userRepository = userRepository;
 		this.authenticationManager = authenticationManager;
 		this.passwordEncoder = passwordEncoder;

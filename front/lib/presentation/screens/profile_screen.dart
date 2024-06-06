@@ -34,9 +34,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Nalog'),
-        ),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(25.0),
@@ -52,10 +49,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   content = Column(
                     children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Nalog',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
                       FieldWidget(
                         label: "Ime i prezime",
                         value: user.fullname,
                         icon: Icons.person,
+                        isPassword: false,
                       ),
                       const SizedBox(
                         height: 10,
@@ -64,6 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         label: "Broj licence",
                         value: user.licenseNumber,
                         icon: Icons.medical_information,
+                        isPassword: false,
                       ),
                       const SizedBox(
                         height: 10,
@@ -72,21 +81,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         label: "Lozinka",
                         value: "*",
                         icon: Icons.lock,
+                        isPassword: true,
                       ),
                       const Spacer(),
-
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: () {},
-                          child: const Text(
-                            'Izmeni',
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 10,
-                      ),
 
                       // Logout button
                       SizedBox(
