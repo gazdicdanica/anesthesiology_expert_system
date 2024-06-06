@@ -4,9 +4,9 @@ patient_id = sys.argv[1]
 procedure_id = sys.argv[2]
 
 
-endpoint_sap = "localhost:8080/api/procedure/" + patient_id + "/sapEvent"
-endpoint_hb = "localhost:8080/api/procedure/" + patient_id + "/heartbeat"
-endpoint_symptom = "localhost:8080/api/procedure/" + patient_id + "/symptomEvent"
+endpoint_sap = "http://localhost:8080/api/procedure/" + patient_id + "/sapEvent"
+endpoint_hb = "http://localhost:8080/api/procedure/" + patient_id + "/heartBeat"
+endpoint_symptom = "http://localhost:8080/api/procedure/" + patient_id + "/symptomEvent"
 base = {
     "patientId": patient_id,
     "procedureId": procedure_id
@@ -31,7 +31,7 @@ def send_data(patient_id, procedure_id, sap, exstrasystole):
 def send_request(data, url):
     headers = {'Content-Type': 'application/json'}
     response = requests.put(url, headers=headers, data=json.dumps(data))
-    if response != 200:
+    if response.status_code != 200:
         print(f"Failed to send data: {response.status_code}, {response.text}")
 
 

@@ -10,6 +10,7 @@ import org.kie.api.runtime.rule.FactHandle;
 import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
@@ -48,6 +49,9 @@ public class ProcedureService implements IProcedureService {
 
         @Autowired
         private IKieService kieService;
+
+        @Autowired
+        public SimpMessagingTemplate simpMessagingTemplate;
 
         @Override
         public Procedure addProcedure(AddProcedureDTO addProcedureDTO, Principal u) {
@@ -216,9 +220,12 @@ public class ProcedureService implements IProcedureService {
                 KieSession kieSession = kieService.createKieSession("cepKsession");
                 kieSession.insert(patient);
                 kieSession.insert(procedure);
+                kieSession.insert(procedure.getIntraOperative());
 
                 HeartBeatEvent event = new HeartBeatEvent(patientId);
                 kieSession.insert(event);
+
+                System.out.println(procedure.getIntraOperative());
                 
                 return getAlarmData(kieSession);
         }
@@ -229,6 +236,7 @@ public class ProcedureService implements IProcedureService {
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
 
                 KieSession kieSession = kieService.createKieSession("cepKsession");
+                // KieSession kieSession2 = kieService.statele("cepKsession");
                 kieSession.insert(patient);
                 kieSession.insert(procedure);
 
@@ -261,7 +269,8 @@ public class ProcedureService implements IProcedureService {
                 if (results.size() > 0) {
                         
                         for (QueryResultsRow row : results) {
-                                Alarm alarm = (Alarm) row.get("alarm");
+                                System.out.println(row);
+                                Alarm alarm = (Alarm) row.get("Alarm");
                                 alarms.add(alarm);
                         }
                         return alarms;
