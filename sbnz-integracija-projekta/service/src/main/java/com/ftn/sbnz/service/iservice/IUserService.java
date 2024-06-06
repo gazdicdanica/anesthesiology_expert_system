@@ -13,5 +13,7 @@ public interface IUserService {
     String login(LoginDTO loginDTO);
 
     Optional<User> findByUsername(String username);
+
+    User get(String username);
     
 }

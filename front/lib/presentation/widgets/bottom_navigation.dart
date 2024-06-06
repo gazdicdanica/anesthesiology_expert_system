@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:front/presentation/screens/add_patient_screen.dart';
 import 'package:front/presentation/screens/procedures_screen.dart';
-import 'package:front/presentation/screens/settings_screen.dart';
+import 'package:front/presentation/screens/profile_screen.dart';
 import 'package:front/theme.dart';
 
 class CustomBottomNavigation extends StatefulWidget {
@@ -21,7 +21,7 @@ class _CustomBottomNavigationState extends State<CustomBottomNavigation> {
       AddPatientScreen(
         onAddPatientTap: _onItemTap,
       ),
-      const SettingsScreen(),
+      const ProfileScreen(),
     ];
 
     final indicatorColor = seedColor.withAlpha(30);

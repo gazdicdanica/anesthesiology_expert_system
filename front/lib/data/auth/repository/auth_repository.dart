@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:front/data/auth/data_provider/auth_data_provider.dart';
 import 'package:front/models/user.dart';
 
@@ -18,5 +20,11 @@ class AuthRepository{
 
   Future<void> logout() async {
     return dataProvider.logout();
+  }
+
+  Future<User> getUser() async {
+    String response = await dataProvider.getUser();
+    String decodedResponse = utf8.decode(response.runes.toList());
+    return User.fromJson(jsonDecode(decodedResponse));
   }
 }

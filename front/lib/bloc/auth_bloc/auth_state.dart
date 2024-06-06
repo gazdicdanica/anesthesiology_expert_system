@@ -82,3 +82,12 @@ final class LogoutSuccess extends AuthState {
   @override
   List<Object?> get props => [];
 }
+
+final class UserSuccess extends AuthState {
+  final User user;
+
+  UserSuccess(this.user);
+
+  @override
+  List<Object?> get props => [user];
+}

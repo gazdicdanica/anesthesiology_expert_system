@@ -79,4 +79,9 @@ public class UserService implements IUserService {
 	public Optional<User> findByUsername(String username) {
 		return userRepository.findByUsername(username);
 	}
+
+	@Override
+	public User get(String username) {
+		return userRepository.findByUsername(username).orElseThrow(() -> new BadRequestException("Korisnik nije pronađen."));
+	}
 }

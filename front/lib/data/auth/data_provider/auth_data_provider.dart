@@ -19,7 +19,7 @@ class AuthDataProvider {
       body: jsonEncode({
         "email": email,
         "password": password,
-        "role": role.toJson(),
+        "role": getRoleString(role),
         "licenseNumber": licenseNumber,
         "fullname": fullname,
       }),
@@ -52,5 +52,23 @@ class AuthDataProvider {
   Future<void> logout() {
     _sharedPrefRepository.removeToken();
     return Future.value();
+  }
+
+  Future<String> getUser() async {
+    final token = await _sharedPrefRepository.getToken();
+    final res = await http.get(
+      Uri.parse("${path}user"),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+    );
+
+    if (res.statusCode == 200) {
+      return Future.value(res.body);
+    } else {
+      print(res.body);
+      throw CustomException(res.body);
+    }
   }
 }
