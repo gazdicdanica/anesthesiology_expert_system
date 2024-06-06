@@ -11,12 +11,14 @@ import org.kie.api.runtime.rule.QueryResults;
 import org.kie.api.runtime.rule.QueryResultsRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
 import com.ftn.sbnz.dto.BaseRulesDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
+import com.ftn.sbnz.dto.intraDTO;
 import com.ftn.sbnz.exception.EntityNotFoundException;
 import com.ftn.sbnz.model.events.HeartBeatEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
@@ -284,5 +286,21 @@ public class ProcedureService implements IProcedureService {
         public void disposeIntraOperativeKieSession(String kieSessionName) {
                 KieSession kieSession = kieService.createKieSession(kieSessionName);
                 kieSession.dispose();
+        }
+
+
+        @Scheduled(fixedRate = 5000)
+        public void sendHeartBeat() {
+                int bpm = (int) ((Math.random() * (80 - 60)) + 60);
+                intraDTO dto = new intraDTO(bpm, 0);
+                simpMessagingTemplate.convertAndSend("/heartbeat/1", dto);
+        }
+        
+        
+        @Scheduled(fixedRate = 7000)
+        public void sendSAP() {
+                int sap  = (int) ((Math.random() * (130 - 80)) + 80);
+                intraDTO dto = new intraDTO(0, sap);
+                simpMessagingTemplate.convertAndSend("/sap/1", dto);
         }
 }
