@@ -9,6 +9,7 @@ import 'package:front/presentation/widgets/loading_widget.dart';
 import 'package:front/presentation/widgets/procedure/risk_and_urgency.dart';
 import 'package:front/presentation/widgets/procedure/single/intra_operative.dart';
 import 'package:front/presentation/widgets/procedure/single/patient_info.dart';
+import 'package:front/presentation/widgets/procedure/single/post_operative.dart';
 import 'package:front/presentation/widgets/procedure/single/preoperative_form.dart';
 import 'package:front/theme.dart';
 
@@ -191,6 +192,8 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                                     ),
                                   ],
                                 ),
+                              if(procedure.postOperative != null)
+                                PostOperativeWidget(procedure: procedure)
                             ],
                           ),
                         ),
