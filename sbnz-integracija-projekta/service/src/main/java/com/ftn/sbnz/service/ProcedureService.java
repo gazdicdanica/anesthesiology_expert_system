@@ -16,10 +16,13 @@ import org.springframework.stereotype.Service;
 import com.ftn.sbnz.dto.AddProcedureDTO;
 import com.ftn.sbnz.dto.BaseRulesDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
+import com.ftn.sbnz.dto.PostOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
 import com.ftn.sbnz.exception.EntityNotFoundException;
+import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.ExtrasystoleEvent;
 import com.ftn.sbnz.model.events.HeartBeatEvent;
+import com.ftn.sbnz.model.events.PulseOximetryEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.events.SymptomEvent;
 import com.ftn.sbnz.model.events.SymptomEvent.Symptom;
@@ -198,6 +201,7 @@ public class ProcedureService implements IProcedureService {
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
                 procedure.setPostOperative(new PostOperative());
 
+                disposeIntraOperativeKieSession(id);
                 return procedureRepository.save(procedure);
         }
 
@@ -295,5 +299,38 @@ public class ProcedureService implements IProcedureService {
         @Override
         public void disposeIntraOperativeKieSession(Long procedureId) {
                 kieService.disposeKieSession(procedureId);
+        }
+
+        @Override
+        public PostOperativeDataDTO updatePostOperativeData(Long patientId, PostOperativeDataDTO postOperativeDataDTO) {
+                Patient patient = patientService.findById(patientId);
+                Procedure procedure = procedureRepository.findById(postOperativeDataDTO.getProcedureId())
+                                .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
+
+                boolean alreadyContains = kieService.alreadyContainsKieSession(postOperativeDataDTO.getProcedureId());
+                KieSession kieSession = kieService.getOrCreateKieSession(postOperativeDataDTO.getProcedureId(), "cepKsessionPOP");
+                if (!alreadyContains) {
+                        kieSession.insert(patient);
+                        kieSession.insert(procedure);
+                        kieSession.insert(procedure.getPostOperative());
+                }
+                
+                SAPEvent sapEv = new SAPEvent(patientId, postOperativeDataDTO.getSap());
+                kieSession.insert(sapEv);
+                if (postOperativeDataDTO.isHeartBeatEvent()) {
+                        HeartBeatEvent hbEv = new HeartBeatEvent(patientId);
+                        kieSession.insert(hbEv);
+                }
+                if (postOperativeDataDTO.isBreathEvent()) {
+                        BreathEvent breathEv = new BreathEvent(patientId);
+                        kieSession.insert(breathEv);
+                }
+
+                PulseOximetryEvent pulseOximetryEv = new PulseOximetryEvent(patientId, postOperativeDataDTO.getPulseOximetry());
+                kieSession.insert(pulseOximetryEv);
+
+                kieSession.fireAllRules();
+
+                return null;
         }
 }

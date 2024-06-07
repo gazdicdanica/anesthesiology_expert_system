@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
+import com.ftn.sbnz.dto.PostOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.service.iservice.IProcedureService;
@@ -82,4 +83,10 @@ public class ProcedureController {
         procedureService.disposeIntraOperativeKieSession(procedureId);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping(value = "/{patientId}/postOpData")
+    public ResponseEntity<PostOperativeDataDTO> updatePostOperativeData(@PathVariable Long patientId, @RequestBody PostOperativeDataDTO postOperativeDataDTO) {
+        return ResponseEntity.ok(procedureService.updatePostOperativeData(patientId, postOperativeDataDTO));
+    }
+
 }
