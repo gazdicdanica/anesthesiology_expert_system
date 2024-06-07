@@ -270,7 +270,6 @@ public class ProcedureService implements IProcedureService {
 
                 SAPEvent event = new SAPEvent(patientId, intraOperativeData.getSap());
                 kieSession.insert(event);
-                kieSession.insert(System.currentTimeMillis());
                 
                 kieSession.fireAllRules();
 

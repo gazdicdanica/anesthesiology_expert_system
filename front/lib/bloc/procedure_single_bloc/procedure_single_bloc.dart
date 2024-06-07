@@ -69,14 +69,11 @@ class ProcedureSingleBloc
     emit(ProcedureUpdateLoading(currentState.patient, currentState.procedure));
     try {
       final procedure = await _procedureRepository.endOperation(event.procedureId);
+
       emit(ProcedurePatientSuccess(currentState.patient, procedure));
     } catch (e) {
       emit(const ProcedureSingleError("Greška prilikom završetka operacije"));
     }
-  }
-
-  _disconnectStomp(DisconnectStomp event, emit) async {
-    emit(DisconnectState(event.procedureId));
   }
 
   _handle(event, emit) async {
@@ -90,8 +87,6 @@ class ProcedureSingleBloc
       await _startOperation(event, emit);
     }else if(event is EndOperation){
       await _endOperation(event, emit);
-    }else if(event is DisconnectStomp){
-      await _disconnectStomp(event, emit);
     }
   }
 }

@@ -66,14 +66,33 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
         _sapController.add(result);
       },
     );
+
+    stompClient?.subscribe(
+      destination: '/alarm/cardio/${widget.procedure.id}',
+      callback: (frame) {
+        String result = json.decode(frame.body!);
+        print("Cardio alarm");
+        print(result);
+      },
+    );
+
+    stompClient?.subscribe(
+      destination: '/alarm/sap/${widget.procedure.id}',
+      callback: (frame) {
+        String result = json.decode(frame.body!);
+        print(result);
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<ProcedureSingleBloc, ProcedureSingleState>(
       listener: (context, state) {
-        if (state is DisconnectState) {
-          stompClient?.deactivate();
+        if (state is ProcedurePatientSuccess &&
+            state.procedure!.postOperative != null) {
+          stompClient!.deactivate();
+
           _bpmController.close();
           _sapController.close();
         }

@@ -5,6 +5,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.ftn.sbnz.dto.IntraDTO;
+import com.ftn.sbnz.model.events.SymptomEvent.Symptom;
 
 @Service
 public class SocketService {
@@ -18,5 +19,22 @@ public class SocketService {
 
     public void sendSap(int sap, Long procedureId) {
         this.template.convertAndSend("/sap/" + procedureId, new IntraDTO(0, sap));
+    }
+
+    public void sendCardioAlarm(Long procedureId, Symptom symptom) {
+        System.err.println("Sending alarm");
+        this.template.convertAndSend("/alarm/cardio/" + procedureId, symptom);
+    }
+
+    public void sendSapAlarm(Long procedureId, Symptom symptom) {
+        this.template.convertAndSend("/alarm/sap/" + procedureId, symptom);
+    }
+
+    public void sendBpmPostOp(int bpm, Long procedureId) {
+        this.template.convertAndSend("/heartbeat/post/" + procedureId, new IntraDTO(bpm, 0));
+    }
+
+    public void sendSapPostOp(int sap, Long procedureId) {
+        this.template.convertAndSend("/sap/post/" + procedureId, new IntraDTO(0, sap));
     }
 }

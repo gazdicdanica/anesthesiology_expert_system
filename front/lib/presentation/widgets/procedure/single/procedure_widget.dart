@@ -102,6 +102,7 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                   _openInfo();
                 }
 
+                print(state);
                 return CustomScrollView(
                   slivers: [
                     SliverToBoxAdapter(
@@ -193,7 +194,13 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                                   ],
                                 ),
                               if(procedure.postOperative != null)
-                                PostOperativeWidget(procedure: procedure)
+                              
+                                Column(
+                                  children: [
+                                    const SizedBox(height: 20),
+                                    PostOperativeWidget(procedure: procedure),
+                                  ],
+                                )
                             ],
                           ),
                         ),
@@ -272,8 +279,6 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
   void _endOperation() {
     BlocProvider.of<ProcedureSingleBloc>(context)
         .add(EndOperation(procedure.id));
-
-    BlocProvider.of<ProcedureSingleBloc>(context).add(DisconnectStomp(procedure.id));
   }
 
   @override

@@ -6,7 +6,6 @@ import com.ftn.sbnz.model.events.HeartBeatEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
-import com.ftn.sbnz.model.events.ExtrasystoleEvent;
 import com.ftn.sbnz.model.events.RetardDTO;
 import com.ftn.sbnz.model.procedure.Alarm;
 
@@ -27,9 +26,6 @@ query "getAlarms"
     $alarm : Alarm()
 end
 
-
-
-
 rule "update bpm"
     when
         $patient : Patient($id: id)
@@ -39,11 +35,8 @@ rule "update bpm"
             over window: time(1m), count($heartBeat)
         )
     then
-        modify($intraOp){
-            setBpm($count)
-        }
-        socketService.sendBpm($count, $procedure.getId());
-        System.out.println("BPM::" + $intraOp);
+        socketService.sendBpmPostOp($count, $procedure.getId());
+        System.out.println("BPM::" + $postOp);
 end
 
 rule "update sap"
@@ -54,32 +47,10 @@ rule "update sap"
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
     then
-        modify($intraOp){
-            setSap($count)
-        }
-        socketService.sendSap($intraOp.getSap(), $procedure.getId());
-        System.out.println("SAP::" + $intraOp);
+        socketService.sendSapPostOp((int) $count, $procedure.getId());
+        System.out.println("SAP::" + $postOp);
 end
 
-
-rule "exstrasystole rule"
-    when
-        $patient : Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id, $doctorId: medicalStaffId, $postOp: postOperative)
-        Number($count : intValue) from accumulate(
-            $exs: ExtrasystoleEvent(patientId == $id)
-            over window: time(5m), count($exs)
-        )
-        eval($count >= 25)
-    then
-        // modify($postOp){
-        //     setExtrasystoleCounter($count)
-        // }
-        System.err.println("EXTRA::" + $postOp);
-        //предиктор срчаних компликација, алармирај лекара
-        System.out.println("Patient " + $patient.getFullname() + ": Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible.");
-        insert(new Alarm($id, $doctorId, "Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible."));
-end
 
 rule "tachycardia rule"
     when
@@ -135,7 +106,7 @@ end
 rule "hypertension rule"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative == null)
+        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative != null)
         Number($count : doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
@@ -148,7 +119,7 @@ end
 rule "hypertension alarm rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id ,postOperative == null)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id ,postOperative != null)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypertension.");
@@ -158,7 +129,7 @@ end
 rule "hypotension rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative == null)
+        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative != null)
         Number($averageVal : doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id)
             over window: time(5m), average($sap.getValue())
@@ -172,7 +143,7 @@ end
 rule "hypotension alarm rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, postOperative == null)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, postOperative != null)
         Number($count: intValue) from accumulate(
             $hypotension: SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension) over window: time(10m), count($hypotension)
         )

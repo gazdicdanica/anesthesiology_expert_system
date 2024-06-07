@@ -28,6 +28,7 @@ final class ProcedurePatientSuccess extends UpdateAndSuccess {
 
   @override
   List<Object> get props => [super.patient, super.procedure ?? ""];
+
 }
 
 final class ProcedureUpdateLoading extends UpdateAndSuccess {
@@ -47,11 +48,3 @@ final class ProcedureSingleError extends ProcedureSingleState {
   List<Object> get props => [message];
 }
 
-final class DisconnectState extends ProcedureSingleState {
-  final int procedureId;
-
-  const DisconnectState(this.procedureId);
-
-  @override
-  List<Object> get props => [procedureId];
-}
