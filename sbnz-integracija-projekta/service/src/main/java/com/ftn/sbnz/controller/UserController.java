@@ -11,11 +11,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ftn.sbnz.dto.LoginDTO;
+import com.ftn.sbnz.dto.PasswordDTO;
 import com.ftn.sbnz.dto.RegisterDTO;
 import com.ftn.sbnz.service.UserService;
 import com.ftn.sbnz.service.iservice.IUserService;
@@ -50,6 +52,22 @@ public class UserController {
 	@GetMapping
 	public ResponseEntity<?> get(Principal u){
 		return new ResponseEntity<>(userService.get(u.getName()), HttpStatus.OK);
+	}
+
+	@PutMapping("/update/fullname")
+	public ResponseEntity<?> updateName(@RequestBody String name, Principal u){
+		return new ResponseEntity<>(userService.updateFullname(name, u), HttpStatus.OK);
+	}
+
+
+	@PutMapping("/update/license")
+	public ResponseEntity<?> updateLicense(@RequestBody String licenseNumber, Principal u){
+		return new ResponseEntity<>(userService.updateLicenseNumber(licenseNumber, u), HttpStatus.OK);
+	}
+
+	@PutMapping("/update/password")
+	public ResponseEntity<?> updatePassword(@RequestBody PasswordDTO passwordDTO, Principal u){
+		return new ResponseEntity<>(userService.updatePassword(passwordDTO.getOldPassword(), passwordDTO.getNewPassword(), u), HttpStatus.OK);
 	}
 
 }

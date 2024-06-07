@@ -4,9 +4,11 @@ import com.ftn.sbnz.config.JwtUtil;
 import com.ftn.sbnz.dto.LoginDTO;
 import com.ftn.sbnz.dto.RegisterDTO;
 import com.ftn.sbnz.exception.BadRequestException;
+import com.ftn.sbnz.exception.EntityNotFoundException;
 import com.ftn.sbnz.model.user.User;
 import com.ftn.sbnz.repository.UserRepository;
 
+import java.security.Principal;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -72,6 +74,30 @@ public class UserService implements IUserService {
 
 	@Override
 	public User get(String username) {
-		return userRepository.findByUsername(username).orElseThrow(() -> new BadRequestException("Korisnik nije pronađen."));
+		return userRepository.findByUsername(username).orElseThrow(() -> new EntityNotFoundException("Korisnik nije pronađen."));
+	}
+
+	@Override
+	public User updateFullname(String fullname, Principal u) {
+		User user = userRepository.findByUsername(u.getName()).orElseThrow(() -> new EntityNotFoundException("Korisnik nije pronađen."));
+		user.setFullname(fullname);
+		return userRepository.save(user);
+	}
+
+	@Override
+	public User updateLicenseNumber(String licenseNumber, Principal u) {
+		User user = userRepository.findByUsername(u.getName()).orElseThrow(() -> new EntityNotFoundException("Korisnik nije pronađen."));
+		user.setLicenseNumber(licenseNumber);
+		return userRepository.save(user);
+	}
+
+	@Override
+	public User updatePassword(String oldPassword, String newPassword, Principal u) {
+		User user = userRepository.findByUsername(u.getName()).orElseThrow(() -> new EntityNotFoundException("Korisnik nije pronađen."));
+		if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+			throw new BadRequestException("Lozinka je netačna.");
+		}
+		user.setPassword(passwordEncoder.encode(newPassword));
+		return userRepository.save(user);
 	}
 }
