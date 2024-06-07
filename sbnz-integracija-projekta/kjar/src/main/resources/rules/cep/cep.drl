@@ -7,7 +7,7 @@ import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
 import com.ftn.sbnz.model.events.ExtrasystoleEvent;
-import com.ftn.sbnz.model.dto.RetardDTO;
+import com.ftn.sbnz.model.events.RetardDTO;
 import com.ftn.sbnz.model.procedure.Alarm;
 
 
@@ -106,12 +106,12 @@ rule "bradycardia rule"
     when
         $patient: Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id, $start: start)
-        // $retard: RetardDTO(procedureId == $procedureId, $current: unixTime)
+        $retard: RetardDTO(procedureId == $procedureId, $current: unixTime)
         Number($count : intValue) from accumulate(
             $heartBeat: HeartBeatEvent(patientId == $id)
             over window: time(1m), count($heartBeat)
         )
-        eval($count < 60 && $count > 0)
+        eval($count < 60 && $count > 0 && ($start + 60000) < $current)
         // eval($start + 60000 < $current)
     then
         //bradikardija

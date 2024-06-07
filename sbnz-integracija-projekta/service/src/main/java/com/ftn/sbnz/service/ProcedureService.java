@@ -226,8 +226,8 @@ public class ProcedureService implements IProcedureService {
                 if (!alreadyContains) {
                         System.out.println("Creating new session");
                         kieSession.setGlobal("socketService", socketService);
-                        // procedure.setStart(System.currentTimeMillis());
-                        // procedure = procedureRepository.save(procedure);
+                        procedure.setStart(System.currentTimeMillis());
+                        procedure = procedureRepository.save(procedure);
                         kieSession.insert(patient);
                         kieSession.insert(procedure);
                         kieSession.insert(procedure.getIntraOperative());
@@ -236,8 +236,8 @@ public class ProcedureService implements IProcedureService {
 
                 HeartBeatEvent event = new HeartBeatEvent(patientId);
                 kieSession.insert(event);
-                // RetardDTO dto = new RetardDTO(procedure.getId(), System.currentTimeMillis());
-                // kieSession.insert(dto);
+                RetardDTO dto = new RetardDTO(procedure.getId(), System.currentTimeMillis());
+                kieSession.insert(dto);
                 kieSession.fireAllRules();
 
                 System.out.println(procedure.getIntraOperative().getBpm());
