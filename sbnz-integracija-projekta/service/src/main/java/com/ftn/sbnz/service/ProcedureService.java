@@ -1,6 +1,7 @@
 package com.ftn.sbnz.service;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,6 +23,7 @@ import com.ftn.sbnz.dto.IntraDTO;
 import com.ftn.sbnz.exception.EntityNotFoundException;
 import com.ftn.sbnz.model.events.ExtrasystoleEvent;
 import com.ftn.sbnz.model.events.HeartBeatEvent;
+import com.ftn.sbnz.model.events.RetardDTO;
 import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.IntraOperative;
@@ -52,7 +54,8 @@ public class ProcedureService implements IProcedureService {
         private IKieService kieService;
 
         @Autowired
-        public SimpMessagingTemplate simpMessagingTemplate;
+        // public SimpMessagingTemplate simpMessagingTemplate;
+        private SocketService socketService;
 
         @Override
         public Procedure addProcedure(AddProcedureDTO addProcedureDTO, Principal u) {
@@ -221,6 +224,10 @@ public class ProcedureService implements IProcedureService {
                 boolean alreadyContains = kieService.alreadyContainsKieSession(intraOperativeData.getProcedureId());
                 KieSession kieSession = kieService.getOrCreateKieSession(intraOperativeData.getProcedureId(), "cepKsession");
                 if (!alreadyContains) {
+                        System.out.println("Creating new session");
+                        kieSession.setGlobal("socketService", socketService);
+                        // procedure.setStart(System.currentTimeMillis());
+                        // procedure = procedureRepository.save(procedure);
                         kieSession.insert(patient);
                         kieSession.insert(procedure);
                         kieSession.insert(procedure.getIntraOperative());
@@ -229,9 +236,13 @@ public class ProcedureService implements IProcedureService {
 
                 HeartBeatEvent event = new HeartBeatEvent(patientId);
                 kieSession.insert(event);
+                // RetardDTO dto = new RetardDTO(procedure.getId(), System.currentTimeMillis());
+                // kieSession.insert(dto);
                 kieSession.fireAllRules();
 
-                simpMessagingTemplate.convertAndSend("/heartbeat/" + procedure.getId(), new IntraDTO(procedure.getIntraOperative().getBpm(), 0));
+                System.out.println(procedure.getIntraOperative().getBpm());
+
+                // simpMessagingTemplate.convertAndSend("/heartbeat/" + procedure.getId(), new IntraDTO(procedure.getIntraOperative().getBpm(), 0));
 
                 return null;
         }
@@ -244,17 +255,22 @@ public class ProcedureService implements IProcedureService {
                 boolean alreadyContains = kieService.alreadyContainsKieSession(intraOperativeData.getProcedureId());
                 KieSession kieSession = kieService.getOrCreateKieSession(intraOperativeData.getProcedureId(), "cepKsession");
                 if (!alreadyContains) {
+                        System.out.println("Creating new session");
+                        kieSession.setGlobal("socketService", socketService);
                         kieSession.insert(patient);
+                        procedure.setStart(System.currentTimeMillis());
+                        procedure = procedureRepository.save(procedure);
                         kieSession.insert(procedure);
                         kieSession.insert(procedure.getIntraOperative());
                 }
 
                 SAPEvent event = new SAPEvent(patientId, intraOperativeData.getSap());
                 kieSession.insert(event);
+                kieSession.insert(System.currentTimeMillis());
                 
                 kieSession.fireAllRules();
 
-                simpMessagingTemplate.convertAndSend("/sap/" + procedure.getId(), new IntraDTO(0, procedure.getIntraOperative().getSap()));
+                // simpMessagingTemplate.convertAndSend("/sap/" + procedure.getId(), new IntraDTO(0, procedure.getIntraOperative().getSap()));
                 return null;
         }
         
@@ -304,18 +320,18 @@ public class ProcedureService implements IProcedureService {
         }
 
 
-        @Scheduled(fixedRate = 5000)
-        public void sendHeartBeat() {
-                int bpm = (int) ((Math.random() * (80 - 60)) + 60);
-                IntraDTO dto = new IntraDTO(bpm, 0);
-                simpMessagingTemplate.convertAndSend("/heartbeat/1", dto);
-        }
+        // @Scheduled(fixedRate = 5000)
+        // public void sendHeartBeat() {
+        //         int bpm = (int) ((Math.random() * (80 - 60)) + 60);
+        //         IntraDTO dto = new IntraDTO(bpm, 0);
+        //         simpMessagingTemplate.convertAndSend("/heartbeat/1", dto);
+        // }
         
         
-        @Scheduled(fixedRate = 7000)
-        public void sendSAP() {
-                int sap  = (int) ((Math.random() * (130 - 80)) + 80);
-                IntraDTO dto = new IntraDTO(0, sap);
-                simpMessagingTemplate.convertAndSend("/sap/1", dto);
-        }
+        // @Scheduled(fixedRate = 7000)
+        // public void sendSAP() {
+        //         int sap  = (int) ((Math.random() * (130 - 80)) + 80);
+        //         IntraDTO dto = new IntraDTO(0, sap);
+        //         simpMessagingTemplate.convertAndSend("/sap/1", dto);
+        // }
 }

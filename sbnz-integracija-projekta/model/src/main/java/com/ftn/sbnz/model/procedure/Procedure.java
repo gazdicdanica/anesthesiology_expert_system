@@ -1,5 +1,7 @@
 package com.ftn.sbnz.model.procedure;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.*;
 
 @Entity
@@ -14,7 +16,7 @@ public class Procedure {
     private Long patientId;
     private Long medicalStaffId;
 
-    // private LocalDateTime date;
+    private long start;
     private OperationRisk risk;
     private ProcedureUrgency urgency;
 
@@ -30,13 +32,13 @@ public class Procedure {
 
     public Procedure(Long patientId, Long medicalStaffId, 
     String name,
-    // LocalDateTime date,
+    long date,
      OperationRisk risk, ProcedureUrgency urget,
             PreOperative preOperative, IntraOperative intraOperative, PostOperative postOperative) {
         this.patientId = patientId;
         this.medicalStaffId = medicalStaffId;
         this.name = name;
-        // this.date = date;
+        this.start = date;
         this.risk = risk;
         this.urgency = urget;
         this.preOperative = preOperative;
@@ -76,13 +78,13 @@ public class Procedure {
         this.name = name;
     }
 
-    // public LocalDateTime getDate() {
-    //     return date;
-    // }
+    public long getStart() {
+        return start;
+    }
 
-    // public void setDate(LocalDateTime date) {
-    //     this.date = date;
-    // }
+    public void setStart(long date) {
+        this.start = date;
+    }
 
     public OperationRisk getRisk() {
         return risk;

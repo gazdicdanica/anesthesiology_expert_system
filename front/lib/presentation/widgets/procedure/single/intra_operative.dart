@@ -52,7 +52,7 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
 
   void onConnectCallback(StompFrame frame) {
     stompClient?.subscribe(
-      destination: 'heartbeat/${widget.procedure.id}',
+      destination: '/heartbeat/${widget.procedure.id}',
       callback: (frame) {
         Map<String, dynamic>? result = json.decode(frame.body!);
         _bpmController.add(result);
@@ -60,7 +60,7 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
     );
 
     stompClient?.subscribe(
-      destination: 'sap/${widget.procedure.id}',
+      destination: '/sap/${widget.procedure.id}',
       callback: (frame) {
         Map<String, dynamic>? result = json.decode(frame.body!);
         _sapController.add(result);
