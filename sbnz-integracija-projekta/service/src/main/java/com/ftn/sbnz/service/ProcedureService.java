@@ -18,13 +18,11 @@ import com.ftn.sbnz.dto.AddProcedureDTO;
 import com.ftn.sbnz.dto.BaseRulesDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
-import com.ftn.sbnz.dto.intraDTO;
+import com.ftn.sbnz.dto.IntraDTO;
 import com.ftn.sbnz.exception.EntityNotFoundException;
 import com.ftn.sbnz.model.events.ExtrasystoleEvent;
 import com.ftn.sbnz.model.events.HeartBeatEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
-import com.ftn.sbnz.model.events.SymptomEvent;
-import com.ftn.sbnz.model.events.SymptomEvent.Symptom;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.IntraOperative;
 import com.ftn.sbnz.model.procedure.PostOperative;
@@ -228,9 +226,13 @@ public class ProcedureService implements IProcedureService {
                         kieSession.insert(procedure.getIntraOperative());
                 }
 
+
                 HeartBeatEvent event = new HeartBeatEvent(patientId);
                 kieSession.insert(event);
                 kieSession.fireAllRules();
+
+                simpMessagingTemplate.convertAndSend("/heartbeat/" + procedure.getId(), new IntraDTO(procedure.getIntraOperative().getBpm(), 0));
+
                 return null;
         }
 
@@ -251,6 +253,8 @@ public class ProcedureService implements IProcedureService {
                 kieSession.insert(event);
                 
                 kieSession.fireAllRules();
+
+                simpMessagingTemplate.convertAndSend("/sap/" + procedure.getId(), new IntraDTO(0, procedure.getIntraOperative().getSap()));
                 return null;
         }
         
@@ -303,7 +307,7 @@ public class ProcedureService implements IProcedureService {
         @Scheduled(fixedRate = 5000)
         public void sendHeartBeat() {
                 int bpm = (int) ((Math.random() * (80 - 60)) + 60);
-                intraDTO dto = new intraDTO(bpm, 0);
+                IntraDTO dto = new IntraDTO(bpm, 0);
                 simpMessagingTemplate.convertAndSend("/heartbeat/1", dto);
         }
         
@@ -311,7 +315,7 @@ public class ProcedureService implements IProcedureService {
         @Scheduled(fixedRate = 7000)
         public void sendSAP() {
                 int sap  = (int) ((Math.random() * (130 - 80)) + 80);
-                intraDTO dto = new intraDTO(0, sap);
+                IntraDTO dto = new IntraDTO(0, sap);
                 simpMessagingTemplate.convertAndSend("/sap/1", dto);
         }
 }

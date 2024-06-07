@@ -5,7 +5,7 @@ import lombok.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class intraDTO {
+public class IntraDTO {
 
     private int bpm;
     private int sap; 
