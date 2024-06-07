@@ -332,7 +332,10 @@ public class ProcedureService implements IProcedureService {
                 boolean alreadyContains = kieService.alreadyContainsKieSession(postOperativeDataDTO.getProcedureId());
                 KieSession kieSession = kieService.getOrCreateKieSession(postOperativeDataDTO.getProcedureId(), "cepKsessionPOP");
                 if (!alreadyContains) {
+                        kieSession.setGlobal("socketService", socketService);
                         kieSession.insert(patient);
+                        procedure.setStart(System.currentTimeMillis());
+                        procedure = procedureRepository.save(procedure);
                         kieSession.insert(procedure);
                         kieSession.insert(procedure.getPostOperative());
                 }
@@ -351,6 +354,9 @@ public class ProcedureService implements IProcedureService {
                 PulseOximetryEvent pulseOximetryEv = new PulseOximetryEvent(patientId, postOperativeDataDTO.getPulseOximetry());
                 kieSession.insert(pulseOximetryEv);
 
+                RetardDTO dto = new RetardDTO(procedure.getId(), System.currentTimeMillis());
+                kieSession.insert(dto);
+                
                 kieSession.fireAllRules();
 
                 return null;
