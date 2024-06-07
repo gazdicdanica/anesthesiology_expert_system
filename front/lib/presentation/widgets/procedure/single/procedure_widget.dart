@@ -199,6 +199,23 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                                   children: [
                                     const SizedBox(height: 20),
                                     PostOperativeWidget(procedure: procedure),
+                                    Container(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        onPressed:
+                                            state is ProcedureUpdateLoading
+                                                ? () {}
+                                                : () {
+                                                    // _endOperation();
+                                                  },
+                                        child: state is ProcedureUpdateLoading
+                                            ? const CircularProgressIndicator(
+                                                color: Colors.white,
+                                              )
+                                            : const Text('Otpusti pacijenta'),
+                                      ),
+                                    ),
                                   ],
                                 )
                             ],

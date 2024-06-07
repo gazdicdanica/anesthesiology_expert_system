@@ -21,16 +21,20 @@ class IntraOperativeWidget extends StatefulWidget {
 class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
   StompClient? stompClient;
   final StreamController<Map<String, dynamic>?> _bpmController =
-      StreamController<Map<String, dynamic>?>();
+      StreamController<Map<String, dynamic>?>.broadcast();
   final StreamController<Map<String, dynamic>?> _sapController =
-      StreamController<Map<String, dynamic>?>();
+      StreamController<Map<String, dynamic>?>.broadcast();
+
+  late Procedure procedure;
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.procedure.intraOperative != null &&
-        widget.procedure.postOperative == null) {
+    procedure = widget.procedure;
+
+    if (procedure.intraOperative != null &&
+        procedure.postOperative == null) {
       connectStomp();
     }
   }
@@ -91,8 +95,10 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
       listener: (context, state) {
         if (state is ProcedurePatientSuccess &&
             state.procedure!.postOperative != null) {
+          procedure = state.procedure!;
           stompClient!.deactivate();
 
+          stompClient = null;
           _bpmController.close();
           _sapController.close();
         }
