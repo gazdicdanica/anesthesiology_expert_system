@@ -6,6 +6,7 @@ import java.util.List;
 import com.ftn.sbnz.dto.AddProcedureDTO;
 import com.ftn.sbnz.dto.BaseRulesDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
+import com.ftn.sbnz.dto.PostOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.Alarm;
@@ -30,4 +31,6 @@ public interface IProcedureService {
     Procedure startOperation(Long id);
 
     Procedure endOperation(Long id);
+
+    PostOperativeDataDTO updatePostOperativeData(Long patientId, PostOperativeDataDTO postOperativeDataDTO);
 }

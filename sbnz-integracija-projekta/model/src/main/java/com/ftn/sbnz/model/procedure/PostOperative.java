@@ -37,4 +37,21 @@ public class PostOperative {
     public void setReleased(boolean released) {
         isReleased = released;
     }
+
+    public Long getId() {
+        return id;
+    }
+    
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "PostOperative{" +
+                "id=" + id +
+                ", hemoglobin=" + hemoglobin +
+                ", isReleased=" + isReleased +
+                '}';
+    }
 }

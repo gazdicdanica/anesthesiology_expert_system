@@ -6,7 +6,7 @@ import org.kie.api.definition.type.Expires;
 import org.kie.api.definition.type.Role;
 
 @Role(Role.Type.EVENT)
-@Expires("10m")
+@Expires("1m")
 public class BreathEvent implements Serializable{
 
     private static final long serialVersionUID = 1L;

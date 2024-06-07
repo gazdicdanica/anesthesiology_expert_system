@@ -6,7 +6,7 @@ import org.kie.api.definition.type.Role;
 import java.io.Serializable;
 
 @Role(Role.Type.EVENT)
-@Expires("1d")
+@Expires("5m")
 public class PulseOximetryEvent implements Serializable {
     private static final long serialVersionUID = 1L;
     private int value;

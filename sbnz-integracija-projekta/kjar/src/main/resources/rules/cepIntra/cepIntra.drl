@@ -1,0 +1,170 @@
+package cepIntra;
+
+import com.ftn.sbnz.model.patient.Patient;
+import com.ftn.sbnz.model.procedure.Procedure;
+import com.ftn.sbnz.model.events.HeartBeatEvent;
+import com.ftn.sbnz.model.events.SAPEvent;
+import com.ftn.sbnz.model.events.BreathEvent;
+import com.ftn.sbnz.model.events.PulseOximetryEvent;
+import com.ftn.sbnz.model.events.ExtrasystoleEvent;
+import com.ftn.sbnz.model.procedure.Alarm;
+
+import com.ftn.sbnz.model.events.SymptomEvent;
+
+declare VasopressorIV
+    @role(event)
+    @expires(16m)
+    patientId: Long
+end
+
+query "getAlarms"
+    $alarm : Alarm()
+end
+
+rule "update bpm"
+    when
+        $patient : Patient($id: id)
+        $procedure: Procedure(patientId == $id, intraOperative != null, $intraOp: intraOperative)
+        Number($count : intValue) from accumulate(
+            $heartBeat: HeartBeatEvent(patientId == $id)
+            over window: time(1m), count($heartBeat)
+        )
+    then
+       modify($intraOp){
+            setBpm($count)
+       }
+       System.out.println("BPM::" + $intraOp);
+end
+
+rule "update sap"
+    when
+        $patient : Patient($id: id)
+        $procedure: Procedure(patientId == $id, intraOperative != null, $intraOp: intraOperative)
+        Number($count : doubleValue) from accumulate(
+            $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
+        )
+    then
+       modify($intraOp){
+            setSap($count)
+       }
+       System.out.println("SAP::" + $intraOp);
+end
+
+
+rule "exstrasystole rule"
+    when
+        $patient : Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id, $doctorId: medicalStaffId, $intraOp: intraOperative)
+        Number($count : intValue) from accumulate(
+            $exs: ExtrasystoleEvent(patientId == $id)
+            over window: time(5m), count($exs)
+        )
+        eval($count >= 25)
+    then
+        modify($intraOp){
+            setExtrasystoleCounter($count)
+        }
+        System.err.println("EXTRA::" + $intraOp);
+        //предиктор срчаних компликација, алармирај лекара
+        System.out.println("Patient " + $patient.getFullname() + ": Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible.");
+        insert(new Alarm($id, $doctorId, "Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible."));
+end
+
+rule "tachycardia rule"
+    when
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        Number($count : intValue) from accumulate(
+            $heartBeat: HeartBeatEvent(patientId == $id)
+            over window: time(1m), count($heartBeat)
+        )
+        eval($count > 80)
+    then
+        //tahikardija
+        insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Tachycardia));
+end
+
+rule "tachycardia alarm"
+    when 
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
+    then
+        System.out.println("Patient " + $patient.getFullname() + ": Detected tachycardia.");
+        insert(new Alarm($id, $doctorId, "Detected tachycardia."));
+end
+
+rule "bradycardia rule"
+    when
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        Number($count : intValue) from accumulate(
+            $heartBeat: HeartBeatEvent(patientId == $id)
+            over window: time(1m), count($heartBeat)
+        )
+        eval($count < 60 && $count > 0)
+    then
+        //bradikardija
+        System.out.println("Bradycardia detected.");
+        insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Bradycardia));    
+end
+
+rule "bradycardia alarm"
+    when 
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradycardia))
+    then
+        System.out.println("Patient " + $patient.getFullname() + ": Detected bradycardia.");
+        insert(new Alarm($id, $doctorId, "Detected bradycardia."));
+end
+
+rule "hypertension rule"
+    when
+        $patient: Patient($id: id, $basalSAP: basalSAP)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        Number($count : doubleValue) from accumulate(
+            $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
+        )
+        eval($count > 130 || $count > ($basalSAP * 1.2))
+    then
+        //hipertenzija
+        insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Hypertension));
+end
+
+rule "hypertension alarm rule"
+    when
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
+    then
+        System.out.println("Patient " + $patient.getFullname() + ": Detected hypertension.");
+        insert(new Alarm($id, $doctorId, "Detected hypertension."));
+end
+
+rule "hypotension rule"
+    when
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        Number($averageVal : doubleValue) from accumulate(
+            $sap: SAPEvent(patientId == $id)
+            over window: time(5m), average($sap.getValue())
+        )
+        eval(($averageVal < 80 && $averageVal > 0) || ($averageVal < ($patient.getBasalSAP() * 0.8)))
+    then
+        System.out.println("Hypotension detected.");
+        insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Hypotension));
+end
+
+rule "hypotension alarm rule"
+    when
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        Number($count: intValue) from accumulate(
+            $hypotension: SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension) over window: time(10m), count($hypotension)
+        )
+        eval($count == 2)
+    then
+        System.out.println("Patient " + $patient.getFullname() + ": Detected hypotension. Cardiovascular complications are possible.");
+        insert(new Alarm($id, $doctorId, "Detected hypotension. Cardiovascular complications are possible."));
+end

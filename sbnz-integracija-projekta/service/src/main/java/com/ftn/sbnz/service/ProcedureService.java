@@ -18,12 +18,15 @@ import org.springframework.stereotype.Service;
 import com.ftn.sbnz.dto.AddProcedureDTO;
 import com.ftn.sbnz.dto.BaseRulesDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
+import com.ftn.sbnz.dto.PostOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
 import com.ftn.sbnz.dto.IntraDTO;
 import com.ftn.sbnz.exception.EntityNotFoundException;
+import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.ExtrasystoleEvent;
 import com.ftn.sbnz.model.events.HeartBeatEvent;
 import com.ftn.sbnz.model.events.RetardDTO;
+import com.ftn.sbnz.model.events.PulseOximetryEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.IntraOperative;
@@ -201,6 +204,7 @@ public class ProcedureService implements IProcedureService {
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
                 procedure.setPostOperative(new PostOperative());
 
+                disposeIntraOperativeKieSession(id);
                 return procedureRepository.save(procedure);
         }
 
@@ -319,19 +323,36 @@ public class ProcedureService implements IProcedureService {
                 kieService.disposeKieSession(procedureId);
         }
 
+        @Override
+        public PostOperativeDataDTO updatePostOperativeData(Long patientId, PostOperativeDataDTO postOperativeDataDTO) {
+                Patient patient = patientService.findById(patientId);
+                Procedure procedure = procedureRepository.findById(postOperativeDataDTO.getProcedureId())
+                                .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
 
-        // @Scheduled(fixedRate = 5000)
-        // public void sendHeartBeat() {
-        //         int bpm = (int) ((Math.random() * (80 - 60)) + 60);
-        //         IntraDTO dto = new IntraDTO(bpm, 0);
-        //         simpMessagingTemplate.convertAndSend("/heartbeat/1", dto);
-        // }
-        
-        
-        // @Scheduled(fixedRate = 7000)
-        // public void sendSAP() {
-        //         int sap  = (int) ((Math.random() * (130 - 80)) + 80);
-        //         IntraDTO dto = new IntraDTO(0, sap);
-        //         simpMessagingTemplate.convertAndSend("/sap/1", dto);
-        // }
+                boolean alreadyContains = kieService.alreadyContainsKieSession(postOperativeDataDTO.getProcedureId());
+                KieSession kieSession = kieService.getOrCreateKieSession(postOperativeDataDTO.getProcedureId(), "cepKsessionPOP");
+                if (!alreadyContains) {
+                        kieSession.insert(patient);
+                        kieSession.insert(procedure);
+                        kieSession.insert(procedure.getPostOperative());
+                }
+                
+                SAPEvent sapEv = new SAPEvent(patientId, postOperativeDataDTO.getSap());
+                kieSession.insert(sapEv);
+                if (postOperativeDataDTO.isHeartBeatEvent()) {
+                        HeartBeatEvent hbEv = new HeartBeatEvent(patientId);
+                        kieSession.insert(hbEv);
+                }
+                if (postOperativeDataDTO.isBreathEvent()) {
+                        BreathEvent breathEv = new BreathEvent(patientId);
+                        kieSession.insert(breathEv);
+                }
+
+                PulseOximetryEvent pulseOximetryEv = new PulseOximetryEvent(patientId, postOperativeDataDTO.getPulseOximetry());
+                kieSession.insert(pulseOximetryEv);
+
+                kieSession.fireAllRules();
+
+                return null;
+        }
 }

@@ -64,6 +64,7 @@ public class WebSecurityConfig {
                         .antMatchers("/api/procedure/*/heartBeat").permitAll()
                         .antMatchers("/api/procedure/*/sapEvent").permitAll()
                         .antMatchers("/api/procedure/*/symptomEvent").permitAll()
+                        .antMatchers("/api/procedure/*/postOpData").permitAll()
                         .anyRequest().authenticated()
                 );
 

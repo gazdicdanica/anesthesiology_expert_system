@@ -1,4 +1,4 @@
-package cep;
+package cepPost;
 
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.Procedure;
@@ -27,10 +27,13 @@ query "getAlarms"
     $alarm : Alarm()
 end
 
+
+
+
 rule "update bpm"
     when
         $patient : Patient($id: id)
-        $procedure: Procedure(patientId == $id, intraOperative != null, $intraOp: intraOperative)
+        $procedure: Procedure(patientId == $id, postOperative != null, $postOp: postOperative)
         Number($count : intValue) from accumulate(
             $heartBeat: HeartBeatEvent(patientId == $id)
             over window: time(1m), count($heartBeat)
@@ -46,7 +49,7 @@ end
 rule "update sap"
     when
         $patient : Patient($id: id)
-        $procedure: Procedure(patientId == $id, intraOperative != null, $intraOp: intraOperative)
+        $procedure: Procedure(patientId == $id, postOperative != null, $postOp: postOperative)
         Number($count : doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
@@ -62,17 +65,17 @@ end
 rule "exstrasystole rule"
     when
         $patient : Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id, $doctorId: medicalStaffId, $intraOp: intraOperative, postOperative == null)
+        $procedure: Procedure(patientId == $id, $procedureId: id, $doctorId: medicalStaffId, $postOp: postOperative)
         Number($count : intValue) from accumulate(
             $exs: ExtrasystoleEvent(patientId == $id)
             over window: time(5m), count($exs)
         )
         eval($count >= 25)
     then
-        modify($intraOp){
-            setExtrasystoleCounter($count)
-        }
-        System.err.println("EXTRA::" + $intraOp);
+        // modify($postOp){
+        //     setExtrasystoleCounter($count)
+        // }
+        System.err.println("EXTRA::" + $postOp);
         //предиктор срчаних компликација, алармирај лекара
         System.out.println("Patient " + $patient.getFullname() + ": Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible.");
         insert(new Alarm($id, $doctorId, "Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible."));
@@ -178,7 +181,6 @@ rule "hypotension alarm rule"
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypotension. Cardiovascular complications are possible.");
         insert(new Alarm($id, $doctorId, "Detected hypotension. Cardiovascular complications are possible."));
 end
-
 
 // Post op
 rule "Post op SAP - Crystalloids"
