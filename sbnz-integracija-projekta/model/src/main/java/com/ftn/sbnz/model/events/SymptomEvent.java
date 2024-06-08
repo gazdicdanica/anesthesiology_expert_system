@@ -7,7 +7,7 @@ import org.kie.api.definition.type.Role;
 
 @Role(Role.Type.EVENT)
 @Entity
-@Expires("10s")
+@Expires(value = "5s")
 public class SymptomEvent {
 
     @Id

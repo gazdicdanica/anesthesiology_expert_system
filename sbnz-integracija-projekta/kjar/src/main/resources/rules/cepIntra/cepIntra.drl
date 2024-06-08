@@ -16,9 +16,9 @@ import com.ftn.sbnz.model.events.SymptomEvent;
 global SocketService socketService;
 global ProcedureRepository procedureRepository;
 
-query "getAlarms"
-    $alarm : Alarm()
-end
+// query "getAlarms"
+//     $alarm : Alarm()
+// end
 
 rule "update bpm"
     when
@@ -54,6 +54,7 @@ rule "exstrasystole rule"
     when
         $patient : Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id, $doctorId: medicalStaffId, $intraOp: intraOperative)
+        not(Alarm(patientId == $id, symptom == SymptomEvent.Symptom.Exstrasystole))
         Number($count : intValue) from accumulate(
             $exs: ExtrasystoleEvent(patientId == $id)
             over window: time(5m), count($exs)
@@ -65,7 +66,31 @@ rule "exstrasystole rule"
         }
         //предиктор срчаних компликација, алармирај лекара
         System.out.println("Patient " + $patient.getFullname() + ": Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible.");
-        insert(new Alarm($id, $doctorId, "Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible."));
+        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Exstrasystole, System.currentTimeMillis());
+
+        insert(alarm);
+        modify($intraOp){
+            addAlarm(alarm)
+        }
+
+        procedureRepository.save($procedure);
+
+        socketService.sendExtraAlarm($procedureId, SymptomEvent.Symptom.Exstrasystole);
+end
+
+rule "normal bpm"
+    when
+        $patient: Patient($id: id)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        Number($count : intValue) from accumulate(
+            $heartBeat: HeartBeatEvent(patientId == $id)
+            over window: time(1m), count($heartBeat)
+        )
+        eval($count >= 60 && $count <= 80)
+    then
+        //tahikardija
+        System.out.println("Normal bpm.");
+        socketService.sendCardioAlarm($procedureId, null);
 end
 
 rule "tachycardia rule"
@@ -90,8 +115,11 @@ rule "tachycardia alarm"
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Tachycardia alarm.");
+
+        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Tachycardia, System.currentTimeMillis());
+
         modify($intraOp){
-            addSymptom(SymptomEvent.Symptom.Tachycardia)
+            addAlarm(alarm)
         }
 
         procedureRepository.save($procedure);
@@ -123,14 +151,29 @@ rule "bradycardia alarm"
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradycardia))
     then
         System.out.println("Patient " + $patient.getFullname() + ": bradycardia alarm.");
-        insert(new Alarm($id, $doctorId, "Detected bradycardia."));
-        socketService.sendCardioAlarm($procedureId, SymptomEvent.Symptom.Bradycardia);
+        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Bradycardia, System.currentTimeMillis());
 
         modify($intraOp){
-            addSymptom(SymptomEvent.Symptom.Bradycardia)
+            addAlarm(alarm)
         }
+
         procedureRepository.save($procedure);
 
+        socketService.sendCardioAlarm($procedureId, SymptomEvent.Symptom.Bradycardia);
+
+end
+
+rule "normal sap rule"
+    when
+        $patient: Patient($id: id, $basalSAP: basalSAP)
+        $procedure: Procedure(patientId == $id, $procedureId: id)
+        Number($count : doubleValue) from accumulate(
+            $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
+        )
+        eval(($count >= 82 && $count <= 130) || ($count <= ($basalSAP * 1.2) && $count >= ($basalSAP * 0.8)))
+    then
+        
+        socketService.sendSapAlarm($procedureId, null);
 end
 
 rule "hypertension rule"
@@ -153,13 +196,15 @@ rule "hypertension alarm rule"
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypertension.");
-        insert(new Alarm($id, $doctorId, "Detected hypertension."));
-        socketService.sendSapAlarm($procedureId, SymptomEvent.Symptom.Hypertension);
+        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Hypertension, System.currentTimeMillis());
 
         modify($intraOp){
-            addSymptom(SymptomEvent.Symptom.Hypertension)
+            addAlarm(alarm)
         }
+
         procedureRepository.save($procedure);
+
+        socketService.sendSapAlarm($procedureId, SymptomEvent.Symptom.Hypertension);
 end
 
 rule "hypotension rule"
@@ -180,17 +225,21 @@ rule "hypotension alarm rule"
     when
         $patient: Patient($id: id)
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
+        
         Number($count: intValue) from accumulate(
             $hypotension: SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension) over window: time(10m), count($hypotension)
         )
         eval($count == 2)
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypotension. Cardiovascular complications are possible.");
-        insert(new Alarm($id, $doctorId, "Detected hypotension. Cardiovascular complications are possible."));
-        socketService.sendSapAlarm($procedureId, SymptomEvent.Symptom.Hypotension);
+        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Hypotension, System.currentTimeMillis());
 
         modify($intraOp){
-            addSymptom(SymptomEvent.Symptom.Hypotension)
+            addAlarm(alarm)
         }
+
         procedureRepository.save($procedure);
+
+        socketService.sendSapAlarm($procedureId, SymptomEvent.Symptom.Hypotension);
 end

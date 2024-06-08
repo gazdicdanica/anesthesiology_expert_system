@@ -1,10 +1,15 @@
 package com.ftn.sbnz.model.procedure;
 
-import java.util.Set;
+import java.util.List;
 
-import javax.persistence.*;
-
-import com.ftn.sbnz.model.events.SymptomEvent.Symptom;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "intra_operative_procedures")
@@ -20,20 +25,18 @@ public class IntraOperative {
     private int sap;
     private int extrasystoleCounter;
 
-    @ElementCollection(targetClass = Symptom.class, fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
-    @CollectionTable
-    private Set<Symptom> symptoms;
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<Alarm> alarms;
 
     public IntraOperative() {
     }
 
-    public IntraOperative(Monitoring monitoring, int bpm, int sap, Set<Symptom> symptoms) {
+    public IntraOperative(Monitoring monitoring, int bpm, int sap, List<Alarm> alarms) {
         this.monitoring = monitoring;
         this.bpm = bpm;
         this.sap = sap;
         this.extrasystoleCounter = 0;
-        this.symptoms = symptoms;
+        this.alarms = alarms;
     }
 
     public Long getId() {
@@ -65,7 +68,7 @@ public class IntraOperative {
     }
 
     public void setSap(double sap) {
-        this.sap =(int) sap;
+        this.sap = (int) sap;
     }
 
     public int getExtrasystoleCounter() {
@@ -76,22 +79,25 @@ public class IntraOperative {
         this.extrasystoleCounter = extrasystoleCounter;
     }
 
-    public Set<Symptom> getSymptoms() {
-        return symptoms;
+    public List<Alarm> getAlarms() {
+        return alarms;
     }
 
-    public void setSymptoms(Set<Symptom> symptoms) {
-        this.symptoms = symptoms;
+    public void setAlarms(List<Alarm> alarms) {
+        this.alarms = alarms;
     }
 
-    public void addSymptom(Symptom symptom) {
-        this.symptoms.add(symptom);
+    public void addAlarm(Alarm alarm) {
+
+        if (!this.alarms.stream()
+                .anyMatch(a -> a.getTimestamp() == alarm.getTimestamp())) {
+            this.alarms.add(alarm);
+        }
     }
 
     public enum Monitoring {
         INVASIVE, NON_INVASIVE
     }
-
 
     @Override
     public String toString() {
@@ -101,7 +107,7 @@ public class IntraOperative {
                 ", bpm=" + bpm +
                 ", sap=" + sap +
                 ", extrasystoleCounter=" + extrasystoleCounter +
-                ", symptoms=" + symptoms +
+                ", alarms=" + alarms +
                 '}';
     }
 }

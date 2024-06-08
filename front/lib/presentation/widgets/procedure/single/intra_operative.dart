@@ -24,6 +24,12 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
       StreamController<Map<String, dynamic>?>.broadcast();
   final StreamController<Map<String, dynamic>?> _sapController =
       StreamController<Map<String, dynamic>?>.broadcast();
+  final StreamController<Map<String, dynamic>?> _bpmAlarmController =
+      StreamController<Map<String, dynamic>?>.broadcast();
+  final StreamController<Map<String, dynamic>?> _sapAlarmController =
+      StreamController<Map<String, dynamic>?>.broadcast();
+  final StreamController<String> _extrasystoleController =
+      StreamController<String>.broadcast();
 
   late Procedure procedure;
 
@@ -33,8 +39,7 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
 
     procedure = widget.procedure;
 
-    if (procedure.intraOperative != null &&
-        procedure.postOperative == null) {
+    if (procedure.intraOperative != null && procedure.postOperative == null) {
       connectStomp();
     }
   }
@@ -74,17 +79,25 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
     stompClient?.subscribe(
       destination: '/alarm/cardio/${widget.procedure.id}',
       callback: (frame) {
-        String result = json.decode(frame.body!);
-        print("Cardio alarm");
-        print(result);
+        Map<String, dynamic>? result = json.decode(frame.body!);
+
+        _bpmAlarmController.add(result);
       },
     );
 
     stompClient?.subscribe(
       destination: '/alarm/sap/${widget.procedure.id}',
       callback: (frame) {
-        String result = json.decode(frame.body!);
-        print(result);
+        Map<String, dynamic>? result = json.decode(frame.body!);
+        _sapAlarmController.add(result);
+      },
+    );
+
+    stompClient?.subscribe(
+      destination: '/alarm/extrasystole/${widget.procedure.id}',
+      callback: (frame) {
+        _extrasystoleController
+            .add("Detektovano je više od 25 ekstrasistola u 5 minuta");
       },
     );
   }
@@ -141,95 +154,181 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
           Column(
             children: [
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(Icons.favorite, color: seedColor),
-                  const SizedBox(width: 8),
-                  Text(
-                    "BPM  ",
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  if (stompClient != null)
-                    StreamBuilder<Map<String, dynamic>?>(
-                      stream: _bpmController.stream,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const SizedBox(
-                            height: 18,
-                            width: 18,
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        if (snapshot.hasData) {
-                          return Text(
-                            snapshot.data!['bpm'].toString(),
-                            style:
-                                Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  Row(
+                    children: [
+                      const Icon(Icons.favorite, color: seedColor),
+                      const SizedBox(width: 8),
+                      Text(
+                        "BPM  ",
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      if (stompClient != null)
+                        StreamBuilder<Map<String, dynamic>?>(
+                          stream: _bpmController.stream,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox(
+                                height: 18,
+                                width: 18,
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            if (snapshot.hasData) {
+                              return Text(
+                                snapshot.data!['bpm'].toString(),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: snackBarColor,
                                     ),
-                          );
+                              );
+                            }
+
+                            return Container();
+                          },
+                        )
+                      else
+                        Text(
+                          "...",
+                          style:
+                              Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: snackBarColor,
+                                  ),
+                        ),
+                    ],
+                  ),
+                  if (stompClient != null)
+                    StreamBuilder<Map<String, dynamic>?>(
+                      stream: _bpmAlarmController.stream,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          String? alarm = snapshot.data!['symptom'];
+                          if (alarm != null) {
+                            return Text(
+                              alarm,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
+                            );
+                          }
                         }
 
                         return Container();
                       },
                     )
-                  else
-                    Text(
-                      "...",
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: snackBarColor,
-                          ),
-                    ),
                 ],
               ),
               const SizedBox(height: 10),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Icon(Icons.monitor_heart_outlined, color: seedColor),
-                  const SizedBox(width: 8),
-                  Text(
-                    "SAP  ",
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  if (stompClient != null)
-                    StreamBuilder<Map<String, dynamic>?>(
-                      stream: _sapController.stream,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const SizedBox(
-                            height: 18,
-                            width: 18,
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        if (snapshot.hasData) {
-                          return Text(
-                            snapshot.data!['sap'].toString(),
-                            style:
-                                Theme.of(context).textTheme.bodyLarge!.copyWith(
+                  Row(
+                    children: [
+                      const Icon(Icons.monitor_heart_outlined,
+                          color: seedColor),
+                      const SizedBox(width: 8),
+                      Text(
+                        "SAP  ",
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      if (stompClient != null)
+                        StreamBuilder<Map<String, dynamic>?>(
+                          stream: _sapController.stream,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const SizedBox(
+                                height: 18,
+                                width: 18,
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            if (snapshot.hasData) {
+                              return Text(
+                                snapshot.data!['sap'].toString(),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge!
+                                    .copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: snackBarColor,
                                     ),
-                          );
+                              );
+                            }
+                            return Container();
+                          },
+                        )
+                      else
+                        Text(
+                          "...",
+                          style:
+                              Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: snackBarColor,
+                                  ),
+                        ),
+                    ],
+                  ),
+                  if (stompClient != null)
+                    StreamBuilder<Map<String, dynamic>?>(
+                      stream: _sapAlarmController.stream,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          String? alarm = snapshot.data!['symptom'];
+                          if (alarm != null) {
+                            return Text(
+                              alarm,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
+                            );
+                          }
                         }
+
                         return Container();
                       },
                     )
-                  else
-                    Text(
-                      "...",
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: snackBarColor,
-                          ),
-                    ),
                 ],
               ),
+              const SizedBox(height: 20),
+              if (stompClient != null)
+                StreamBuilder<String>(
+                  stream: _extrasystoleController.stream,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      String? alarm = snapshot.data;
+                      if (alarm != null) {
+                        return Text(
+                          softWrap: true,
+                          alarm,
+                          style:
+                              Theme.of(context).textTheme.bodyLarge!.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
+                        );
+                      }
+                    }
+
+                    return Container();
+                  },
+                ),
               const SizedBox(height: 20),
             ],
           )
@@ -244,5 +343,7 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
     stompClient?.deactivate();
     _bpmController.close();
     _sapController.close();
+    _bpmAlarmController.close();
+    _sapAlarmController.close();
   }
 }

@@ -290,7 +290,6 @@ rule "ASA III echocardiography"
         $preOp: PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
         System.out.println("Echocardiography");
-        insert(new Alarm($id, $doctorId, "Do echocardiography"));
         modify($preOp){
             setPostponeReason("Pacijent se podla\u017Ee visokorizi\u010Dnoj elektivnoj operaciji. Odlo\u017Eiti operaciju i uraditi ehokardiografiju.")
         }
@@ -304,8 +303,6 @@ rule "ASA III stres test and echocardiography"
         $preOp: PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
         System.out.println("Stress test and echocardiography");
-
-        insert(new Alarm($id, $doctorId, "Do stress test and echocardiography"));
         modify($preOp){
             setPostponeReason("Pacijent ima istoriju kardiovaskularnih bolesti i visokorizi\u010Dan je. Potrebno je odlo\u017Eiti operaciju i uraditi ehokardiografiju i stres test.")
         }
@@ -318,7 +315,6 @@ rule "ASA IV tests"
         $preOp: PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
         System.out.println("Stres test, echocardiography, B-type natriuretic peptide");
-        insert(new Alarm($id, $doctorId, "Do stress test, echocardiography, B-type natriuretic peptide"));
 
         modify($preOp){
             setPostponeReason("Pacijent je visokorizi\u010Dan. Odlo\u017Eiti operaciju i uraditi stres test, ehokardiografiju i sr\u010Dane biomarkere B-tip natriuretskog peptida.")
