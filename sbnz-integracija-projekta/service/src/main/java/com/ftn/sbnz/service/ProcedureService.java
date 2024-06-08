@@ -230,6 +230,7 @@ public class ProcedureService implements IProcedureService {
                 if (!alreadyContains) {
                         System.out.println("Creating new session");
                         kieSession.setGlobal("socketService", socketService);
+                        kieSession.setGlobal("procedureRepository", procedureRepository);
                         procedure.setStart(System.currentTimeMillis());
                         procedure = procedureRepository.save(procedure);
                         kieSession.insert(patient);
@@ -244,7 +245,7 @@ public class ProcedureService implements IProcedureService {
                 kieSession.insert(dto);
                 kieSession.fireAllRules();
 
-                System.out.println(procedure.getIntraOperative().getBpm());
+                System.out.println(procedure.getIntraOperative());
 
                 // simpMessagingTemplate.convertAndSend("/heartbeat/" + procedure.getId(), new IntraDTO(procedure.getIntraOperative().getBpm(), 0));
 
@@ -261,18 +262,19 @@ public class ProcedureService implements IProcedureService {
                 if (!alreadyContains) {
                         System.out.println("Creating new session");
                         kieSession.setGlobal("socketService", socketService);
+                        kieSession.setGlobal("procedureRepository", procedureRepository);
                         kieSession.insert(patient);
                         procedure.setStart(System.currentTimeMillis());
                         procedure = procedureRepository.save(procedure);
                         kieSession.insert(procedure);
                         kieSession.insert(procedure.getIntraOperative());
                 }
-
+                
                 SAPEvent event = new SAPEvent(patientId, intraOperativeData.getSap());
                 kieSession.insert(event);
                 
                 kieSession.fireAllRules();
-
+                System.out.println(procedure.getIntraOperative());
                 // simpMessagingTemplate.convertAndSend("/sap/" + procedure.getId(), new IntraDTO(0, procedure.getIntraOperative().getSap()));
                 return null;
         }

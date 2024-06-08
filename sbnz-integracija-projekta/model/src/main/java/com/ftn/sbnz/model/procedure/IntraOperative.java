@@ -1,6 +1,10 @@
 package com.ftn.sbnz.model.procedure;
 
+import java.util.Set;
+
 import javax.persistence.*;
+
+import com.ftn.sbnz.model.events.SymptomEvent.Symptom;
 
 @Entity
 @Table(name = "intra_operative_procedures")
@@ -16,13 +20,20 @@ public class IntraOperative {
     private int sap;
     private int extrasystoleCounter;
 
+    @ElementCollection(targetClass = Symptom.class, fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    @CollectionTable
+    private Set<Symptom> symptoms;
+
     public IntraOperative() {
     }
 
-    public IntraOperative(Monitoring monitoring, int bpm, int sap) {
+    public IntraOperative(Monitoring monitoring, int bpm, int sap, Set<Symptom> symptoms) {
         this.monitoring = monitoring;
         this.bpm = bpm;
         this.sap = sap;
+        this.extrasystoleCounter = 0;
+        this.symptoms = symptoms;
     }
 
     public Long getId() {
@@ -65,6 +76,18 @@ public class IntraOperative {
         this.extrasystoleCounter = extrasystoleCounter;
     }
 
+    public Set<Symptom> getSymptoms() {
+        return symptoms;
+    }
+
+    public void setSymptoms(Set<Symptom> symptoms) {
+        this.symptoms = symptoms;
+    }
+
+    public void addSymptom(Symptom symptom) {
+        this.symptoms.add(symptom);
+    }
+
     public enum Monitoring {
         INVASIVE, NON_INVASIVE
     }
@@ -78,6 +101,7 @@ public class IntraOperative {
                 ", bpm=" + bpm +
                 ", sap=" + sap +
                 ", extrasystoleCounter=" + extrasystoleCounter +
+                ", symptoms=" + symptoms +
                 '}';
     }
 }

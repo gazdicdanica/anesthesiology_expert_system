@@ -195,16 +195,21 @@ class PostOperative {
 class IntraOperative {
   final int id;
   final Monitoring monitoring;
+  final Set<Symptom> symptoms;
 
   IntraOperative({
     required this.id,
     required this.monitoring,
+    this.symptoms = const {},
   });
 
   factory IntraOperative.fromJson(Map<String, dynamic> json) {
     return IntraOperative(
       id: json['id'],
       monitoring: getMonitoring(json['monitoring']),
+      symptoms: json['symptoms'] != null
+          ? (json['symptoms'] as List).map((e) => getSymptom(e)).toSet()
+          : {},
     );
   }
 
@@ -237,3 +242,47 @@ getMonitoringString(Monitoring monitoring) {
 }
 
 enum Monitoring { INVASIVE, NON_INVASIVE }
+
+Symptom getSymptom(String symptom){
+  switch (symptom) {
+    case 'Arythmia':
+      return Symptom.Arythmia;
+    case 'Bradycardia':
+      return Symptom.Bradycardia;
+    case 'Bradypnea':
+      return Symptom.Bradypnea;
+    case 'Cyanosis':
+      return Symptom.Cyanosis;
+    case 'Dyspnea':
+      return Symptom.Dyspnea;
+    case 'Exstrasystole':
+      return Symptom.Exstrasystole;
+    case 'Hypertension':
+      return Symptom.Hypertension;
+    case 'Hypotension':
+      return Symptom.Hypotension;
+    case 'Hypoxemia':
+      return Symptom.Hypoxemia;
+    case 'Tachycardia':
+      return Symptom.Tachycardia;
+    case 'Tachypnea':
+      return Symptom.Tachypnea;
+    case 'Wheezing':
+      return Symptom.Wheezing;
+    case 'Fever':
+      return Symptom.Fever;
+    case 'AbsentBreathSounds':
+      return Symptom.AbsentBreathSounds;
+    case 'PulmonaryEdema':
+      return Symptom.PulmonaryEdema;
+    case 'ChestPain':
+      return Symptom.ChestPain;
+    default:
+      return Symptom.Arythmia;
+  }
+
+}
+
+enum Symptom {
+  Arythmia, Bradycardia, Bradypnea, Cyanosis, Dyspnea, Exstrasystole, Hypertension, Hypotension, Hypoxemia, Tachycardia, Tachypnea, Wheezing, Fever, AbsentBreathSounds, PulmonaryEdema, ChestPain
+}
