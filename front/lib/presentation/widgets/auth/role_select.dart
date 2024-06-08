@@ -31,11 +31,11 @@ class RoleSelectState extends State<RoleSelect> {
       value: _selectedLicense,
       items: const [
         DropdownMenuItem(
-          value: Role.nurse,
+          value: Role.NURSE,
           child: Text('Medicinski tehničar'),
         ),
         DropdownMenuItem(
-          value: Role.doctor,
+          value: Role.DOCTOR,
           child: Text('Lekar',),
         ),
       ],

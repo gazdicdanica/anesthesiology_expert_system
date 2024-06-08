@@ -9,6 +9,7 @@ import 'package:front/presentation/widgets/loading_widget.dart';
 import 'package:front/presentation/widgets/procedure/risk_and_urgency.dart';
 import 'package:front/presentation/widgets/procedure/single/intra_operative.dart';
 import 'package:front/presentation/widgets/procedure/single/patient_info.dart';
+import 'package:front/presentation/widgets/procedure/single/post_operative.dart';
 import 'package:front/presentation/widgets/procedure/single/preoperative_form.dart';
 import 'package:front/theme.dart';
 
@@ -101,6 +102,7 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                   _openInfo();
                 }
 
+                print(state);
                 return CustomScrollView(
                   slivers: [
                     SliverToBoxAdapter(
@@ -191,6 +193,31 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                                     ),
                                   ],
                                 ),
+                              if(procedure.postOperative != null)
+                              
+                                Column(
+                                  children: [
+                                    const SizedBox(height: 20),
+                                    PostOperativeWidget(procedure: procedure),
+                                    Container(
+                                      padding: const EdgeInsets.only(top: 20),
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        onPressed:
+                                            state is ProcedureUpdateLoading
+                                                ? () {}
+                                                : () {
+                                                    // _endOperation();
+                                                  },
+                                        child: state is ProcedureUpdateLoading
+                                            ? const CircularProgressIndicator(
+                                                color: Colors.white,
+                                              )
+                                            : const Text('Otpusti pacijenta'),
+                                      ),
+                                    ),
+                                  ],
+                                )
                             ],
                           ),
                         ),

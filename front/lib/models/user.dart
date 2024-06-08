@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class User {
@@ -23,7 +22,7 @@ class User {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'name': fullname,
+      'fullname': fullname,
       'email': email,
       'licenseNumber': licenseNumber,
       'role': role,
@@ -31,42 +30,38 @@ class User {
     };
   }
 
-  factory User.fromMap(Map<String, dynamic> map) {
+  factory User.fromJson(Map<String, dynamic> map) {
     return User(
-      id: int.tryParse(map['id'])!,
-      fullname: map['name'] as String,
+      id: map['id'],
+      fullname: map['fullname'] as String,
       email: map['email'] as String,
       licenseNumber: map['licenseNumber'] as String,
-      role: map['role'],
+      role: parseRole(map['role']),
       password: map['password'] as String,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory User.fromJson(String source) => User.fromMap(json.decode(source) as Map<String, dynamic>);
 }
 
 enum Role {
-  nurse,
-  doctor
+  NURSE,
+  DOCTOR
 }
 
-extension RoleExtension on Role {
-  String toJson() {
-    return toString().split('.').last.toUpperCase();
+Role parseRole(String role) {
+  switch (role) {
+    case 'NURSE':
+      return Role.NURSE;
+    case 'DOCTOR':
+      return Role.DOCTOR;
+    default:
+      throw Exception('Unknown role: $role');
   }
 }
 
-extension StringRoleExtension on String {
-  Role toRole() {
-    switch (this) {
-      case 'DOCTOR':
-        return Role.doctor;
-      case 'NURSE':
-        return Role.nurse;
-      default:
-        throw Exception('Unknown role: $this');
-    }
-  }
+String getRoleString(Role role) {
+  return role.toString().split('.').last.toUpperCase();
+  
 }

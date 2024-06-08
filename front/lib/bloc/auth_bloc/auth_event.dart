@@ -42,3 +42,14 @@ class LoginEvent extends AuthEvent{
 }
 
 class LogoutEvent extends AuthEvent {}
+
+class GetUserEvent extends AuthEvent {}
+
+class UpdateEvent extends AuthEvent {
+  final String? fullname;
+  final String? licenseNumber;
+  final String? oldPassword;
+  final String? newPassword;
+
+  UpdateEvent(this.fullname, this.licenseNumber, this.oldPassword, this.newPassword);
+}

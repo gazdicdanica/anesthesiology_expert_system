@@ -1,17 +1,39 @@
 package com.ftn.sbnz.model.procedure;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+import com.ftn.sbnz.model.events.SymptomEvent.Symptom;
+
+@Entity
 public class Alarm {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private Long patientId;
     private Long doctorId;
-    private String message;
+    private Symptom symptom;
+    private long timestamp;
 
     public Alarm() {
     }
 
-    public Alarm(Long patientId, Long doctorId, String message) {
+    public Alarm(Long patientId, Long doctorId, Symptom message, long timestamp) {
         this.patientId = patientId;
         this.doctorId = doctorId;
-        this.message = message;
+        this.symptom = message;
+        this.timestamp = timestamp;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Long getPatientId() {
@@ -30,12 +52,20 @@ public class Alarm {
         this.doctorId = doctorId;
     }
 
-    public String getMessage() {
-        return message;
+    public Symptom getSymptom() {
+        return symptom;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setSymptom(Symptom message) {
+        this.symptom = message;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
     @Override
@@ -43,7 +73,8 @@ public class Alarm {
         return "Alarm{" +
                 "patientId=" + patientId +
                 ", doctorId=" + doctorId +
-                ", message='" + message + '\'' +
+                ", message='" + symptom + '\'' +
+                ", timestamp=" + timestamp +
                 '}';
     }
 

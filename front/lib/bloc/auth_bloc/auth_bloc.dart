@@ -17,6 +17,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterEvent>(_register);
     on<ValidateRegisterForm>(_validateRegisterForm);
     on<LogoutEvent>(_logout);
+    on<GetUserEvent>(_getUser);
+    on<UpdateEvent>(_update);
   }
 
   void _resetForm(ResetForm event, emit) {
@@ -152,4 +154,33 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(LogoutSuccess());
   }
 
+  void _getUser(GetUserEvent event, emit) async{
+    emit(AuthLoading());
+    try {
+      final User user = await _repository.getUser();
+      emit(UserSuccess(user));
+    } on CustomException catch (e) {
+      emit(AuthFailure(e.toString()));
+    }catch(e){
+      print(e);
+      emit(AuthFailure("Došlo je do greške prilikom učitavanja naloga."));
+    }
+  }
+
+  void _update(UpdateEvent event, emit) async {
+    emit(AuthLoading());
+    try {
+      User user = await _repository.update(
+        event.fullname,
+        event.licenseNumber,
+        event.oldPassword,
+        event.newPassword,
+      );
+      emit(UserSuccess(user));
+    } on CustomException catch (e) {
+      emit(AuthValidationFailure(passwordError: e.toString()));
+    }catch(e){
+      emit(AuthFailure("Došlo je do greške prilikom ažuriranja naloga. Molimo pokušajte ponovo kasnije."));
+    }
+  }
 }

@@ -1,5 +1,6 @@
 package com.ftn.sbnz.service.iservice;
 
+import java.security.Principal;
 import java.util.Optional;
 
 import com.ftn.sbnz.dto.LoginDTO;
@@ -13,5 +14,12 @@ public interface IUserService {
     String login(LoginDTO loginDTO);
 
     Optional<User> findByUsername(String username);
+
+    User get(String username);
     
+    User updateFullname(String name, Principal u);
+
+    User updateLicenseNumber(String licenseNumber, Principal u);
+
+    User updatePassword(String oldPassword, String newPassword, Principal u);
 }

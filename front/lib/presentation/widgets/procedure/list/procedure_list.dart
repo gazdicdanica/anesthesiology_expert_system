@@ -78,7 +78,7 @@ class _ProcedureListState extends State<ProcedureList> {
                   alignment: Alignment.center,
                   child: Text(
                     textAlign: TextAlign.center,
-                    "Došlo je do greške prilikom učitavanja operacija..",
+                    "Došlo je do greške prilikom učitavanja operacija.",
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),

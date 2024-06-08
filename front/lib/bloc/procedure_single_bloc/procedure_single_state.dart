@@ -28,6 +28,7 @@ final class ProcedurePatientSuccess extends UpdateAndSuccess {
 
   @override
   List<Object> get props => [super.patient, super.procedure ?? ""];
+
 }
 
 final class ProcedureUpdateLoading extends UpdateAndSuccess {
@@ -46,3 +47,4 @@ final class ProcedureSingleError extends ProcedureSingleState {
   @override
   List<Object> get props => [message];
 }
+

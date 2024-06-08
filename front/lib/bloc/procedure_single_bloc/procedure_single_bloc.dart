@@ -15,9 +15,6 @@ class ProcedureSingleBloc
   ProcedureSingleBloc(this._procedureRepository)
       : super(ProcedureSingleInitial()) {
     on<ProcedureSingleEvent>(_handle, transformer: restartable());
-    // on<FetchProcedurePatient>(_fetchProcedurePatient);
-    // on<UpdatePreoperative>(_updatePreoperative);
-    // on<UpdateBnp>(_updateBnp);
   }
 
   _fetchProcedurePatient(FetchProcedurePatient event, emit) async {
@@ -72,6 +69,7 @@ class ProcedureSingleBloc
     emit(ProcedureUpdateLoading(currentState.patient, currentState.procedure));
     try {
       final procedure = await _procedureRepository.endOperation(event.procedureId);
+
       emit(ProcedurePatientSuccess(currentState.patient, procedure));
     } catch (e) {
       emit(const ProcedureSingleError("Greška prilikom završetka operacije"));

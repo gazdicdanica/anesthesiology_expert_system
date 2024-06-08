@@ -57,3 +57,4 @@ final class EndOperation extends ProcedureSingleEvent {
   @override
   List<Object> get props => [procedureId];
 }
+
