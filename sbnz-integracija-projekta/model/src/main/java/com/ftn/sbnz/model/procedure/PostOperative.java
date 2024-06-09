@@ -1,6 +1,15 @@
 package com.ftn.sbnz.model.procedure;
 
-import javax.persistence.*;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "post_operative_procedures")
@@ -15,6 +24,9 @@ public class PostOperative {
     private boolean isReleased;
     private double pulseOximetry;
 
+    
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<Alarm> alarms = new java.util.HashSet<>();
 
     public PostOperative() {
     }
@@ -66,6 +78,21 @@ public class PostOperative {
     public void setPulseOximetry(double pulseOximetry) {
         this.pulseOximetry = pulseOximetry;
     }
+    public Set<Alarm> getAlarms() {
+        return alarms;
+    }
+
+    public void setAlarms(Set<Alarm> alarms) {
+        this.alarms = alarms;
+    }
+
+    public void addAlarm(Alarm alarm) {
+
+        if (!this.alarms.stream()
+                .anyMatch(a -> a.getTimestamp() == alarm.getTimestamp())) {
+            this.alarms.add(alarm);
+        }
+    }
 
     @Override
     public String toString() {
@@ -74,6 +101,7 @@ public class PostOperative {
                 ", hemoglobin=" + hemoglobin +
                 ", isReleased=" + isReleased +
                 ", doHemoglobin=" + doHemoglobin +
+                ", alarms=" + alarms +
                 '}';
     }
 }

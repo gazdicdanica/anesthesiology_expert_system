@@ -23,6 +23,7 @@ import com.ftn.sbnz.model.events.HeartBeatEvent;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
 import com.ftn.sbnz.model.events.RetardDTO;
 import com.ftn.sbnz.model.events.SAPEvent;
+import com.ftn.sbnz.model.events.SymptomEvent;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.Alarm;
 import com.ftn.sbnz.model.procedure.IntraOperative;
@@ -349,4 +350,52 @@ public class ProcedureService implements IProcedureService {
 
                 return null;
         }
+
+        @Override
+        public Object getDiagnosis(Long patientId, Long procedureId) {
+                Patient patient = patientService.findById(patientId);
+                Procedure procedure = procedureRepository.findById(procedureId)
+                                .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
+                
+                // Patient patient = new Patient();
+                // patient.setId(1L);
+                // Procedure procedure = new Procedure();
+                // procedure.setId(1L);
+                // procedure.setPatientId(1L);
+
+                // IntraOperative intraOperative = new IntraOperative();
+                // intraOperative.setAlarms(genIntraOpAlarams());
+                // PostOperative postOperative = new PostOperative();
+                // procedure.setIntraOperative(intraOperative);
+                // procedure.setPostOperative(postOperative);
+
+                KieSession kieSession = kieService.createKieSession("diagnosisKsession");
+                kieSession.insert(patient);
+                kieSession.insert(procedure);
+                kieSession.insert(procedure.getIntraOperative());
+                kieSession.insert(procedure.getPostOperative());
+                for (Alarm al : procedure.getIntraOperative().getAlarms()) {
+                        System.err.println(al.getSymptom());
+                        kieSession.insert(new SymptomEvent(patientId, procedureId, al.getSymptom()));
+                }
+                for (Alarm al : procedure.getPostOperative().getAlarms()) {
+                        kieSession.insert(new SymptomEvent(patientId, procedureId, al.getSymptom()));
+                }
+
+                kieSession.fireAllRules();
+
+                return patient.getIllnesses();
+        }
+
+        // private Set<Alarm> genIntraOpAlarams() {
+        //         Set<Alarm> li = new HashSet<>();
+        //         li.add(new Alarm(1L, 1L, Symptom.Dyspnea, 1L));
+        //         li.add(new Alarm(1L, 1L, Symptom.Tachypnea, 1L));
+        //         li.add(new Alarm(1L, 1L, Symptom.Hypoxemia, 1L));
+        //         li.add(new Alarm(1L, 1L, Symptom.Tachycardia, 1L));
+        //         li.add(new Alarm(1L, 1L, Symptom.Hypotension, 1L));
+        //         li.add(new Alarm(1L, 1L, Symptom.AbsentBreathSounds, 1L));
+
+        //         return li;
+        // }
 }
