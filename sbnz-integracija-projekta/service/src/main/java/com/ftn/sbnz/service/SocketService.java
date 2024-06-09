@@ -36,11 +36,21 @@ public class SocketService {
         this.template.convertAndSend("/alarm/extrasystole/" + procedureId, new StatusDTO(symptom));
     }
 
+    
     public void sendBpmPostOp(int bpm, Long procedureId) {
         this.template.convertAndSend("/heartbeat/post/" + procedureId, new IntraDTO(bpm, 0));
     }
 
     public void sendSapPostOp(int sap, Long procedureId) {
         this.template.convertAndSend("/sap/post/" + procedureId, new IntraDTO(0, sap));
+    }
+
+    public void sendBreathFrequency(int frequency, Long procedureId) {
+        this.template.convertAndSend("/breath/" + procedureId, new IntraDTO(frequency, 0));
+    }
+
+    public void sendBreathAlarm(Long procedureId, Symptom symptom) {
+        if(symptom != null) this.template.convertAndSend("/alarm/breath/" + procedureId, new StatusDTO(symptom));
+        else this.template.convertAndSend("/alarm/breath/" + procedureId, new StatusDTO());
     }
 }

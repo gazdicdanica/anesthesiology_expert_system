@@ -10,16 +10,20 @@ public class PostOperative {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private boolean doHemoglobin;
     private int hemoglobin;
     private boolean isReleased;
+    private double pulseOximetry;
 
 
     public PostOperative() {
     }
 
-    public PostOperative(int hemoglobinValue, boolean isReleased) {
+    public PostOperative(int hemoglobinValue, boolean isReleased, boolean doHemoglobin, double pulseOximetry) {
         this.hemoglobin = hemoglobinValue;
         this.isReleased = isReleased;
+        this.doHemoglobin = doHemoglobin;
+        this.pulseOximetry = pulseOximetry;
     }
 
     public int getHemoglobin() {
@@ -46,12 +50,30 @@ public class PostOperative {
         this.id = id;
     }
 
+    public boolean isDoHemoglobin() {
+        return doHemoglobin;
+    }
+
+    public void setDoHemoglobin(boolean doHemoglobin) {
+        this.doHemoglobin = doHemoglobin;
+    }
+
+
+    public double getPulseOximetry() {
+        return pulseOximetry;
+    }
+
+    public void setPulseOximetry(double pulseOximetry) {
+        this.pulseOximetry = pulseOximetry;
+    }
+
     @Override
     public String toString() {
         return "PostOperative{" +
                 "id=" + id +
                 ", hemoglobin=" + hemoglobin +
                 ", isReleased=" + isReleased +
+                ", doHemoglobin=" + doHemoglobin +
                 '}';
     }
 }

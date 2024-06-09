@@ -72,8 +72,6 @@ String getSymptomString(Symptom symptom){
       return 'Bradypnoea';
     case Symptom.Cyanosis:
       return 'Cyanosis';
-    case Symptom.Dyspnea:
-      return 'Dyspnoea';
     case Symptom.Exstrasystole:
       return 'Extrasystolae';
     case Symptom.Hypertension:
@@ -86,6 +84,9 @@ String getSymptomString(Symptom symptom){
       return 'Tachycardia';
     case Symptom.Tachypnea:
       return 'Tachypnoea';
+
+    case Symptom.Dyspnea:
+      return 'Dyspnoea';
     case Symptom.Wheezing:
       return 'Zviždanje u grudima';
     case Symptom.Fever:

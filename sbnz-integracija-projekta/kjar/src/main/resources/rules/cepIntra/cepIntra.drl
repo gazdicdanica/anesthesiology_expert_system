@@ -29,9 +29,6 @@ rule "update bpm"
             over window: time(1m), count($heartBeat)
         )
     then
-       modify($intraOp){
-            setBpm($count)
-       }
         socketService.sendBpm($count, $procedure.getId());
 end
 
@@ -86,7 +83,7 @@ rule "normal bpm"
             $heartBeat: HeartBeatEvent(patientId == $id)
             over window: time(1m), count($heartBeat)
         )
-        eval($count >= 60 && $count <= 80)
+        eval($count >= 61 && $count <= 79)
     then
         //tahikardija
         System.out.println("Normal bpm.");
@@ -128,6 +125,7 @@ rule "tachycardia alarm"
 end
 
 rule "bradycardia rule"
+    no-loop true
     when
         $patient: Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id, $start: start)
@@ -139,7 +137,7 @@ rule "bradycardia rule"
         eval($count < 60 && $count > 0 && ($start + 60000) < $current)
     then
         //bradikardija
-        System.out.println("Bradycardia detected.");
+        // System.out.println("Bradycardia detected.");
         insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Bradycardia));    
 
 end
