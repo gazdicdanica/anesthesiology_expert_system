@@ -1,3 +1,5 @@
+import 'package:front/models/alarm.dart';
+
 class Procedure {
   final int id;
   final int patientId;
@@ -195,16 +197,19 @@ class PostOperative {
 class IntraOperative {
   final int id;
   final Monitoring monitoring;
+  final Set<Alarm> alarms;
 
   IntraOperative({
     required this.id,
     required this.monitoring,
+    this.alarms = const {},
   });
 
   factory IntraOperative.fromJson(Map<String, dynamic> json) {
     return IntraOperative(
       id: json['id'],
       monitoring: getMonitoring(json['monitoring']),
+      alarms: (json['alarms'] as List).map((e) => Alarm.fromJson(e)).toSet(),
     );
   }
 

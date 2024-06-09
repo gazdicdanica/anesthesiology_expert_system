@@ -1,18 +1,14 @@
 package com.ftn.sbnz.service;
 
 import java.security.Principal;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
-import org.kie.api.runtime.rule.QueryResults;
-import org.kie.api.runtime.rule.QueryResultsRow;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
@@ -20,18 +16,17 @@ import com.ftn.sbnz.dto.BaseRulesDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PostOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
-import com.ftn.sbnz.dto.IntraDTO;
 import com.ftn.sbnz.exception.EntityNotFoundException;
 import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.ExtrasystoleEvent;
 import com.ftn.sbnz.model.events.HeartBeatEvent;
-import com.ftn.sbnz.model.events.RetardDTO;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
+import com.ftn.sbnz.model.events.RetardDTO;
 import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.patient.Patient;
+import com.ftn.sbnz.model.procedure.Alarm;
 import com.ftn.sbnz.model.procedure.IntraOperative;
 import com.ftn.sbnz.model.procedure.PostOperative;
-import com.ftn.sbnz.model.procedure.Alarm;
 import com.ftn.sbnz.model.procedure.PreOperative;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.model.user.User;
@@ -204,8 +199,17 @@ public class ProcedureService implements IProcedureService {
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
                 procedure.setPostOperative(new PostOperative());
 
+                Set<Alarm> distinct = procedure.getIntraOperative().getAlarms().stream()
+                                .filter(distinctByKey(Alarm::getTimestamp)).collect(Collectors.toSet());
+
+                procedure.getIntraOperative().setAlarms(distinct);
                 disposeIntraOperativeKieSession(id);
                 return procedureRepository.save(procedure);
+        }
+
+        public static <T> java.util.function.Predicate<T> distinctByKey(java.util.function.Function<? super T, ?> keyExtractor) {
+                Set<Object> seen = ConcurrentHashMap.newKeySet();
+                return t -> seen.add(keyExtractor.apply(t));
         }
 
         public List<Alarm> updateIntraOperativeData(Long patientId, IntraOperativeDataDTO intraOperativeData, int eventType) {
@@ -300,23 +304,6 @@ public class ProcedureService implements IProcedureService {
                 
                 kieSession.fireAllRules();
                 return null;               
-        }
-
-        private List<Alarm> getAlarmData(KieSession kieSession) {
-                List<Alarm> alarms = new ArrayList<>();
-                QueryResults results = kieSession.getQueryResults("getAlarms");
-                if (results.size() > 0) {
-                        
-                        for (QueryResultsRow row : results) {
-                                System.out.println(row);
-                                Alarm alarm = (Alarm) row.get("Alarm");
-                                alarms.add(alarm);
-                        }
-                        return alarms;
-                        
-                } else {
-                        return null;
-                } 
         }
 
         @Override

@@ -1,6 +1,6 @@
 package com.ftn.sbnz.model.procedure;
 
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -26,12 +26,12 @@ public class IntraOperative {
     private int extrasystoleCounter;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<Alarm> alarms;
+    private Set<Alarm> alarms;
 
     public IntraOperative() {
     }
 
-    public IntraOperative(Monitoring monitoring, int bpm, int sap, List<Alarm> alarms) {
+    public IntraOperative(Monitoring monitoring, int bpm, int sap, Set<Alarm> alarms) {
         this.monitoring = monitoring;
         this.bpm = bpm;
         this.sap = sap;
@@ -79,11 +79,11 @@ public class IntraOperative {
         this.extrasystoleCounter = extrasystoleCounter;
     }
 
-    public List<Alarm> getAlarms() {
+    public Set<Alarm> getAlarms() {
         return alarms;
     }
 
-    public void setAlarms(List<Alarm> alarms) {
+    public void setAlarms(Set<Alarm> alarms) {
         this.alarms = alarms;
     }
 

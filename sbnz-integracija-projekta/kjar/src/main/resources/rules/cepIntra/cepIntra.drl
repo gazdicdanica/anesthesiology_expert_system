@@ -66,7 +66,7 @@ rule "exstrasystole rule"
         }
         //предиктор срчаних компликација, алармирај лекара
         System.out.println("Patient " + $patient.getFullname() + ": Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible.");
-        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Exstrasystole, System.currentTimeMillis());
+        Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Exstrasystole, System.currentTimeMillis());
 
         insert(alarm);
         modify($intraOp){
@@ -116,7 +116,7 @@ rule "tachycardia alarm"
     then
         System.out.println("Patient " + $patient.getFullname() + ": Tachycardia alarm.");
 
-        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Tachycardia, System.currentTimeMillis());
+        Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Tachycardia, System.currentTimeMillis());
 
         modify($intraOp){
             addAlarm(alarm)
@@ -151,7 +151,7 @@ rule "bradycardia alarm"
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradycardia))
     then
         System.out.println("Patient " + $patient.getFullname() + ": bradycardia alarm.");
-        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Bradycardia, System.currentTimeMillis());
+        Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Bradycardia, System.currentTimeMillis());
 
         modify($intraOp){
             addAlarm(alarm)
@@ -196,7 +196,7 @@ rule "hypertension alarm rule"
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypertension.");
-        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Hypertension, System.currentTimeMillis());
+        Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypertension, System.currentTimeMillis());
 
         modify($intraOp){
             addAlarm(alarm)
@@ -233,7 +233,7 @@ rule "hypotension alarm rule"
         eval($count == 2)
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypotension. Cardiovascular complications are possible.");
-        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Hypotension, System.currentTimeMillis());
+        Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypotension, System.currentTimeMillis());
 
         modify($intraOp){
             addAlarm(alarm)
