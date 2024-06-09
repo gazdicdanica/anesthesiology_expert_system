@@ -11,6 +11,7 @@ import com.ftn.sbnz.model.procedure.Alarm;
 
 
 import com.ftn.sbnz.service.SocketService;
+import com.ftn.sbnz.repository.ProcedureRepository;
 
 import com.ftn.sbnz.model.events.SymptomEvent;
 
@@ -81,13 +82,13 @@ end
 rule "tachycardia alarm"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, $postOp: postOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected tachycardia.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Tachycardia, System.currentTimeMillis());
 
-        modify($intraOp){
+        modify($postOp){
             addAlarm(alarm)
         }
 
@@ -116,13 +117,13 @@ end
 rule "bradycardia alarm"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, $postOp: postOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradycardia))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected bradycardia.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Bradycardia, System.currentTimeMillis());
 
-        modify($intraOp){
+        modify($postOp){
             addAlarm(alarm)
         }
 
@@ -148,7 +149,7 @@ end
 rule "Post op SAP - Vasopressors Infusion"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
         not(VasopressorIV(patientId == $id))
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
@@ -158,7 +159,7 @@ rule "Post op SAP - Vasopressors Infusion"
         System.out.println("Patient " + $patient.getFullname() + ": Start vasopressors infusion.");
         // insert(new Alarm($id, $doctorId, "Start vasopressors infusion."));
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypotension, System.currentTimeMillis());
-        modify($intraOp){
+        modify($postOp){
             addAlarm(alarm)
         }
 
@@ -210,7 +211,7 @@ end
 rule "Post op SAP - Inc 50"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
@@ -220,7 +221,7 @@ rule "Post op SAP - Inc 50"
         // insert(new Alarm($id, $doctorId, "Give patient hypertensive."));
 
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypertension, System.currentTimeMillis());
-        modify($intraOp){
+        modify($postOp){
             addAlarm(alarm)
         }
 
@@ -239,7 +240,8 @@ rule "update pulse oximetry"
             over window: time(5m), average($pulseOximetry.getValue())
         )
     then
-        socketService.sendPulseOximetry($count, $procedure.getId());
+        // socketService.sendPulseOximetry($count, $procedure.getId());
+        System.out.println("Pulse oximetry::" + $count);
 end
 
 
@@ -377,7 +379,7 @@ end
 rule "Tachypnea alarm rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative != null, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, postOperative != null, $postOp: postOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected tachypnea.");
@@ -407,7 +409,7 @@ end
 rule "Bradypnea alarm rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative != null, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, postOperative != null, $postOp: postOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradypnea))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected bradypnea.");

@@ -38,10 +38,12 @@ public class SocketService {
 
     
     public void sendBpmPostOp(int bpm, Long procedureId) {
+        System.out.println("Sending bpm post op");
         this.template.convertAndSend("/heartbeat/post/" + procedureId, new IntraDTO(bpm, 0));
     }
 
     public void sendSapPostOp(int sap, Long procedureId) {
+        System.out.println("Sending sap post op");
         this.template.convertAndSend("/sap/post/" + procedureId, new IntraDTO(0, sap));
     }
 
@@ -53,4 +55,8 @@ public class SocketService {
         if(symptom != null) this.template.convertAndSend("/alarm/breath/" + procedureId, new StatusDTO(symptom));
         else this.template.convertAndSend("/alarm/breath/" + procedureId, new StatusDTO());
     }
+
+    // public void sendPulseOximetry(double pulseOximetry, Long procedureId) {
+    //     this.template.convertAndSend("/pulse/" + procedureId, new IntraDTO(0, pulseOximetry));
+    // }
 }

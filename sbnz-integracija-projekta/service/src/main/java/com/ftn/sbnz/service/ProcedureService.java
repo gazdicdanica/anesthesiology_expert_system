@@ -322,6 +322,7 @@ public class ProcedureService implements IProcedureService {
                 KieSession kieSession = kieService.getOrCreateKieSession(postOperativeDataDTO.getProcedureId(), "cepKsessionPOP");
                 if (!alreadyContains) {
                         kieSession.setGlobal("socketService", socketService);
+                        kieSession.setGlobal("procedureRepository", procedureRepository);
                         kieSession.insert(patient);
                         procedure.setStart(System.currentTimeMillis());
                         procedure = procedureRepository.save(procedure);
