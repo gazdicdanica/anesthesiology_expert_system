@@ -1,5 +1,8 @@
 package com.ftn.sbnz.model.procedure;
 
+import java.util.List;
+import java.util.Set;
+
 import javax.persistence.*;
 
 @Entity
@@ -13,6 +16,9 @@ public class PostOperative {
     private int hemoglobin;
     private boolean isReleased;
 
+    
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<Alarm> alarms;
 
     public PostOperative() {
     }
@@ -46,12 +52,29 @@ public class PostOperative {
         this.id = id;
     }
 
+    public Set<Alarm> getAlarms() {
+        return alarms;
+    }
+
+    public void setAlarms(Set<Alarm> alarms) {
+        this.alarms = alarms;
+    }
+
+    public void addAlarm(Alarm alarm) {
+
+        if (!this.alarms.stream()
+                .anyMatch(a -> a.getTimestamp() == alarm.getTimestamp())) {
+            this.alarms.add(alarm);
+        }
+    }
+
     @Override
     public String toString() {
         return "PostOperative{" +
                 "id=" + id +
                 ", hemoglobin=" + hemoglobin +
                 ", isReleased=" + isReleased +
+                ", alarms=" + alarms +
                 '}';
     }
 }

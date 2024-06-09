@@ -33,4 +33,6 @@ public interface IProcedureService {
     Procedure endOperation(Long id);
 
     PostOperativeDataDTO updatePostOperativeData(Long patientId, PostOperativeDataDTO postOperativeDataDTO);
+    
+    Object getDiagnosis(Long patientId, Long procedureId);
 }

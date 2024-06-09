@@ -89,4 +89,9 @@ public class ProcedureController {
         return ResponseEntity.ok(procedureService.updatePostOperativeData(patientId, postOperativeDataDTO));
     }
 
+    @GetMapping(value = "/{patientId}/{procedureId}/diagnosis")
+    public ResponseEntity<?> getDiagnosis(@PathVariable Long patientId, @PathVariable Long procedureId) {
+        return ResponseEntity.ok(procedureService.getDiagnosis(patientId, procedureId));
+    }
+
 }
