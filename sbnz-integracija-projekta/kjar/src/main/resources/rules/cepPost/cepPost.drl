@@ -33,7 +33,7 @@ rule "update bpm"
             over window: time(1m), count($heartBeat)
         )
     then
-        socketService.sendBpmPostOp($count, $procedure.getId());
+        socketService.sendBpm($count, $procedure.getId());
         System.out.println("BPM::" + $postOp);
 end
 
@@ -45,7 +45,7 @@ rule "update sap"
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
     then
-        socketService.sendSapPostOp((int) $count, $procedure.getId());
+        socketService.sendSap((int) $count, $procedure.getId());
         System.out.println("SAP::" + $postOp);
 end
 
@@ -143,7 +143,8 @@ rule "Post op SAP - Crystalloids"
         eval($averageVal < ($patient.getBasalSAP() - 20) && $averageVal > ($patient.getBasalSAP() - 50))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Initiate IV crystalloids and alert anesthesiologist.");
-        // send IV crystalloids       
+        // send IV crystalloids    
+        socketService.sendDialogAlarm($procedure.getId(), "SAP je pao izmedju 20 i 50 mmHg u odnosu na bazalnu vrednost. Zapo\u010Deti intravensku primenu izotoni\u010Dnih kristaloidnih rastvora.");
 end
 
 rule "Post op SAP - Vasopressors Infusion"
@@ -165,6 +166,7 @@ rule "Post op SAP - Vasopressors Infusion"
 
         procedureRepository.save($procedure);
         insert(new VasopressorIV($id));
+        socketService.sendDialogAlarm($procedure.getId(), "SAP je pao za vi\u0161e od 50 mmHg u odnosu na bazalnu vrednost. Mogu\u0107i uzroci: krvarenje, sepsa, šok, pneumotoraks. Primeniti infuziju vazopresora.");
         
 end
 
@@ -183,6 +185,9 @@ rule "Post op SAP - Vasopressors IV still low"
         }
 
         procedureRepository.save($procedure);
+
+        socketService.sendDialogAlarm($procedure.getId(), "SAP je jo\u0161 uvek manji za vi\u0161e od 50 mmHg u odnosu na bazalnu vrednost. Odrediti hemoglobin.");
+
 end
 
 rule "Hemoglobin results"
@@ -192,6 +197,7 @@ rule "Hemoglobin results"
     then
         System.out.println("Patient " + $patient.getFullname() + ": give blood transfusion.");
         // insert(new Alarm($id, $doctorId, "Give patient blood transfusion."));
+        socketService.sendDialogAlarm($procedure.getId(), "Nizak nivo hemoglobina. Uraditi transfuziju eritrocita.");
 end
 
 rule "Post op SAP - Inc"
@@ -206,6 +212,9 @@ rule "Post op SAP - Inc"
         System.out.println("Patient " + $patient.getFullname() + ": бол, делиријум, мучнина и повраћање, плитко дисање.");
         // insert(new Alarm($id, $doctorId, "Determine if has pain, delirium, nausea and vomiting or shallow breathing."));
         // send alert
+
+        socketService.sendDialogAlarm($procedure.getId(), "SAP je povi\u0161en za 20 do 50 mmHg u odnosu na bazalnu vrednost. Mogu\u0107i uzroci: bol, delirijum, plitko disanje.");
+
 end
 
 rule "Post op SAP - Inc 50"
@@ -227,6 +236,7 @@ rule "Post op SAP - Inc 50"
 
         procedureRepository.save($procedure);
         // Todo add alert
+        socketService.sendDialogAlarm($procedure.getId(), "SAP je povi\u0161en za vi\u0161e od 50 mmHg u odnosu na bazalnu vrednost. Dati hipertenziv.");
 end
 
 
@@ -240,8 +250,9 @@ rule "update pulse oximetry"
             over window: time(5m), average($pulseOximetry.getValue())
         )
     then
-        // socketService.sendPulseOximetry($count, $procedure.getId());
         System.out.println("Pulse oximetry::" + $count);
+
+        socketService.sendPulseOximetry($count, $procedure.getId());
 end
 
 
@@ -256,6 +267,9 @@ rule "normal pulse oximetry"
         eval($count >= 92.0 && $count <= 100.0)
     then
         System.out.println("Normal pulse oximetry.");
+        socketService.sendPulseOximetryAlarm($procedure.getId(), null);
+        socketService.sendPulseOximetryAlarmDialog($procedureId, "");
+
 end
 
 rule "hypoxemia rule"
@@ -286,6 +300,7 @@ rule "hypoxemia alarm rule"
         }
 
         procedureRepository.save($procedure);
+        socketService.sendPulseOximetryAlarm($procedure.getId(), SymptomEvent.Symptom.Hypoxemia);
 end
 
 rule "hypoxemia venilator rule"
@@ -301,6 +316,9 @@ rule "hypoxemia venilator rule"
     then
         System.out.println("Patient " + $patient.getFullname() + ": Connect patient to ventilator.");
         // insert(new Alarm($id, $doctorId, "Connect patient to ventilator."));
+
+        // TODO send ws
+        socketService.sendPulseOximetryAlarmDialog($procedureId, "Povezati pacijenta na respirator.");
 
 end
 
@@ -331,6 +349,8 @@ rule "cyanosis alarm rule"
         }
 
         procedureRepository.save($procedure);
+        socketService.sendPulseOximetryAlarm($procedureId, SymptomEvent.Symptom.Cyanosis);
+
 end
 
 
@@ -390,6 +410,8 @@ rule "Tachypnea alarm rule"
         }
 
         procedureRepository.save($procedure);
+
+        socketService.sendBreathAlarm($procedureId, SymptomEvent.Symptom.Tachypnea);
 end
 
 rule "Breath frequency - bradypnea"
@@ -420,4 +442,6 @@ rule "Bradypnea alarm rule"
         }
 
         procedureRepository.save($procedure);
+
+        socketService.sendBreathAlarm($procedureId, SymptomEvent.Symptom.Bradypnea);
 end

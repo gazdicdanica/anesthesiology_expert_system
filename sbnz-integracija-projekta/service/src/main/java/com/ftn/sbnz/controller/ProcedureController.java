@@ -94,4 +94,9 @@ public class ProcedureController {
         return ResponseEntity.ok(procedureService.getDiagnosis(patientId, procedureId));
     }
 
+    @PutMapping(value = "/{id}/discharge")
+    public ResponseEntity<Procedure> dischargePatient(@PathVariable Long id) {
+        return new ResponseEntity<Procedure>(procedureService.dischargePatinet(id), HttpStatus.OK);
+    }
+
 }

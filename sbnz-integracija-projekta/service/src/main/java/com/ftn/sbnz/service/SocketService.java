@@ -5,6 +5,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import com.ftn.sbnz.dto.IntraDTO;
+import com.ftn.sbnz.dto.MessageDTO;
 import com.ftn.sbnz.dto.StatusDTO;
 import com.ftn.sbnz.model.events.SymptomEvent.Symptom;
 
@@ -36,17 +37,8 @@ public class SocketService {
         this.template.convertAndSend("/alarm/extrasystole/" + procedureId, new StatusDTO(symptom));
     }
 
+
     
-    public void sendBpmPostOp(int bpm, Long procedureId) {
-        System.out.println("Sending bpm post op");
-        this.template.convertAndSend("/heartbeat/post/" + procedureId, new IntraDTO(bpm, 0));
-    }
-
-    public void sendSapPostOp(int sap, Long procedureId) {
-        System.out.println("Sending sap post op");
-        this.template.convertAndSend("/sap/post/" + procedureId, new IntraDTO(0, sap));
-    }
-
     public void sendBreathFrequency(int frequency, Long procedureId) {
         this.template.convertAndSend("/breath/" + procedureId, new IntraDTO(frequency, 0));
     }
@@ -56,7 +48,20 @@ public class SocketService {
         else this.template.convertAndSend("/alarm/breath/" + procedureId, new StatusDTO());
     }
 
-    // public void sendPulseOximetry(double pulseOximetry, Long procedureId) {
-    //     this.template.convertAndSend("/pulse/" + procedureId, new IntraDTO(0, pulseOximetry));
-    // }
+    public void sendDialogAlarm(Long procedureId, String message) {
+        this.template.convertAndSend("/alarm/sap/dialog/" + procedureId, new MessageDTO(message));
+    }
+
+    public void sendPulseOximetry(double pulseOximetry, Long procedureId) {
+        this.template.convertAndSend("/pulseoximetry/" + procedureId, new IntraDTO(0, (int) pulseOximetry));
+    }
+
+    public void sendPulseOximetryAlarm(Long procedureId, Symptom symptom) {
+        if(symptom == null) this.template.convertAndSend("/alarm/pulseoximetry/" + procedureId, new StatusDTO());
+        else this.template.convertAndSend("/alarm/pulseoximetry/" + procedureId, new StatusDTO(symptom));
+    }
+
+    public void sendPulseOximetryAlarmDialog(Long procedureId, String message) {
+        this.template.convertAndSend("/alarm/pulseoximetry/dialog/" + procedureId, new MessageDTO(message));
+    }
 }

@@ -296,7 +296,7 @@ public class ProcedureService implements IProcedureService {
                         kieSession.insert(procedure);
                         kieSession.insert(procedure.getIntraOperative());
                 }
-
+                intraOperativeData.isExstrasystole();
                 if (intraOperativeData.isExstrasystole()) {
                         System.out.println("Extrasystole detected");
                         ExtrasystoleEvent event = new ExtrasystoleEvent(patientId);
@@ -399,4 +399,15 @@ public class ProcedureService implements IProcedureService {
 
         //         return li;
         // }
+
+
+        @Override
+        public Procedure dischargePatinet(Long id) {
+                Procedure procedure = procedureRepository.findById(id)
+                                .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
+                procedure.getPostOperative().setReleased(true);
+                return procedureRepository.save(procedure);
+        }
 }
+
+

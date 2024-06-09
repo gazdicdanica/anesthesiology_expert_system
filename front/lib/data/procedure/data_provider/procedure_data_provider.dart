@@ -142,4 +142,21 @@ class ProcedureDataProvider {
       throw CustomException('Greška prilikom završetka operacije');
     }
   }
+
+
+  Future<String> dischargePatient(int id) async{
+    final token = await _sharedPrefRepository.getToken();
+
+    final res = await http.put(Uri.parse("${path}procedure/$id/discharge"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token'
+        });
+
+    if (res.statusCode == 200) {
+      return res.body;
+    } else {
+      throw CustomException('Greška prilikom otpusta pacijenta');
+    }
+  }
 }

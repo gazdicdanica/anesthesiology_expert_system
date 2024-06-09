@@ -199,24 +199,25 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                                   children: [
                                     const SizedBox(height: 20),
                                     PostOperativeWidget(procedure: procedure),
-                                    Container(
-                                      padding: const EdgeInsets.only(top: 20),
-                                      width: double.infinity,
-                                      child: ElevatedButton(
-                                        onPressed:
-                                            state is ProcedureUpdateLoading
-                                                ? () {}
-                                                : () {
-                                                    // _endOperation();
-                                                  },
-                                        child: state is ProcedureUpdateLoading
-                                            ? const CircularProgressIndicator(
-                                                color: Colors.white,
-                                              )
-                                            : const Text('Otpusti pacijenta'),
+                                    if(!procedure.postOperative!.isReleased)
+                                      Container(
+                                        padding: const EdgeInsets.only(top: 20),
+                                        width: double.infinity,
+                                        child: ElevatedButton(
+                                          onPressed:
+                                              state is ProcedureUpdateLoading
+                                                  ? () {}
+                                                  : () {
+                                                      _dischargePatient();
+                                                    },
+                                          child: state is ProcedureUpdateLoading
+                                              ? const CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                )
+                                              : const Text('Otpusti pacijenta'),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
                                 )
                             ],
                           ),
@@ -296,6 +297,11 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
   void _endOperation() {
     BlocProvider.of<ProcedureSingleBloc>(context)
         .add(EndOperation(procedure.id));
+  }
+
+  void _dischargePatient() {
+    BlocProvider.of<ProcedureSingleBloc>(context)
+        .add(DischargePatient(procedure.id));
   }
 
   @override

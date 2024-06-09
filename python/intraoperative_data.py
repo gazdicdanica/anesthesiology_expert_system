@@ -27,7 +27,7 @@ def send_data(patient_id, procedure_id, sap, exstrasystole):
         if counter == 24 or counter == 0:
             send_request(data, endpoint_sap)
             counter = 0
-        if counter == 16 or counter == 0:
+        if counter == 16 or counter == 0 or counter == 8 or counter == 4:
             send_request(data, endpoint_symptom)
 
         # send_request(data, endpoint_hb)

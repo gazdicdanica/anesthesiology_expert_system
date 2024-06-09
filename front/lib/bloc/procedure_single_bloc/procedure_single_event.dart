@@ -58,3 +58,12 @@ final class EndOperation extends ProcedureSingleEvent {
   List<Object> get props => [procedureId];
 }
 
+
+final class DischargePatient extends ProcedureSingleEvent {
+  final int procedureId;
+
+  const DischargePatient(this.procedureId);
+
+  @override
+  List<Object> get props => [procedureId];
+}

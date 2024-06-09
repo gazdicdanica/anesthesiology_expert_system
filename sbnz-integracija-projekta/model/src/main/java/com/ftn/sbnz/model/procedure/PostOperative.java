@@ -21,7 +21,7 @@ public class PostOperative {
 
     private boolean doHemoglobin;
     private int hemoglobin;
-    private boolean isReleased;
+    private boolean isReleased = false;
     private double pulseOximetry;
 
     
@@ -29,6 +29,7 @@ public class PostOperative {
     private Set<Alarm> alarms = new java.util.HashSet<>();
 
     public PostOperative() {
+        this.isReleased = false;
     }
 
     public PostOperative(int hemoglobinValue, boolean isReleased, boolean doHemoglobin, double pulseOximetry) {
