@@ -103,6 +103,8 @@ rule "tachycardia rule"
         //tahikardija
         System.out.println("Tachycardia detected.");
         insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Tachycardia));
+        socketService.sendCardioAlarm($procedureId, SymptomEvent.Symptom.Tachycardia);
+
 end
 
 rule "tachycardia alarm"
@@ -121,7 +123,6 @@ rule "tachycardia alarm"
 
         procedureRepository.save($procedure);
 
-        socketService.sendCardioAlarm($procedureId, SymptomEvent.Symptom.Tachycardia);
 end
 
 rule "bradycardia rule"
@@ -139,6 +140,8 @@ rule "bradycardia rule"
         //bradikardija
         // System.out.println("Bradycardia detected.");
         insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Bradycardia));    
+        socketService.sendCardioAlarm($procedureId, SymptomEvent.Symptom.Bradycardia);
+
 
 end
 
@@ -157,7 +160,6 @@ rule "bradycardia alarm"
 
         procedureRepository.save($procedure);
 
-        socketService.sendCardioAlarm($procedureId, SymptomEvent.Symptom.Bradycardia);
 
 end
 
@@ -185,6 +187,8 @@ rule "hypertension rule"
     then
         //hipertenzija
         insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Hypertension));
+        socketService.sendSapAlarm($procedureId, SymptomEvent.Symptom.Hypertension);
+
 end
 
 rule "hypertension alarm rule"
@@ -202,7 +206,6 @@ rule "hypertension alarm rule"
 
         procedureRepository.save($procedure);
 
-        socketService.sendSapAlarm($procedureId, SymptomEvent.Symptom.Hypertension);
 end
 
 rule "hypotension rule"
@@ -223,7 +226,7 @@ rule "hypotension alarm rule"
     when
         $patient: Patient($id: id)
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
-        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension))
         
         Number($count: intValue) from accumulate(
             $hypotension: SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension) over window: time(10m), count($hypotension)
@@ -237,7 +240,8 @@ rule "hypotension alarm rule"
             addAlarm(alarm)
         }
 
-        procedureRepository.save($procedure);
-
+        procedureRepository.save($procedure);        
         socketService.sendSapAlarm($procedureId, SymptomEvent.Symptom.Hypotension);
+
+
 end

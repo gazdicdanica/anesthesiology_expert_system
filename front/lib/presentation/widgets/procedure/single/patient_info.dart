@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:front/models/patient.dart';
 import 'package:front/presentation/widgets/procedure/single/chip.dart';
 import 'package:front/theme.dart';

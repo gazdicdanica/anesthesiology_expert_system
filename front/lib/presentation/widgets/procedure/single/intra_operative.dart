@@ -110,7 +110,7 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
         if (state is ProcedurePatientSuccess &&
             state.procedure!.postOperative != null) {
           procedure = state.procedure!;
-          stompClient!.deactivate();
+          stompClient?.deactivate();
 
           stompClient = null;
           _bpmController.close();

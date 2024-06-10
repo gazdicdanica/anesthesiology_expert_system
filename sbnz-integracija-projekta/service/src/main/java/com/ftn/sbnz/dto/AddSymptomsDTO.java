@@ -1,5 +1,9 @@
 package com.ftn.sbnz.dto;
 
+import java.util.Set;
+
+import com.ftn.sbnz.model.events.SymptomEvent.Symptom;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageDTO {
-    private String message;
-
+public class AddSymptomsDTO {
+    private Set<Symptom> symptoms;
 }

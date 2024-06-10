@@ -48,6 +48,7 @@ while True:
     exstrasystole = True
 
     send_request(base, endpoint_hb)
+    # send_data(patient_id, procedure_id, sap, exstrasystole)
     time.sleep(1.4)
     send_request(base, endpoint_hb)
     time.sleep(1.4)

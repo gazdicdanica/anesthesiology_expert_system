@@ -1,6 +1,6 @@
 <kmodule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://jboss.org/kie/6.0.0/kmodule">
     <kbase name="bwBase" eventProcessingMode="stream" packages="backward">
-        <ksession name="bwKsession" clockType="pseudo" />
+        <ksession name="bwKsession" clockType="realtime" />
     </kbase>
     <kbase name="cepKbase" eventProcessingMode="stream" packages="cepIntra">
         <ksession type="stateful" name="cepKsession" clockType="pseudo"/>
@@ -9,12 +9,12 @@
         <ksession type="stateful" name="cepKsessionPOP" clockType="pseudo"/>
     </kbase>
     <kbase name="baseKbase" eventProcessingMode="stream" packages="base">
-        <ksession name="baseKsession" clockType="pseudo"/>
+        <ksession name="baseKsession" clockType="realtime"/>
     </kbase>
     <kbase name="diagnosisKbase" eventProcessingMode="stream" packages="diagnosis">
-        <ksession name="diagnosisKsession" clockType="pseudo"/>
+        <ksession name="diagnosisKsession" clockType="realtime"/>
     </kbase>
     <kbase name="monitoringKbase" eventProcessingMode="stream" packages="monitoring">
-        <ksession name="monitoringKsession" clockType="pseudo"/>
+        <ksession name="monitoringKsession" clockType="realtime"/>
     </kbase>
 </kmodule>

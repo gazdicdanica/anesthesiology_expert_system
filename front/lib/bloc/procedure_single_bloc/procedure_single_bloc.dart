@@ -2,6 +2,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/data/procedure/repository/procedure_repository.dart';
+import 'package:front/models/alarm.dart';
 import 'package:front/models/patient.dart';
 import 'package:front/models/procedure.dart';
 
@@ -87,6 +88,17 @@ class ProcedureSingleBloc
     }
   }
 
+  _updateSymptoms(UpdateSymptoms event, emit) async {
+    final currentState = state as ProcedurePatientSuccess;
+    emit(ProcedureUpdateLoading(currentState.patient, currentState.procedure));
+    try {
+      final dto = await _procedureRepository.addSymptoms(event.symptoms, event.procedureId);
+      emit(ProcedurePatientSuccess(dto.patient, dto.procedure));
+    } catch (e) {
+      emit(const ProcedureSingleError("Greška prilikom dodavanja simptoma"));
+    }
+  }
+
   _handle(event, emit) async {
     if (event is FetchProcedurePatient) {
       await _fetchProcedurePatient(event, emit);
@@ -100,6 +112,8 @@ class ProcedureSingleBloc
       await _endOperation(event, emit);
     }else if(event is DischargePatient){
       await _dischargePatient(event, emit);
+    }else if(event is UpdateSymptoms){
+      await _updateSymptoms(event, emit);
     }
   }
 }
