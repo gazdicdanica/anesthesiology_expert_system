@@ -16,9 +16,11 @@ import com.ftn.sbnz.model.events.SymptomEvent;
 global SocketService socketService;
 global ProcedureRepository procedureRepository;
 
-// query "getAlarms"
-//     $alarm : Alarm()
-// end
+
+query "getAllAlarms"
+    $alarm : Alarm()
+end
+
 
 rule "update bpm"
     when
@@ -114,7 +116,7 @@ rule "tachycardia alarm"
         System.out.println("Patient " + $patient.getFullname() + ": Tachycardia alarm.");
 
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Tachycardia, System.currentTimeMillis());
-
+        insert(alarm);
         modify($intraOp){
             addAlarm(alarm)
         }
@@ -150,7 +152,7 @@ rule "bradycardia alarm"
     then
         System.out.println("Patient " + $patient.getFullname() + ": bradycardia alarm.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Bradycardia, System.currentTimeMillis());
-
+        insert(alarm);
         modify($intraOp){
             addAlarm(alarm)
         }
@@ -195,7 +197,7 @@ rule "hypertension alarm rule"
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypertension.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypertension, System.currentTimeMillis());
-
+        insert(alarm);
         modify($intraOp){
             addAlarm(alarm)
         }
@@ -232,7 +234,7 @@ rule "hypotension alarm rule"
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypotension. Cardiovascular complications are possible.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypotension, System.currentTimeMillis());
-
+        insert(alarm);
         modify($intraOp){
             addAlarm(alarm)
         }
