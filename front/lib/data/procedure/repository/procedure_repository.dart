@@ -60,4 +60,11 @@ class ProcedureRepository {
     String decodedResponse = utf8.decode(response.runes.toList());
     return Procedure.fromJson(jsonDecode(decodedResponse));
   }
+
+  Future<Procedure> dischargePatient(int procedureId) async {
+    String response =
+        await _procedureDataProvider.dischargePatient(procedureId);
+    String decodedResponse = utf8.decode(response.runes.toList());
+    return Procedure.fromJson(jsonDecode(decodedResponse));
+  }
 }

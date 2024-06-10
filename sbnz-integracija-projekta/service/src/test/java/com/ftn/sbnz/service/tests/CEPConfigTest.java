@@ -13,14 +13,13 @@ import org.junit.Test;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
-import org.kie.api.runtime.rule.QueryResults;
 
 import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.PulseOximetryEvent;
 import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.events.SymptomEvent;
-import com.ftn.sbnz.model.illness.PatientHistory;
 import com.ftn.sbnz.model.illness.Illness.IllnessName;
+import com.ftn.sbnz.model.illness.PatientHistory;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.patient.Patient.PatientRisk;
 import com.ftn.sbnz.model.procedure.IntraOperative;

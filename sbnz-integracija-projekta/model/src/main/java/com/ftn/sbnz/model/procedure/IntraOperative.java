@@ -1,6 +1,6 @@
 package com.ftn.sbnz.model.procedure;
 
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -27,7 +27,7 @@ public class IntraOperative {
     private int extrasystoleCounter;
 
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<Alarm> alarms;
+    private Set<Alarm> alarms = new HashSet<>();
 
     public IntraOperative() {
     }

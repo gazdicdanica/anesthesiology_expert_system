@@ -1,9 +1,15 @@
 package com.ftn.sbnz.model.procedure;
 
-import java.util.List;
 import java.util.Set;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "post_operative_procedures")
@@ -13,19 +19,24 @@ public class PostOperative {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private boolean doHemoglobin;
     private int hemoglobin;
-    private boolean isReleased;
+    private boolean isReleased = false;
+    private double pulseOximetry;
 
     
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<Alarm> alarms;
+    private Set<Alarm> alarms = new java.util.HashSet<>();
 
     public PostOperative() {
+        this.isReleased = false;
     }
 
-    public PostOperative(int hemoglobinValue, boolean isReleased) {
+    public PostOperative(int hemoglobinValue, boolean isReleased, boolean doHemoglobin, double pulseOximetry) {
         this.hemoglobin = hemoglobinValue;
         this.isReleased = isReleased;
+        this.doHemoglobin = doHemoglobin;
+        this.pulseOximetry = pulseOximetry;
     }
 
     public int getHemoglobin() {
@@ -52,6 +63,22 @@ public class PostOperative {
         this.id = id;
     }
 
+    public boolean isDoHemoglobin() {
+        return doHemoglobin;
+    }
+
+    public void setDoHemoglobin(boolean doHemoglobin) {
+        this.doHemoglobin = doHemoglobin;
+    }
+
+
+    public double getPulseOximetry() {
+        return pulseOximetry;
+    }
+
+    public void setPulseOximetry(double pulseOximetry) {
+        this.pulseOximetry = pulseOximetry;
+    }
     public Set<Alarm> getAlarms() {
         return alarms;
     }
@@ -74,6 +101,7 @@ public class PostOperative {
                 "id=" + id +
                 ", hemoglobin=" + hemoglobin +
                 ", isReleased=" + isReleased +
+                ", doHemoglobin=" + doHemoglobin +
                 ", alarms=" + alarms +
                 '}';
     }
