@@ -4,7 +4,9 @@ import java.security.Principal;
 import java.util.List;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
+import com.ftn.sbnz.dto.AddSymptomsDTO;
 import com.ftn.sbnz.dto.BaseRulesDTO;
+import com.ftn.sbnz.dto.DiagnosisDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PostOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
@@ -38,5 +40,6 @@ public interface IProcedureService {
 
     Procedure dischargePatinet(Long id);
 
+    DiagnosisDTO addSymptom(Long procedureId, AddSymptomsDTO symptoms, Principal u);
     List<Alarm> getAllAlarmsForProcedure(Long procedureId);
 }

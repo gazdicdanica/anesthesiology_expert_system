@@ -168,13 +168,11 @@ class PreOperative {
 
 class PostOperative {
   final int? id;
-  final int? hemoglobin;
   final bool isReleased;
   final Set<Alarm> alarms;
 
   PostOperative({
     this.id,
-    this.hemoglobin,
     required this.isReleased,
     this.alarms = const {},
   });
@@ -182,7 +180,6 @@ class PostOperative {
   factory PostOperative.fromJson(Map<String, dynamic> json) {
     return PostOperative(
       id: json['id'],
-      hemoglobin: json['hemoglobin'],
       isReleased: json['released'],
       alarms: (json['alarms'] as List).map((e) => Alarm.fromJson(e)).toSet(),
     );
@@ -191,7 +188,6 @@ class PostOperative {
   toJson() {
     return {
       'id': id,
-      'hemoglobin': hemoglobin,
       'released': isReleased,
     };
   }

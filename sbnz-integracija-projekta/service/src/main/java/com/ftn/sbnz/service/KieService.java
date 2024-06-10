@@ -102,6 +102,8 @@ public class KieService implements IKieService {
             kieSession.dispose();
             sessionMap.remove(procedureId);
         }
+
+        System.out.println(sessionMap);
     }
 
     @Override

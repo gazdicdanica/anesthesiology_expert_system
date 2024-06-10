@@ -15,10 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
+import com.ftn.sbnz.dto.AddSymptomsDTO;
 import com.ftn.sbnz.dto.BaseRulesDTO;
+import com.ftn.sbnz.dto.DiagnosisDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PostOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
+import com.ftn.sbnz.exception.BadRequestException;
 import com.ftn.sbnz.exception.EntityNotFoundException;
 import com.ftn.sbnz.model.events.BreathEvent;
 import com.ftn.sbnz.model.events.ExtrasystoleEvent;
@@ -27,6 +30,7 @@ import com.ftn.sbnz.model.events.PulseOximetryEvent;
 import com.ftn.sbnz.model.events.RetardDTO;
 import com.ftn.sbnz.model.events.SAPEvent;
 import com.ftn.sbnz.model.events.SymptomEvent;
+import com.ftn.sbnz.model.events.SymptomEvent.Symptom;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.Alarm;
 import com.ftn.sbnz.model.procedure.IntraOperative;
@@ -80,7 +84,9 @@ public class ProcedureService implements IProcedureService {
                                 .orElseThrow(() -> new EntityNotFoundException("Not authenticated"));
                 List<Procedure> allProcedures = procedureRepository.findByMedicalStaffId(doctor.getId());
                 return allProcedures.stream()
-                                .filter(p -> (p.getPreOperative().isShouldContinueProcedure() || (!p.getPreOperative().isShouldContinueProcedure() && p.getPreOperative().isDoBnp()))
+                                .filter(p -> (p.getPreOperative().isShouldContinueProcedure()
+                                                || (!p.getPreOperative().isShouldContinueProcedure()
+                                                                && p.getPreOperative().isDoBnp()))
                                                 && !(p.getPostOperative() != null && p.getPostOperative().isReleased()))
                                 .collect(Collectors.toList());
         }
@@ -117,7 +123,7 @@ public class ProcedureService implements IProcedureService {
 
                 BaseRulesDTO dto = new BaseRulesDTO(patient, procedure);
 
-                if(!procedure.getPreOperative().isShouldContinueProcedure()){
+                if (!procedure.getPreOperative().isShouldContinueProcedure()) {
                         kieSession.delete(handle);
                         kieSession.delete(preOpHandle);
                 }
@@ -155,7 +161,6 @@ public class ProcedureService implements IProcedureService {
                 procedure.setPreOperative(preOperative);
 
                 Patient patient = patientService.findById(procedure.getPatientId());
-
 
                 KieSession templateSession = kieService.createKieSessionFromTemplate(patient, procedure,
                                 procedure.getPreOperative(), "/templatetable/B_TypeNatriuretic.drt", 9, 10,
@@ -211,12 +216,14 @@ public class ProcedureService implements IProcedureService {
                 return procedureRepository.save(procedure);
         }
 
-        public static <T> java.util.function.Predicate<T> distinctByKey(java.util.function.Function<? super T, ?> keyExtractor) {
+        public static <T> java.util.function.Predicate<T> distinctByKey(
+                        java.util.function.Function<? super T, ?> keyExtractor) {
                 Set<Object> seen = ConcurrentHashMap.newKeySet();
                 return t -> seen.add(keyExtractor.apply(t));
         }
 
-        public List<Alarm> updateIntraOperativeData(Long patientId, IntraOperativeDataDTO intraOperativeData, int eventType) {
+        public List<Alarm> updateIntraOperativeData(Long patientId, IntraOperativeDataDTO intraOperativeData,
+                        int eventType) {
                 if (eventType == 1) {
                         return updateIntraOperativeBPMData(patientId, intraOperativeData);
                 } else if (eventType == 2) {
@@ -234,7 +241,8 @@ public class ProcedureService implements IProcedureService {
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
 
                 boolean alreadyContains = kieService.alreadyContainsKieSession(intraOperativeData.getProcedureId());
-                KieSession kieSession = kieService.getOrCreateKieSession(intraOperativeData.getProcedureId(), "cepKsession");
+                KieSession kieSession = kieService.getOrCreateKieSession(intraOperativeData.getProcedureId(),
+                                "cepKsession");
                 if (!alreadyContains) {
                         System.out.println("Creating new session");
                         kieSession.setGlobal("socketService", socketService);
@@ -246,7 +254,6 @@ public class ProcedureService implements IProcedureService {
                         kieSession.insert(procedure.getIntraOperative());
                 }
 
-
                 HeartBeatEvent event = new HeartBeatEvent(patientId);
                 kieSession.insert(event);
                 RetardDTO dto = new RetardDTO(procedure.getId(), System.currentTimeMillis());
@@ -255,7 +262,8 @@ public class ProcedureService implements IProcedureService {
 
                 System.out.println(procedure.getIntraOperative());
 
-                // simpMessagingTemplate.convertAndSend("/heartbeat/" + procedure.getId(), new IntraDTO(procedure.getIntraOperative().getBpm(), 0));
+                // simpMessagingTemplate.convertAndSend("/heartbeat/" + procedure.getId(), new
+                // IntraDTO(procedure.getIntraOperative().getBpm(), 0));
 
                 return null;
         }
@@ -266,7 +274,8 @@ public class ProcedureService implements IProcedureService {
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
 
                 boolean alreadyContains = kieService.alreadyContainsKieSession(intraOperativeData.getProcedureId());
-                KieSession kieSession = kieService.getOrCreateKieSession(intraOperativeData.getProcedureId(), "cepKsession");
+                KieSession kieSession = kieService.getOrCreateKieSession(intraOperativeData.getProcedureId(),
+                                "cepKsession");
                 if (!alreadyContains) {
                         System.out.println("Creating new session");
                         kieSession.setGlobal("socketService", socketService);
@@ -277,23 +286,26 @@ public class ProcedureService implements IProcedureService {
                         kieSession.insert(procedure);
                         kieSession.insert(procedure.getIntraOperative());
                 }
-                
+
                 SAPEvent event = new SAPEvent(patientId, intraOperativeData.getSap());
                 kieSession.insert(event);
-                
+
                 kieSession.fireAllRules();
                 System.out.println(procedure.getIntraOperative());
-                // simpMessagingTemplate.convertAndSend("/sap/" + procedure.getId(), new IntraDTO(0, procedure.getIntraOperative().getSap()));
+                // simpMessagingTemplate.convertAndSend("/sap/" + procedure.getId(), new
+                // IntraDTO(0, procedure.getIntraOperative().getSap()));
                 return null;
         }
-        
-        private List<Alarm> updateIntraOperativeExtrasystoleData(Long patientId, IntraOperativeDataDTO intraOperativeData) {
+
+        private List<Alarm> updateIntraOperativeExtrasystoleData(Long patientId,
+                        IntraOperativeDataDTO intraOperativeData) {
                 Patient patient = patientService.findById(patientId);
                 Procedure procedure = procedureRepository.findById(intraOperativeData.getProcedureId())
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
 
                 boolean alreadyContains = kieService.alreadyContainsKieSession(intraOperativeData.getProcedureId());
-                KieSession kieSession = kieService.getOrCreateKieSession(intraOperativeData.getProcedureId(), "cepKsession");
+                KieSession kieSession = kieService.getOrCreateKieSession(intraOperativeData.getProcedureId(),
+                                "cepKsession");
                 if (!alreadyContains) {
                         kieSession.insert(patient);
                         kieSession.insert(procedure);
@@ -305,9 +317,9 @@ public class ProcedureService implements IProcedureService {
                         ExtrasystoleEvent event = new ExtrasystoleEvent(patientId);
                         kieSession.insert(event);
                 }
-                
+
                 kieSession.fireAllRules();
-                return null;               
+                return null;
         }
 
         @Override
@@ -322,7 +334,8 @@ public class ProcedureService implements IProcedureService {
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
 
                 boolean alreadyContains = kieService.alreadyContainsKieSession(postOperativeDataDTO.getProcedureId());
-                KieSession kieSession = kieService.getOrCreateKieSession(postOperativeDataDTO.getProcedureId(), "cepKsessionPOP");
+                KieSession kieSession = kieService.getOrCreateKieSession(postOperativeDataDTO.getProcedureId(),
+                                "cepKsessionPOP");
                 if (!alreadyContains) {
                         kieSession.setGlobal("socketService", socketService);
                         kieSession.setGlobal("procedureRepository", procedureRepository);
@@ -332,7 +345,7 @@ public class ProcedureService implements IProcedureService {
                         kieSession.insert(procedure);
                         kieSession.insert(procedure.getPostOperative());
                 }
-                
+
                 SAPEvent sapEv = new SAPEvent(patientId, postOperativeDataDTO.getSap());
                 kieSession.insert(sapEv);
                 if (postOperativeDataDTO.isHeartBeatEvent()) {
@@ -344,23 +357,24 @@ public class ProcedureService implements IProcedureService {
                         kieSession.insert(breathEv);
                 }
 
-                PulseOximetryEvent pulseOximetryEv = new PulseOximetryEvent(patientId, postOperativeDataDTO.getPulseOximetry());
+                PulseOximetryEvent pulseOximetryEv = new PulseOximetryEvent(patientId,
+                                postOperativeDataDTO.getPulseOximetry());
                 kieSession.insert(pulseOximetryEv);
 
                 RetardDTO dto = new RetardDTO(procedure.getId(), System.currentTimeMillis());
                 kieSession.insert(dto);
-                
+
                 kieSession.fireAllRules();
 
                 return null;
         }
 
         @Override
-        public Object getDiagnosis(Long patientId, Long procedureId) {
+        public Patient getDiagnosis(Long patientId, Long procedureId) {
                 Patient patient = patientService.findById(patientId);
                 Procedure procedure = procedureRepository.findById(procedureId)
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
-                
+
                 // Patient patient = new Patient();
                 // patient.setId(1L);
                 // Procedure procedure = new Procedure();
@@ -388,21 +402,20 @@ public class ProcedureService implements IProcedureService {
 
                 kieSession.fireAllRules();
 
-                return patient.getIllnesses();
+                return patientService.save(patient);
         }
 
         // private Set<Alarm> genIntraOpAlarams() {
-        //         Set<Alarm> li = new HashSet<>();
-        //         li.add(new Alarm(1L, 1L, Symptom.Dyspnea, 1L));
-        //         li.add(new Alarm(1L, 1L, Symptom.Tachypnea, 1L));
-        //         li.add(new Alarm(1L, 1L, Symptom.Hypoxemia, 1L));
-        //         li.add(new Alarm(1L, 1L, Symptom.Tachycardia, 1L));
-        //         li.add(new Alarm(1L, 1L, Symptom.Hypotension, 1L));
-        //         li.add(new Alarm(1L, 1L, Symptom.AbsentBreathSounds, 1L));
+        // Set<Alarm> li = new HashSet<>();
+        // li.add(new Alarm(1L, 1L, Symptom.Dyspnea, 1L));
+        // li.add(new Alarm(1L, 1L, Symptom.Tachypnea, 1L));
+        // li.add(new Alarm(1L, 1L, Symptom.Hypoxemia, 1L));
+        // li.add(new Alarm(1L, 1L, Symptom.Tachycardia, 1L));
+        // li.add(new Alarm(1L, 1L, Symptom.Hypotension, 1L));
+        // li.add(new Alarm(1L, 1L, Symptom.AbsentBreathSounds, 1L));
 
-        //         return li;
+        // return li;
         // }
-
 
         @Override
         public Procedure dischargePatinet(Long id) {
@@ -415,6 +428,29 @@ public class ProcedureService implements IProcedureService {
         }
 
         @Override
+        public DiagnosisDTO addSymptom(Long procedureId, AddSymptomsDTO symptoms, Principal u) {
+                Procedure procedure = procedureRepository.findById(procedureId)
+                                .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
+                User user = userService.findByUsername(u.getName())
+                                .orElseThrow(() -> new EntityNotFoundException("Not authenticated"));
+                if (procedure.getPostOperative() == null) {
+                        throw new BadRequestException("Operacija jos nije zavrsena");
+                }
+
+                for (Symptom symptom : symptoms.getSymptoms()) {
+                        if (!procedure.getPostOperative().getAlarms().stream().anyMatch(a -> a.getSymptom().equals(symptom))) {
+                                procedure.getPostOperative().addAlarm(new Alarm(0L, procedure.getPatientId(), user.getId(),
+                                                symptom, System.currentTimeMillis()));
+                                procedureRepository.save(procedure);
+        
+                        }
+        
+                }
+                
+                Patient patient = getDiagnosis(procedure.getPatientId(), procedureId);
+                return new DiagnosisDTO(patient, procedure);
+        }
+
         public List<Alarm> getAllAlarmsForProcedure(Long procedureId) {
                 if (kieService.alreadyContainsKieSession(procedureId)) {
                         List<Alarm> alarms = new ArrayList<>();
@@ -431,5 +467,3 @@ public class ProcedureService implements IProcedureService {
                 return new ArrayList<>();
         }
 }
-
-
