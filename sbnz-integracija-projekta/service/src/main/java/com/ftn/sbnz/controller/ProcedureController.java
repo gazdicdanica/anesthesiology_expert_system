@@ -1,6 +1,7 @@
 package com.ftn.sbnz.controller;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import com.ftn.sbnz.dto.AddSymptomsDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PostOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
+import com.ftn.sbnz.model.procedure.Alarm;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.service.iservice.IProcedureService;
 
@@ -85,8 +87,9 @@ public class ProcedureController {
 
     @PutMapping(value = "/{procedureId}/dispose")
     public ResponseEntity<?> disposeIntraOperativeKieSession(@PathVariable Long procedureId) {
+        List<Alarm> alarms = procedureService.getAllAlarmsForProcedure(procedureId);
         procedureService.disposeIntraOperativeKieSession(procedureId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(alarms);
     }
 
     @PutMapping(value = "/{patientId}/postOpData")
@@ -110,6 +113,14 @@ public class ProcedureController {
             Principal u) {
         return ResponseEntity.ok(
                 procedureService.addSymptom(id, symptoms, u));
+    }
+
+    @GetMapping(value = "/{procedureId}/alarms")
+    public ResponseEntity<?> getAlarms(@PathVariable Long procedureId) {
+        List<Alarm> list = procedureService.getAllAlarmsForProcedure(procedureId);
+        if (list == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
 }

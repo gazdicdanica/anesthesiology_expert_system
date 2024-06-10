@@ -111,4 +111,9 @@ public class KieService implements IKieService {
         return sessionMap.containsKey(procedureId);
     }
 
+    @Override
+    public KieSession getKieSession(Long procedureId) {
+        return sessionMap.get(procedureId);
+    }
+
 }

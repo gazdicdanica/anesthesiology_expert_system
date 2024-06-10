@@ -24,6 +24,12 @@ declare VasopressorIV
     patientId: Long
 end
 
+
+query "getAllAlarms"
+    $alarm : Alarm()
+end
+
+
 rule "update bpm"
     when
         $patient : Patient($id: id)
@@ -89,7 +95,7 @@ rule "tachycardia alarm"
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected tachycardia.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Tachycardia, System.currentTimeMillis());
-
+        insert(alarm);
         modify($postOp){
             addAlarm(alarm)
         }
@@ -125,7 +131,7 @@ rule "bradycardia alarm"
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected bradycardia.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Bradycardia, System.currentTimeMillis());
-
+        insert(alarm);
         modify($postOp){
             addAlarm(alarm)
         }
@@ -173,6 +179,7 @@ rule "Post op SAP - Vasopressors Infusion"
     then
         System.out.println("Patient " + $patient.getFullname() + ": Start vasopressors infusion.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypotension, System.currentTimeMillis());
+        insert(alarm);
         modify($postOp){
             addAlarm(alarm)
         }
@@ -209,6 +216,7 @@ rule "Post op SAP - Inc 50"
         // insert(new Alarm($id, $doctorId, "Give patient hypertensive."));
 
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypertension, System.currentTimeMillis());
+        insert(alarm);
         modify($postOp){
             addAlarm(alarm)
         }
@@ -276,6 +284,7 @@ rule "hypoxemia alarm rule"
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypoxemia.");
         // insert(new Alarm($id, $doctorId, "Detected hypoxemia."));
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypoxemia, System.currentTimeMillis());
+        insert(alarm);
         modify($postOp){
             addAlarm(alarm)
         }
@@ -323,6 +332,7 @@ rule "cyanosis alarm rule"
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected cyanosis.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Cyanosis, System.currentTimeMillis());
+        insert(alarm);
         modify($postOp){
             addAlarm(alarm)
         }
@@ -384,7 +394,7 @@ rule "Tachypnea alarm rule"
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected tachypnea.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Tachypnea, System.currentTimeMillis());
-
+        insert(alarm);
         modify($postOp){
             addAlarm(alarm)
         }
@@ -417,7 +427,7 @@ rule "Bradypnea alarm rule"
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected bradypnea.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Bradypnea, System.currentTimeMillis());
-
+        insert(alarm);
         modify($postOp){
             addAlarm(alarm)
         }

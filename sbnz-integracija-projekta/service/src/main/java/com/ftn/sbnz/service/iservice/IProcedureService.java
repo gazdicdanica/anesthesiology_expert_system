@@ -41,4 +41,5 @@ public interface IProcedureService {
     Procedure dischargePatinet(Long id);
 
     DiagnosisDTO addSymptom(Long procedureId, AddSymptomsDTO symptoms, Principal u);
+    List<Alarm> getAllAlarmsForProcedure(Long procedureId);
 }
