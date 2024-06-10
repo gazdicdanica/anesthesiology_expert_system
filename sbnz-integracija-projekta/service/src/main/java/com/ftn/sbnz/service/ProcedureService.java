@@ -1,6 +1,7 @@
 package com.ftn.sbnz.service;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,6 +9,8 @@ import java.util.stream.Collectors;
 
 import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.rule.FactHandle;
+import org.kie.api.runtime.rule.QueryResults;
+import org.kie.api.runtime.rule.QueryResultsRow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -406,7 +409,26 @@ public class ProcedureService implements IProcedureService {
                 Procedure procedure = procedureRepository.findById(id)
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
                 procedure.getPostOperative().setReleased(true);
+                
+                kieService.disposeKieSession(id);
                 return procedureRepository.save(procedure);
+        }
+
+        @Override
+        public List<Alarm> getAllAlarmsForProcedure(Long procedureId) {
+                if (kieService.alreadyContainsKieSession(procedureId)) {
+                        List<Alarm> alarms = new ArrayList<>();
+                        KieSession kieSession = kieService.getKieSession(procedureId);
+                        QueryResults results = kieSession.getQueryResults("getAllAlarms");
+                        
+                        for (QueryResultsRow row : results) {
+                                Alarm alarm = (Alarm) row.get("$alarm");
+                                alarms.add(alarm);
+                        }
+                        return alarms;
+                }
+                
+                return new ArrayList<>();
         }
 }
 

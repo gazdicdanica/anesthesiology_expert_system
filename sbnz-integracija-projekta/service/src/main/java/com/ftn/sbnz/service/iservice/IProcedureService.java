@@ -37,4 +37,6 @@ public interface IProcedureService {
     Object getDiagnosis(Long patientId, Long procedureId);
 
     Procedure dischargePatinet(Long id);
+
+    List<Alarm> getAllAlarmsForProcedure(Long procedureId);
 }
