@@ -1,1 +1,31 @@
 package backward;
+
+import com.ftn.sbnz.model.illness.PatientHistory;
+import com.ftn.sbnz.model.patient.Patient;
+
+
+query familyHasHeartProblems(Long id, Long mId, Long fId)
+    PatientHistory(id, mId, fId, true;) 
+    or
+    (
+        PatientHistory(mId, mMotherId, mFatherId, mHasHeartIssues;)
+        and familyHasHeartProblems(mId, mMotherId, mFatherId; )
+    )
+    or
+    (
+        PatientHistory(fId, fMotherId, fFatherId, fHasHeartIssues;)
+        and familyHasHeartProblems(fId, fMotherId, fFatherId; )
+    )
+end
+
+rule "Backward chaining - Family has heart problems"
+when
+    $p: Patient($id : id)
+    $ph: PatientHistory(idPatient == $id, $mId : motherId, $fId : fatherId)
+    familyHasHeartProblems($id, $mId, $fId;)
+then
+    modify($p){
+        setHasCVSFamilyHistory(true);
+    }
+    System.out.println("Patient has heart problems");
+end

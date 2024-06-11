@@ -1,0 +1,22 @@
+template header
+ageLower
+ageHigher
+score
+risk
+
+package template;
+
+import com.ftn.sbnz.model.patient.Patient;
+
+template "riskAssessment"
+
+rule "RA @{row.rowNumber}"
+    when 
+        $p: Patient(age >= @{ageLower}, age <= @{ageHigher}, RCRIScore == @{score})
+    then
+        modify($p){
+            setRisk(@{risk});
+        }
+end
+
+end template
