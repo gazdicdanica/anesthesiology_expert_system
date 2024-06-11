@@ -106,7 +106,6 @@ rule "tachycardia rule"
         System.out.println("Tachycardia detected.");
         insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Tachycardia));
         socketService.sendCardioAlarm($procedureId, SymptomEvent.Symptom.Tachycardia);
-
 end
 
 rule "tachycardia alarm"
@@ -190,7 +189,6 @@ rule "hypertension rule"
         //hipertenzija
         insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Hypertension));
         socketService.sendSapAlarm($procedureId, SymptomEvent.Symptom.Hypertension);
-
 end
 
 rule "hypertension alarm rule"
@@ -222,6 +220,8 @@ rule "hypotension rule"
     then
         System.out.println("Hypotension detected.");
         insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Hypotension));
+        socketService.sendSapAlarm($procedureId, SymptomEvent.Symptom.Hypotension);
+
 end
 
 rule "hypotension alarm rule"

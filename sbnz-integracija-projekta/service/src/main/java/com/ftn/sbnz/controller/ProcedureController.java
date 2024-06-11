@@ -118,8 +118,8 @@ public class ProcedureController {
     @GetMapping(value = "/{procedureId}/alarms")
     public ResponseEntity<?> getAlarms(@PathVariable Long procedureId) {
         List<Alarm> list = procedureService.getAllAlarmsForProcedure(procedureId);
-        if (list == null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        // if (list == null)
+        //     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 

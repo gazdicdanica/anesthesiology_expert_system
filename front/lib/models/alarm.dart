@@ -4,12 +4,14 @@ class Alarm {
   final int patientId;
   final int doctorId;
   final Symptom symptom;
+  final int timestamp;
 
   Alarm({
     required this.id,
     required this.patientId,
     required this.doctorId,
     required this.symptom,
+    this.timestamp = 0,
   });
 
   factory Alarm.fromJson(Map<String, dynamic> json) {
@@ -18,9 +20,28 @@ class Alarm {
       patientId: json['patientId'],
       doctorId: json['doctorId'],
       symptom: getSymptom(json['symptom']),
+      timestamp: json['timestamp'],
     );
   }
 
+  @override
+  bool operator ==(Object other) =>
+    identical(this, other) ||
+    other is Alarm &&
+      runtimeType == other.runtimeType &&
+      id == other.id &&
+      patientId == other.patientId &&
+      doctorId == other.doctorId &&
+      symptom == other.symptom &&
+      timestamp == other.timestamp;
+
+  @override
+  int get hashCode =>
+    id.hashCode ^
+    patientId.hashCode ^
+    doctorId.hashCode ^
+    symptom.hashCode ^
+    timestamp.hashCode;
 
 }
 

@@ -73,6 +73,13 @@ class ProcedureRepository {
   Future<DiagnosisDTO> addSymptoms(Set<Symptom> symptoms, int id) async {
     String response = await _procedureDataProvider.addSymptoms(symptoms, id);
     String decodedResponse = utf8.decode(response.runes.toList());
-    return DiagnosisDTO.fromJson(jsonDecode(decodedResponse));
+    DiagnosisDTO dto = DiagnosisDTO.fromJson(jsonDecode(decodedResponse));
+
+    String resp = await _procedureDataProvider.getAlarms(id);
+    String decodedResp = utf8.decode(resp.runes.toList());
+    List<dynamic> alarms = jsonDecode(decodedResp);
+    dto.procedure.postOperative!.alarms.addAll(alarms.map((alarm) => Alarm.fromJson(alarm)));
+    
+    return dto;
   }
 }

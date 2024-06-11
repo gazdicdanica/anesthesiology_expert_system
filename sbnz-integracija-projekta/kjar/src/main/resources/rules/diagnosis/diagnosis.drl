@@ -75,7 +75,7 @@ rule "Pulmonary tromboembolism"
 end
 
 
-rule "Heart failure - hypotension"
+rule "Heart failure"
     lock-on-active true
     when
         $p : Patient($id: id)
@@ -84,8 +84,11 @@ rule "Heart failure - hypotension"
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.PulmonaryEdema))
+        (
+            exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension)) ||
+            exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
+        )
     then
         System.out.println("Heart failure detected");
 
@@ -97,39 +100,23 @@ rule "Heart failure - hypotension"
         }
 end
 
-rule "Heart failure - hypertension"
+rule "Myocardial infarction"
     lock-on-active true
     when
         $p : Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id)
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Dyspnea))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.PulmonaryEdema))
-    then
-        System.out.println("Heart failure detected");
-        modify($p) {
-            addIllness(new Illness(LocalDateTime.now(), Illness.IllnessName.HEART_FAILURE));
-        }
-        modify($p) {
-            setHasHearthFailure(true);
-        }
-end
-
-rule "Myocardial infarction - hypotension"
-    lock-on-active true
-    when
-        $p : Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id)
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Dyspnea))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.ChestPain))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Arythmia))
+        (
+            exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension)) ||
+            exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
+        )
+        (
+            exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia)) ||
+            exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradycardia))
+        )
 
     then
         System.out.println("Myocardial infarction detected");
@@ -142,28 +129,6 @@ rule "Myocardial infarction - hypotension"
         }
 end
 
-rule "Myocardial infarction - hypertension"
-    lock-on-active true
-    when
-        $p : Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id)
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Dyspnea))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.ChestPain))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Arythmia))
-
-    then
-        System.out.println("Myocardial infarction detected");
-        modify($p) {
-            addIllness(new Illness(LocalDateTime.now(), Illness.IllnessName.MYOCARDIAL_INFARCTION));
-        }
-        modify($p) {
-            setHadHearthAttack(true);
-        }
-end
 
 rule "Respiratory insuficiency"
     lock-on-active true
@@ -171,12 +136,14 @@ rule "Respiratory insuficiency"
         $p : Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id)
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Dyspnea))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
         exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Cyanosis))
-        exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradypnea))
+        (
+            exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea)) ||
+            exists(SymptomEvent(patientId == $id,procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradypnea))
+        )
     then
     
         modify($p) {

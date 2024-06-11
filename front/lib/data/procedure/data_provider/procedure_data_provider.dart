@@ -181,4 +181,20 @@ class ProcedureDataProvider {
       throw CustomException('Greška prilikom dodavanja simptoma');
     }
   }
+
+  Future<String> getAlarms(int id) async {
+    final token = await _sharedPrefRepository.getToken();
+
+    final res = await http.get(Uri.parse("${path}procedure/$id/alarms"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token'
+        });
+
+    if (res.statusCode == 200) {
+      return res.body;
+    } else {
+      throw CustomException('Greška prilikom dobavljanja alarma');
+    }
+  }
 }

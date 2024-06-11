@@ -70,7 +70,6 @@ rule "normal bpm"
         socketService.sendCardioAlarm($procedureId, null);
 end
 
-
 rule "tachycardia rule"
     when
         $patient: Patient($id: id)
@@ -84,7 +83,6 @@ rule "tachycardia rule"
         //tahikardija
         insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Tachycardia));
         socketService.sendCardioAlarm($procedureId, SymptomEvent.Symptom.Tachycardia);
-
 end
 
 rule "tachycardia alarm"
@@ -99,9 +97,7 @@ rule "tachycardia alarm"
         modify($postOp){
             addAlarm(alarm)
         }
-
         procedureRepository.save($procedure);
-
 end
 
 rule "bradycardia rule"
@@ -135,7 +131,7 @@ rule "bradycardia alarm"
         modify($postOp){
             addAlarm(alarm)
         }
-
+        insert(alarm);
         procedureRepository.save($procedure);
 
 end
@@ -171,22 +167,61 @@ rule "Post op SAP - Vasopressors Infusion"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
-        not(VasopressorIV(patientId == $id))
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
         eval($averageVal <= ($basalSAP - 50))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Start vasopressors infusion.");
+        insert(new SymptomEvent($id, $procedure.getId(), SymptomEvent.Symptom.Hypotension));
+        socketService.sendDialogAlarm($procedure.getId(), "SAP je pao za vi\u0161e od 50 mmHg u odnosu na bazalnu vrednost. Mogu\u0107i uzroci: krvarenje, sepsa, \u0161ok, pneumotoraks. Primeniti infuziju vazopresora.");     
+end
+
+rule "Post op SAP - Vasopressors Infusion alarm"
+    when
+        $patient: Patient($id: id, $basalSAP: basalSAP)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
+        exists(SymptomEvent(patientId == $id, procedureId == $procedure.getId(), symptom == SymptomEvent.Symptom.Hypotension))
+    then
+        System.out.println("Patient " + $patient.getFullname() + ": Start vasopressors infusion.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypotension, System.currentTimeMillis());
-        insert(alarm);
         modify($postOp){
             addAlarm(alarm)
         }
+        insert(alarm);
 
         procedureRepository.save($procedure);
-        socketService.sendDialogAlarm($procedure.getId(), "SAP je pao za vi\u0161e od 50 mmHg u odnosu na bazalnu vrednost. Mogu\u0107i uzroci: krvarenje, sepsa, \u0161ok, pneumotoraks. Primeniti infuziju vazopresora.");
-        
+end
+
+rule "Add vasopresorIV"
+
+    when
+        $patient: Patient($id: id, $basalSAP: basalSAP)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
+        not(VasopressorIV(patientId == $id))
+        exists(SymptomEvent(patientId == $id, procedureId == $procedure.getId(), symptom == SymptomEvent.Symptom.Hypotension))
+
+    then
+        insert(new VasopressorIV($id));
+end
+
+
+rule "Post op SAP - Vasopressors IV still low"
+    when
+        $patient: Patient($id: id, $basalSAP: basalSAP)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
+        $vasopressorIV: VasopressorIV(patientId == $id)
+        $SAPEvent: SAPEvent(this after[15m] $vasopressorIV, patientId == $id, value <= ($basalSAP - 50))
+    then
+        System.out.println("Patient " + $patient.getFullname() + ": transfusion.");
+        Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypotension, System.currentTimeMillis());
+        modify($postOp){
+            addAlarm(alarm)
+        }
+        insert(alarm);
+
+        socketService.sendDialogAlarm($procedure.getId(), "SAP je jo\u0161 uvek nizak. Dati pacijentu transfuziju eritrocita.");
+
 end
 
 rule "Post op SAP - Inc"
@@ -200,7 +235,6 @@ rule "Post op SAP - Inc"
     then
         System.out.println("Patient " + $patient.getFullname() + ": бол, делиријум, мучнина и повраћање, плитко дисање.");
         socketService.sendDialogAlarm($procedure.getId(), "SAP je povi\u0161en za 20 do 50 mmHg u odnosu na bazalnu vrednost. Mogu\u0107i uzroci: bol, delirijum, plitko disanje.");
-
 end
 
 rule "Post op SAP - Inc 50"
@@ -215,6 +249,20 @@ rule "Post op SAP - Inc 50"
         System.out.println("Patient " + $patient.getFullname() + ": give hypertensive.");
         // insert(new Alarm($id, $doctorId, "Give patient hypertensive."));
 
+        insert(new SymptomEvent($id, $procedure.getId(), SymptomEvent.Symptom.Hypertension));
+
+        // Todo add alert
+        socketService.sendDialogAlarm($procedure.getId(), "SAP je povi\u0161en za vi\u0161e od 50 mmHg u odnosu na bazalnu vrednost. Dati hipertenziv.");
+end
+
+rule "Post op SAP - Inc 50 alarm"
+    when
+        $patient: Patient($id: id, $basalSAP: basalSAP)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
+        exists(SymptomEvent(patientId == $id, procedureId == $procedure.getId(), symptom == SymptomEvent.Symptom.Hypertension))
+    then
+        System.out.println("Patient " + $patient.getFullname() + ": give hypertensive.");
+
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypertension, System.currentTimeMillis());
         insert(alarm);
         modify($postOp){
@@ -222,8 +270,7 @@ rule "Post op SAP - Inc 50"
         }
 
         procedureRepository.save($procedure);
-        // Todo add alert
-        socketService.sendDialogAlarm($procedure.getId(), "SAP je povi\u0161en za vi\u0161e od 50 mmHg u odnosu na bazalnu vrednost. Dati hipertenziv.");
+        
 end
 
 
@@ -341,7 +388,6 @@ rule "cyanosis alarm rule"
 
 end
 
-
 // breath frequency
 rule "Update breath frequency"
     when
@@ -406,12 +452,13 @@ end
 rule "Breath frequency - bradypnea"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative != null)
+        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative != null, $start: start)
+        $retard: RetardDTO(procedureId == $procedureId, $current: unixTime)
         Number($count: intValue) from accumulate(
             $e: BreathEvent(patientId == $id)
             over window: time(1m), count($e)
         )
-        eval($count < 12 && $count > 0)
+        eval($count < 12 && $count > 0 && ($start + 30000) < $current)
     then
         System.out.println("Patient " + $patient.getFullname() + ": Bradypnea detected.");
         insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Bradypnea));
@@ -427,11 +474,11 @@ rule "Bradypnea alarm rule"
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected bradypnea.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Bradypnea, System.currentTimeMillis());
-        insert(alarm);
+
         modify($postOp){
             addAlarm(alarm)
         }
-
+        insert(alarm);
         procedureRepository.save($procedure);
 
 end
