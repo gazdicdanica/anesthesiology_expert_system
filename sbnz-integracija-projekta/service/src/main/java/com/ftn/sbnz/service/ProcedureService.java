@@ -366,6 +366,15 @@ public class ProcedureService implements IProcedureService {
 
                 kieSession.fireAllRules();
 
+                Set<Alarm> all = procedure.getPostOperative().getAlarms();
+                Set<Alarm> distinct = procedure.getPostOperative().getAlarms().stream()
+                                .filter(distinctByKey(Alarm::getTimestamp)).collect(Collectors.toSet());
+
+                if(all.size() != distinct.size()) {
+                        procedure.getPostOperative().setAlarms(distinct);
+                        procedureRepository.save(procedure);
+                }
+
                 return null;
         }
 

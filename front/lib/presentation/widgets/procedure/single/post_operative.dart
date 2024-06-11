@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/procedure_single_bloc/procedure_single_bloc.dart';
 import 'package:front/models/procedure.dart';
+import 'package:front/presentation/widgets/procedure/single/complications.dart';
 import 'package:front/presentation/widgets/procedure/single/symptoms.dart';
 import 'package:front/server_path.dart';
 import 'package:front/theme.dart';
@@ -511,10 +512,26 @@ class _PostOperativeWidgetState extends State<PostOperativeWidget> {
                     return Container();
                   },
                 ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
+              const Divider(),
+              const SizedBox(height: 10),
+              BlocBuilder<ProcedureSingleBloc, ProcedureSingleState>(
+                builder: (context, state) {
+                  if(state is ProcedurePatientSuccess){
+                    if(state.procedure!= null){
+                      return Complications(alarms: state.procedure!.postOperative!.alarms);
+
+                    }
+                    return Complications(alarms: procedure.postOperative!.alarms);
+
+                  }
+                  return Container();
+                },
+              ),
+              const SizedBox(height: 10),
               const Divider(),
               const SizedBox(height: 20),
-              Symptoms(procedure: procedure,)
+              Symptoms(procedure: procedure)
             ],
           )
         ],

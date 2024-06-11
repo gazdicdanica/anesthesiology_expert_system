@@ -167,11 +167,21 @@ rule "Post op SAP - Vasopressors Infusion"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
-        not(VasopressorIV(patientId == $id))
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
         eval($averageVal <= ($basalSAP - 50))
+    then
+        System.out.println("Patient " + $patient.getFullname() + ": Start vasopressors infusion.");
+        insert(new SymptomEvent($id, $procedure.getId(), SymptomEvent.Symptom.Hypotension));
+        socketService.sendDialogAlarm($procedure.getId(), "SAP je pao za vi\u0161e od 50 mmHg u odnosu na bazalnu vrednost. Mogu\u0107i uzroci: krvarenje, sepsa, \u0161ok, pneumotoraks. Primeniti infuziju vazopresora.");     
+end
+
+rule "Post op SAP - Vasopressors Infusion alarm"
+    when
+        $patient: Patient($id: id, $basalSAP: basalSAP)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
+        exists(SymptomEvent(patientId == $id, procedureId == $procedure.getId(), symptom == SymptomEvent.Symptom.Hypotension))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Start vasopressors infusion.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypotension, System.currentTimeMillis());
@@ -179,23 +189,37 @@ rule "Post op SAP - Vasopressors Infusion"
             addAlarm(alarm)
         }
         insert(alarm);
-        insert(new VasopressorIV($id));
 
         procedureRepository.save($procedure);
-        socketService.sendDialogAlarm($procedure.getId(), "SAP je pao za vi\u0161e od 50 mmHg u odnosu na bazalnu vrednost. Mogu\u0107i uzroci: krvarenje, sepsa, \u0161ok, pneumotoraks. Primeniti infuziju vazopresora.");
-        
-        
 end
+
+rule "Add vasopresorIV"
+
+    when
+        $patient: Patient($id: id, $basalSAP: basalSAP)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
+        not(VasopressorIV(patientId == $id))
+        exists(SymptomEvent(patientId == $id, procedureId == $procedure.getId(), symptom == SymptomEvent.Symptom.Hypotension))
+
+    then
+        insert(new VasopressorIV($id));
+end
+
 
 rule "Post op SAP - Vasopressors IV still low"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
         $vasopressorIV: VasopressorIV(patientId == $id)
         $SAPEvent: SAPEvent(this after[15m] $vasopressorIV, patientId == $id, value <= ($basalSAP - 50))
     then
-        System.out.println("Patient " + $patient.getFullname() + ": determine hemoglobin.");
-        insert(new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypotension, System.currentTimeMillis()));
+        System.out.println("Patient " + $patient.getFullname() + ": transfusion.");
+        Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypotension, System.currentTimeMillis());
+        modify($postOp){
+            addAlarm(alarm)
+        }
+        insert(alarm);
+
         socketService.sendDialogAlarm($procedure.getId(), "SAP je jo\u0161 uvek nizak. Dati pacijentu transfuziju eritrocita.");
 
 end
@@ -225,6 +249,20 @@ rule "Post op SAP - Inc 50"
         System.out.println("Patient " + $patient.getFullname() + ": give hypertensive.");
         // insert(new Alarm($id, $doctorId, "Give patient hypertensive."));
 
+        insert(new SymptomEvent($id, $procedure.getId(), SymptomEvent.Symptom.Hypertension));
+
+        // Todo add alert
+        socketService.sendDialogAlarm($procedure.getId(), "SAP je povi\u0161en za vi\u0161e od 50 mmHg u odnosu na bazalnu vrednost. Dati hipertenziv.");
+end
+
+rule "Post op SAP - Inc 50 alarm"
+    when
+        $patient: Patient($id: id, $basalSAP: basalSAP)
+        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
+        exists(SymptomEvent(patientId == $id, procedureId == $procedure.getId(), symptom == SymptomEvent.Symptom.Hypertension))
+    then
+        System.out.println("Patient " + $patient.getFullname() + ": give hypertensive.");
+
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypertension, System.currentTimeMillis());
         insert(alarm);
         modify($postOp){
@@ -232,8 +270,7 @@ rule "Post op SAP - Inc 50"
         }
 
         procedureRepository.save($procedure);
-        // Todo add alert
-        socketService.sendDialogAlarm($procedure.getId(), "SAP je povi\u0161en za vi\u0161e od 50 mmHg u odnosu na bazalnu vrednost. Dati hipertenziv.");
+        
 end
 
 

@@ -169,7 +169,7 @@ class PreOperative {
 class PostOperative {
   final int? id;
   final bool isReleased;
-  final Set<Alarm> alarms;
+  Set<Alarm> alarms;
 
   PostOperative({
     this.id,
