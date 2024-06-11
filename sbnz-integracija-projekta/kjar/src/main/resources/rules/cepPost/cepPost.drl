@@ -452,12 +452,13 @@ end
 rule "Breath frequency - bradypnea"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative != null)
+        $procedure: Procedure(patientId == $id, $procedureId: id, postOperative != null, $start: start)
+        $retard: RetardDTO(procedureId == $procedureId, $current: unixTime)
         Number($count: intValue) from accumulate(
             $e: BreathEvent(patientId == $id)
             over window: time(1m), count($e)
         )
-        eval($count < 12 && $count > 0)
+        eval($count < 12 && $count > 0 && ($start + 30000) < $current)
     then
         System.out.println("Patient " + $patient.getFullname() + ": Bradypnea detected.");
         insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Bradypnea));
