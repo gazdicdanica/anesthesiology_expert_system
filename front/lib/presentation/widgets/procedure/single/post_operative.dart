@@ -301,7 +301,7 @@ class _PostOperativeWidgetState extends State<PostOperativeWidget> {
                     if (snapshot.hasData) {
                       String? alarm = snapshot.data!['message'];
 
-                      if (alarm != null) {
+                      if (alarm != null && alarm != "") {
                         return Column(
                           children: [
                             const SizedBox(
@@ -485,7 +485,7 @@ class _PostOperativeWidgetState extends State<PostOperativeWidget> {
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       String? alarm = snapshot.data!['message'];
-                      if (alarm != null) {
+                      if (alarm != null && alarm != "") {
                         return Column(
                           children: [
                             const SizedBox(
