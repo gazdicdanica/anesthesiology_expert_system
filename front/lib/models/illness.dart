@@ -47,7 +47,10 @@ class Illness {
   String dayString = date.day.toString().padLeft(2, '0');
   String monthString = date.month.toString().padLeft(2, '0');
 
-  return '$dayString.$monthString.${date.year}';
+  String hourString = date.hour.toString().padLeft(2, '0');
+  String minuteString = date.minute.toString().padLeft(2, '0');
+
+  return '$dayString.$monthString.${date.year}  $hourString:$minuteString';
 }
 }
 

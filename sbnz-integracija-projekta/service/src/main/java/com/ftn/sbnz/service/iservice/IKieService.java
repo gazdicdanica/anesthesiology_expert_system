@@ -26,4 +26,6 @@ public interface IKieService {
     void disposeKieSession(Long procedureId);
 
     boolean alreadyContainsKieSession(Long procedureId);
+
+    KieSession getKieSession(Long procedureId);
 }

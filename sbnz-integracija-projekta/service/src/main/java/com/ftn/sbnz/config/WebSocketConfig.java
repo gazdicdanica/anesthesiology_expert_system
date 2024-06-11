@@ -18,7 +18,8 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry){
         registry.setApplicationDestinationPrefixes("/sub")
-                .enableSimpleBroker("/heartbeat", "/sap", "/alarm/cardio", "/alarm/sap", "/heartbeat/post", "/sap/post");
+                .enableSimpleBroker("/heartbeat", "/sap", "/alarm/cardio", "/alarm/sap", "/alarm/extrasystole",
+                "/breath", "/alarm/breath", "/alarm/sap/dialog", "/pulseoximetry",  "/alarm/pulseoximetry", "/alarm/pulseoximetry/dialog");
 
     }
 }

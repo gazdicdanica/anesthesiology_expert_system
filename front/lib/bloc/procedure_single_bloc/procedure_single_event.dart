@@ -58,3 +58,23 @@ final class EndOperation extends ProcedureSingleEvent {
   List<Object> get props => [procedureId];
 }
 
+final class UpdateSymptoms extends ProcedureSingleEvent {
+  final Set<Symptom> symptoms;
+  final int procedureId;
+
+  const UpdateSymptoms(this.symptoms, this.procedureId);
+
+  @override
+  List<Object> get props => [symptoms, procedureId];
+
+}
+
+
+final class DischargePatient extends ProcedureSingleEvent {
+  final int procedureId;
+
+  const DischargePatient(this.procedureId);
+
+  @override
+  List<Object> get props => [procedureId];
+}

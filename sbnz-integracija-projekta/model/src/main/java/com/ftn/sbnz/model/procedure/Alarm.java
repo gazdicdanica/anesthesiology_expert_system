@@ -21,7 +21,15 @@ public class Alarm {
     public Alarm() {
     }
 
-    public Alarm(Long patientId, Long doctorId, Symptom message, long timestamp) {
+    // public Alarm(Long patientId, Long doctorId, Symptom message, long timestamp) {
+    //     this.patientId = patientId;
+    //     this.doctorId = doctorId;
+    //     this.symptom = message;
+    //     this.timestamp = timestamp;
+    // }
+
+    public Alarm(Long id, Long patientId, Long doctorId, Symptom message, long timestamp) {
+        this.id = id;
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.symptom = message;
@@ -78,4 +86,49 @@ public class Alarm {
                 '}';
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((patientId == null) ? 0 : patientId.hashCode());
+        result = prime * result + ((doctorId == null) ? 0 : doctorId.hashCode());
+        result = prime * result + ((symptom == null) ? 0 : symptom.hashCode());
+        result = prime * result + (int) (timestamp ^ (timestamp >>> 32));
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Alarm other = (Alarm) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        if (patientId == null) {
+            if (other.patientId != null)
+                return false;
+        } else if (!patientId.equals(other.patientId))
+            return false;
+        if (doctorId == null) {
+            if (other.doctorId != null)
+                return false;
+        } else if (!doctorId.equals(other.doctorId))
+            return false;
+        if (symptom != other.symptom)
+            return false;
+        if (timestamp != other.timestamp)
+            return false;
+        return true;
+    }
+
+
+    
 }

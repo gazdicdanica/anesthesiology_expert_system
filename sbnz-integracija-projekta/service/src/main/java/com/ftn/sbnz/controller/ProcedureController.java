@@ -1,6 +1,7 @@
 package com.ftn.sbnz.controller;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,9 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ftn.sbnz.dto.AddProcedureDTO;
+import com.ftn.sbnz.dto.AddSymptomsDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PostOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
+import com.ftn.sbnz.model.procedure.Alarm;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.service.iservice.IProcedureService;
 
@@ -26,7 +29,8 @@ import com.ftn.sbnz.service.iservice.IProcedureService;
 @RequestMapping(value = "/api/procedure", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ProcedureController {
 
-    @Autowired private IProcedureService procedureService;
+    @Autowired
+    private IProcedureService procedureService;
 
     @PostMapping
     public ResponseEntity<?> addProcedure(@RequestBody AddProcedureDTO addProcedureDTO, Principal u) {
@@ -49,7 +53,7 @@ public class ProcedureController {
     }
 
     @PutMapping(value = "/{id}/bnp")
-    public ResponseEntity<?> updateBnp(@PathVariable Long id, @RequestParam(name="bnp") double bnpValue) {
+    public ResponseEntity<?> updateBnp(@PathVariable Long id, @RequestParam(name = "bnp") double bnpValue) {
         return ResponseEntity.ok(procedureService.updateBnp(id, bnpValue));
     }
 
@@ -62,31 +66,61 @@ public class ProcedureController {
     public ResponseEntity<Procedure> endOperation(@PathVariable Long id) {
         return new ResponseEntity<Procedure>(procedureService.endOperation(id), HttpStatus.OK);
     }
-    
+
     @PutMapping(value = "/{patientId}/heartBeat")
-    public ResponseEntity<?> updateIntraOperativeBPMData(@PathVariable Long patientId, @RequestBody IntraOperativeDataDTO intraOperativeData) {
+    public ResponseEntity<?> updateIntraOperativeBPMData(@PathVariable Long patientId,
+            @RequestBody IntraOperativeDataDTO intraOperativeData) {
         return ResponseEntity.ok(procedureService.updateIntraOperativeData(patientId, intraOperativeData, 1));
     }
 
     @PutMapping(value = "/{patientId}/sapEvent")
-    public ResponseEntity<?> updateIntraOperativeSAPData(@PathVariable Long patientId, @RequestBody IntraOperativeDataDTO intraOperativeData) {
+    public ResponseEntity<?> updateIntraOperativeSAPData(@PathVariable Long patientId,
+            @RequestBody IntraOperativeDataDTO intraOperativeData) {
         return ResponseEntity.ok(procedureService.updateIntraOperativeData(patientId, intraOperativeData, 2));
     }
 
     @PutMapping(value = "/{patientId}/symptomEvent")
-    public ResponseEntity<?> updateIntraOperativeSymptomData(@PathVariable Long patientId, @RequestBody IntraOperativeDataDTO intraOperativeData) {
+    public ResponseEntity<?> updateIntraOperativeSymptomData(@PathVariable Long patientId,
+            @RequestBody IntraOperativeDataDTO intraOperativeData) {
         return ResponseEntity.ok(procedureService.updateIntraOperativeData(patientId, intraOperativeData, 3));
     }
 
     @PutMapping(value = "/{procedureId}/dispose")
     public ResponseEntity<?> disposeIntraOperativeKieSession(@PathVariable Long procedureId) {
+        List<Alarm> alarms = procedureService.getAllAlarmsForProcedure(procedureId);
         procedureService.disposeIntraOperativeKieSession(procedureId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(alarms);
     }
 
     @PutMapping(value = "/{patientId}/postOpData")
-    public ResponseEntity<PostOperativeDataDTO> updatePostOperativeData(@PathVariable Long patientId, @RequestBody PostOperativeDataDTO postOperativeDataDTO) {
+    public ResponseEntity<PostOperativeDataDTO> updatePostOperativeData(@PathVariable Long patientId,
+            @RequestBody PostOperativeDataDTO postOperativeDataDTO) {
         return ResponseEntity.ok(procedureService.updatePostOperativeData(patientId, postOperativeDataDTO));
+    }
+
+    @GetMapping(value = "/{patientId}/{procedureId}/diagnosis")
+    public ResponseEntity<?> getDiagnosis(@PathVariable Long patientId, @PathVariable Long procedureId) {
+        return ResponseEntity.ok(procedureService.getDiagnosis(patientId, procedureId));
+    }
+
+    @PutMapping(value = "/{id}/discharge")
+    public ResponseEntity<Procedure> dischargePatient(@PathVariable Long id) {
+        return new ResponseEntity<Procedure>(procedureService.dischargePatinet(id), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/{id}/add-symptoms")
+    public ResponseEntity<?> addSymptom(@PathVariable Long id, @RequestBody AddSymptomsDTO symptoms,
+            Principal u) {
+        return ResponseEntity.ok(
+                procedureService.addSymptom(id, symptoms, u));
+    }
+
+    @GetMapping(value = "/{procedureId}/alarms")
+    public ResponseEntity<?> getAlarms(@PathVariable Long procedureId) {
+        List<Alarm> list = procedureService.getAllAlarmsForProcedure(procedureId);
+        if (list == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
 }

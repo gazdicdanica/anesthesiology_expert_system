@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:front/data/procedure/data_provider/procedure_data_provider.dart';
+import 'package:front/models/alarm.dart';
 import 'package:front/models/dto/base_rules_dto.dart';
+import 'package:front/models/dto/diagnosis_dto.dart';
 import 'package:front/models/patient.dart';
 import 'package:front/models/procedure.dart';
 
@@ -59,5 +61,18 @@ class ProcedureRepository {
     String response = await _procedureDataProvider.endOperation(procedureId);
     String decodedResponse = utf8.decode(response.runes.toList());
     return Procedure.fromJson(jsonDecode(decodedResponse));
+  }
+
+  Future<Procedure> dischargePatient(int procedureId) async {
+    String response =
+        await _procedureDataProvider.dischargePatient(procedureId);
+    String decodedResponse = utf8.decode(response.runes.toList());
+    return Procedure.fromJson(jsonDecode(decodedResponse));
+  }
+
+  Future<DiagnosisDTO> addSymptoms(Set<Symptom> symptoms, int id) async {
+    String response = await _procedureDataProvider.addSymptoms(symptoms, id);
+    String decodedResponse = utf8.decode(response.runes.toList());
+    return DiagnosisDTO.fromJson(jsonDecode(decodedResponse));
   }
 }

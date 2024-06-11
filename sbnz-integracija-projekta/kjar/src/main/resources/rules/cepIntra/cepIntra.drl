@@ -16,9 +16,11 @@ import com.ftn.sbnz.model.events.SymptomEvent;
 global SocketService socketService;
 global ProcedureRepository procedureRepository;
 
-// query "getAlarms"
-//     $alarm : Alarm()
-// end
+
+query "getAllAlarms"
+    $alarm : Alarm()
+end
+
 
 rule "update bpm"
     when
@@ -29,9 +31,6 @@ rule "update bpm"
             over window: time(1m), count($heartBeat)
         )
     then
-       modify($intraOp){
-            setBpm($count)
-       }
         socketService.sendBpm($count, $procedure.getId());
 end
 
@@ -66,7 +65,7 @@ rule "exstrasystole rule"
         }
         //предиктор срчаних компликација, алармирај лекара
         System.out.println("Patient " + $patient.getFullname() + ": Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible.");
-        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Exstrasystole, System.currentTimeMillis());
+        Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Exstrasystole, System.currentTimeMillis());
 
         insert(alarm);
         modify($intraOp){
@@ -86,7 +85,7 @@ rule "normal bpm"
             $heartBeat: HeartBeatEvent(patientId == $id)
             over window: time(1m), count($heartBeat)
         )
-        eval($count >= 60 && $count <= 80)
+        eval($count >= 61 && $count <= 79)
     then
         //tahikardija
         System.out.println("Normal bpm.");
@@ -117,8 +116,8 @@ rule "tachycardia alarm"
     then
         System.out.println("Patient " + $patient.getFullname() + ": Tachycardia alarm.");
 
-        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Tachycardia, System.currentTimeMillis());
-
+        Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Tachycardia, System.currentTimeMillis());
+        insert(alarm);
         modify($intraOp){
             addAlarm(alarm)
         }
@@ -128,6 +127,7 @@ rule "tachycardia alarm"
 end
 
 rule "bradycardia rule"
+    no-loop true
     when
         $patient: Patient($id: id)
         $procedure: Procedure(patientId == $id, $procedureId: id, $start: start)
@@ -139,7 +139,7 @@ rule "bradycardia rule"
         eval($count < 60 && $count > 0 && ($start + 60000) < $current)
     then
         //bradikardija
-        System.out.println("Bradycardia detected.");
+        // System.out.println("Bradycardia detected.");
         insert(new SymptomEvent($id, $procedureId, SymptomEvent.Symptom.Bradycardia));    
         socketService.sendCardioAlarm($procedureId, SymptomEvent.Symptom.Bradycardia);
 
@@ -153,8 +153,8 @@ rule "bradycardia alarm"
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradycardia))
     then
         System.out.println("Patient " + $patient.getFullname() + ": bradycardia alarm.");
-        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Bradycardia, System.currentTimeMillis());
-
+        Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Bradycardia, System.currentTimeMillis());
+        insert(alarm);
         modify($intraOp){
             addAlarm(alarm)
         }
@@ -198,8 +198,8 @@ rule "hypertension alarm rule"
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypertension.");
-        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Hypertension, System.currentTimeMillis());
-
+        Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypertension, System.currentTimeMillis());
+        insert(alarm);
         modify($intraOp){
             addAlarm(alarm)
         }
@@ -228,7 +228,7 @@ rule "hypotension alarm rule"
     when
         $patient: Patient($id: id)
         $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
-        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
+        exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension))
         
         Number($count: intValue) from accumulate(
             $hypotension: SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension) over window: time(10m), count($hypotension)
@@ -236,12 +236,14 @@ rule "hypotension alarm rule"
         eval($count == 2)
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypotension. Cardiovascular complications are possible.");
-        Alarm alarm = new Alarm($id, $doctorId, SymptomEvent.Symptom.Hypotension, System.currentTimeMillis());
-
+        Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Hypotension, System.currentTimeMillis());
+        insert(alarm);
         modify($intraOp){
             addAlarm(alarm)
         }
 
-        procedureRepository.save($procedure);
+        procedureRepository.save($procedure);        
+        socketService.sendSapAlarm($procedureId, SymptomEvent.Symptom.Hypotension);
+
 
 end

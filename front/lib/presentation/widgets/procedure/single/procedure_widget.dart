@@ -10,7 +10,7 @@ import 'package:front/presentation/widgets/procedure/risk_and_urgency.dart';
 import 'package:front/presentation/widgets/procedure/single/intra_operative.dart';
 import 'package:front/presentation/widgets/procedure/single/patient_info.dart';
 import 'package:front/presentation/widgets/procedure/single/post_operative.dart';
-import 'package:front/presentation/widgets/procedure/single/preoperative_form.dart';
+import 'package:front/presentation/widgets/procedure/single/pre_operative_form.dart';
 import 'package:front/theme.dart';
 
 class ProcedureWidget extends StatefulWidget {
@@ -199,24 +199,25 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                                   children: [
                                     const SizedBox(height: 20),
                                     PostOperativeWidget(procedure: procedure),
-                                    Container(
-                                      padding: const EdgeInsets.only(top: 20),
-                                      width: double.infinity,
-                                      child: ElevatedButton(
-                                        onPressed:
-                                            state is ProcedureUpdateLoading
-                                                ? () {}
-                                                : () {
-                                                    // _endOperation();
-                                                  },
-                                        child: state is ProcedureUpdateLoading
-                                            ? const CircularProgressIndicator(
-                                                color: Colors.white,
-                                              )
-                                            : const Text('Otpusti pacijenta'),
+                                    if(!procedure.postOperative!.isReleased)
+                                      Container(
+                                        padding: const EdgeInsets.only(top: 20, right: 10, left: 10),
+                                        width: double.infinity,
+                                        child: ElevatedButton(
+                                          onPressed:
+                                              state is ProcedureUpdateLoading
+                                                  ? () {}
+                                                  : () {
+                                                      _dischargePatient();
+                                                    },
+                                          child: state is ProcedureUpdateLoading
+                                              ? const CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                )
+                                              : const Text('Otpusti pacijenta'),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
                                 )
                             ],
                           ),
@@ -296,6 +297,11 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
   void _endOperation() {
     BlocProvider.of<ProcedureSingleBloc>(context)
         .add(EndOperation(procedure.id));
+  }
+
+  void _dischargePatient() {
+    BlocProvider.of<ProcedureSingleBloc>(context)
+        .add(DischargePatient(procedure.id));
   }
 
   @override

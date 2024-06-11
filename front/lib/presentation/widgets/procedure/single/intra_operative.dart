@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/procedure_single_bloc/procedure_single_bloc.dart';
 import 'package:front/models/procedure.dart';
+import 'package:front/presentation/widgets/procedure/single/complications.dart';
 import 'package:front/server_path.dart';
 import 'package:front/theme.dart';
 import 'package:stomp_dart_client/stomp_dart_client.dart';
@@ -109,11 +110,14 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
         if (state is ProcedurePatientSuccess &&
             state.procedure!.postOperative != null) {
           procedure = state.procedure!;
-          stompClient!.deactivate();
+          stompClient?.deactivate();
 
           stompClient = null;
           _bpmController.close();
           _sapController.close();
+          _bpmAlarmController.close();
+          _sapAlarmController.close();
+          _extrasystoleController.close();
         }
       },
       child: ExpansionTile(
@@ -306,7 +310,6 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
                     )
                 ],
               ),
-              const SizedBox(height: 20),
               if (stompClient != null)
                 StreamBuilder<String>(
                   stream: _extrasystoleController.stream,
@@ -314,14 +317,21 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
                     if (snapshot.hasData) {
                       String? alarm = snapshot.data;
                       if (alarm != null) {
-                        return Text(
-                          softWrap: true,
-                          alarm,
-                          style:
-                              Theme.of(context).textTheme.bodyLarge!.copyWith(
+                        return Column(
+                          children: [
+                            const SizedBox(height: 20),
+                            Text(
+                              softWrap: true,
+                              alarm,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyLarge!
+                                  .copyWith(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.red,
                                   ),
+                            ),
+                          ],
                         );
                       }
                     }
@@ -330,6 +340,9 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
                   },
                 ),
               const SizedBox(height: 20),
+              Complications(alarms: procedure.intraOperative!.alarms),
+              const SizedBox(height: 20),
+
             ],
           )
         ],
@@ -345,5 +358,6 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
     _sapController.close();
     _bpmAlarmController.close();
     _sapAlarmController.close();
+    _extrasystoleController.close();
   }
 }

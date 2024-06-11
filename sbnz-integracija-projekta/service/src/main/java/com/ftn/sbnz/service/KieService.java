@@ -102,11 +102,18 @@ public class KieService implements IKieService {
             kieSession.dispose();
             sessionMap.remove(procedureId);
         }
+
+        System.out.println(sessionMap);
     }
 
     @Override
     public boolean alreadyContainsKieSession(Long procedureId) {
         return sessionMap.containsKey(procedureId);
+    }
+
+    @Override
+    public KieSession getKieSession(Long procedureId) {
+        return sessionMap.get(procedureId);
     }
 
 }
