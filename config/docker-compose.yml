@@ -1,0 +1,19 @@
+version: "3.7"
+services:
+  mysqldb:
+    image: mysql:latest
+    restart: always
+    container_name: mysqldb
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin123#
+      - MYSQL_DATABASE=sbnz
+    ports:
+      - "3306:3306"
+    expose:
+      - 3306
+    volumes:
+      - db:/data/mysql
+volumes:
+    mysql_data:
+        driver: local
+    db:
