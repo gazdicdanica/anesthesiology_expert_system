@@ -30,7 +30,7 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
   final expansionController = ExpansionTileController();
 
   late SharedPrefRepository sharedPrefRepository;
-  bool? isDoctor; // Changed to nullable
+  bool? isDoctor; 
 
   @override
   void initState() {
@@ -42,19 +42,16 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
         .add(FetchProcedurePatient(widget.procedure.id));
 
     procedure = widget.procedure;
-
-    // Removed getRole() call from initState
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<void>(
-      future: getRole(), // Wait for getRole() to complete
+      future: getRole(), 
       builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LoadingWidget(); // Show loading widget while waiting
+          return const LoadingWidget(); 
         } else {
-          // Once getRole() is done, build the UI
           return Scaffold(
             appBar: AppBar(
               leading: IconButton(

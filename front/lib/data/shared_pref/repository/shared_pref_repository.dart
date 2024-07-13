@@ -10,9 +10,7 @@ class SharedPrefRepository {
     await _dataProvider.saveString("token", value);
 
     Map<String, dynamic> payload = Jwt.parseJwt(value);
-    print(payload);
     String role = payload['role'];
-    print(role);
     await _dataProvider.saveString("role", role);
   }
 

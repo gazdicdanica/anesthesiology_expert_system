@@ -25,7 +25,6 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
 
   final bnpController = TextEditingController();
 
-
   late Procedure procedure;
   late Patient patient;
 
@@ -34,7 +33,6 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
     super.initState();
     procedure = widget.procedure;
     patient = widget.patient;
-
 
     if (widget.procedure.preOperative.SIB != 0.0) {
       sibController.text = widget.procedure.preOperative.SIB.toString();
@@ -46,7 +44,6 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
     if(widget.procedure.preOperative.bnpValue != 0.0) {
       bnpController.text = widget.procedure.preOperative.bnpValue.toString();
     }
-
   }
 
   @override
