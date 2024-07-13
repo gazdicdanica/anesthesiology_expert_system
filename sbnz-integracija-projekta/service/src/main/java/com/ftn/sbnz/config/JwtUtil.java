@@ -5,6 +5,9 @@ import java.util.Date;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.stereotype.Component;
+
+import com.ftn.sbnz.model.user.User;
+
 import org.springframework.beans.factory.annotation.Value;
 
 import io.jsonwebtoken.*;
@@ -16,9 +19,12 @@ public class JwtUtil {
     @Value("Authorization")
     private String AUTH_HEADER;
 
-    public static String generateToken(String username) {
+    public static String generateToken(String username, User.Role role) {
+        Claims claims = Jwts.claims().setSubject(username);
+        claims.put("role", role.name());
+
         return Jwts.builder()
-            .setSubject(username)
+            .setClaims(claims)
             .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
             .signWith(SignatureAlgorithm.HS512, SECRET)
             .compact();

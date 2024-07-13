@@ -13,7 +13,7 @@ class ProcedureDataProvider {
   ProcedureDataProvider(this._sharedPrefRepository);
 
   Future<String> addProcedure(int patientId, OperationRisk risk,
-      ProcedureUrgency urgency, String name) async {
+      ProcedureUrgency urgency, String name, int staffId) async {
     final token = await _sharedPrefRepository.getToken();
 
     final res = await http.post(Uri.parse("${path}procedure"),
@@ -25,7 +25,8 @@ class ProcedureDataProvider {
           'patientId': patientId,
           'risk': risk.toString().split('.').last,
           'urgency': urgency.toString().split('.').last,
-          'name': name
+          'name': name,
+          "staffId": staffId
         }));
 
     if (res.statusCode == 200) {
@@ -195,6 +196,23 @@ class ProcedureDataProvider {
       return res.body;
     } else {
       throw CustomException('Greška prilikom dobavljanja alarma');
+    }
+  }
+
+
+  Future<String> getStaff() async{
+    final token = await _sharedPrefRepository.getToken();
+
+    final res = await http.get(Uri.parse("${path}user/staff"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token'
+        });
+
+    if (res.statusCode == 200) {
+      return res.body;
+    } else {
+      throw CustomException('Greška prilikom dobavljanja osoblja');
     }
   }
 }

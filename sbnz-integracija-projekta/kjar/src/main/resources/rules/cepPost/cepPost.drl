@@ -88,7 +88,7 @@ end
 rule "tachycardia alarm"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, $procedureId: id, $postOp: postOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected tachycardia.");
@@ -122,7 +122,7 @@ end
 rule "bradycardia alarm"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, $procedureId: id, $postOp: postOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradycardia))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected bradycardia.");
@@ -153,7 +153,7 @@ end
 rule "Post op SAP - Crystalloids"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, postOperative != null)
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
@@ -166,7 +166,7 @@ end
 rule "Post op SAP - Vasopressors Infusion"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, postOperative != null, $postOp: postOperative)
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
@@ -180,7 +180,7 @@ end
 rule "Post op SAP - Vasopressors Infusion alarm"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, postOperative != null, $postOp: postOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedure.getId(), symptom == SymptomEvent.Symptom.Hypotension))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Start vasopressors infusion.");
@@ -197,7 +197,7 @@ rule "Add vasopresorIV"
 
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, postOperative != null, $postOp: postOperative)
         not(VasopressorIV(patientId == $id))
         exists(SymptomEvent(patientId == $id, procedureId == $procedure.getId(), symptom == SymptomEvent.Symptom.Hypotension))
 
@@ -209,7 +209,7 @@ end
 rule "Post op SAP - Vasopressors IV still low"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, postOperative != null, $postOp: postOperative)
         $vasopressorIV: VasopressorIV(patientId == $id)
         $SAPEvent: SAPEvent(this after[15m] $vasopressorIV, patientId == $id, value <= ($basalSAP - 50))
     then
@@ -227,7 +227,7 @@ end
 rule "Post op SAP - Inc"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, postOperative != null)
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
@@ -240,7 +240,7 @@ end
 rule "Post op SAP - Inc 50"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, postOperative != null, $postOp: postOperative)
         Number($averageVal: doubleValue) from accumulate(
             $sap: SAPEvent(patientId == $id) over window: time(5m), average($sap.getValue())
         )
@@ -258,7 +258,7 @@ end
 rule "Post op SAP - Inc 50 alarm"
     when
         $patient: Patient($id: id, $basalSAP: basalSAP)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, postOperative != null, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, postOperative != null, $postOp: postOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedure.getId(), symptom == SymptomEvent.Symptom.Hypertension))
     then
         System.out.println("Patient " + $patient.getFullname() + ": give hypertensive.");
@@ -325,7 +325,7 @@ end
 rule "hypoxemia alarm rule"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, postOperative != null, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, $procedureId: id, postOperative != null, $postOp: postOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypoxemia.");
@@ -342,7 +342,7 @@ end
 rule "hypoxemia venilator rule"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, postOperative != null)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, $procedureId: id, postOperative != null)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypoxemia))
         Number($count : doubleValue) from accumulate(
             $pulseOximetry: PulseOximetryEvent(patientId == $id)
@@ -374,7 +374,7 @@ end
 rule "cyanosis alarm rule"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, postOperative != null, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, $procedureId: id, postOperative != null, $postOp: postOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Cyanosis))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected cyanosis.");
@@ -435,7 +435,7 @@ end
 rule "Tachypnea alarm rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, postOperative != null, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, $procedureId: id, postOperative != null, $postOp: postOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachypnea))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected tachypnea.");
@@ -469,7 +469,7 @@ end
 rule "Bradypnea alarm rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, postOperative != null, $postOp: postOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, $procedureId: id, postOperative != null, $postOp: postOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradypnea))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected bradypnea.");

@@ -70,7 +70,14 @@ public class ProcedureService implements IProcedureService {
                 Procedure procedure = new Procedure();
                 procedure.setPatientId(addProcedureDTO.getPatientId());
                 procedure.setName(addProcedureDTO.getName());
-                procedure.setMedicalStaffId(user.getId());
+                if(user.getRole() == User.Role.DOCTOR) {
+                        procedure.setDoctorId(user.getId());
+                        procedure.setNurseId(addProcedureDTO.getStaffId());
+                } else {
+                        procedure.setNurseId(user.getId());
+                        procedure.setDoctorId(addProcedureDTO.getStaffId());
+                }
+                procedure.setDoctorId(user.getId());
                 procedure.setRisk(addProcedureDTO.getRisk());
                 procedure.setUrgency(addProcedureDTO.getUrgency());
                 procedure.setPreOperative(new PreOperative());
@@ -80,10 +87,15 @@ public class ProcedureService implements IProcedureService {
 
         @Override
         public List<Procedure> getCurrentProcedures(Principal u) {
-                User doctor = userService.findByUsername(u.getName())
-                                .orElseThrow(() -> new EntityNotFoundException("Not authenticated"));
-                List<Procedure> allProcedures = procedureRepository.findByMedicalStaffId(doctor.getId());
-                return allProcedures.stream()
+                User staff = userService.findByUsername(u.getName())
+                        .orElseThrow(() -> new EntityNotFoundException("Not authenticated"));
+                List<Procedure> procedures;
+                if(staff.getRole() == User.Role.DOCTOR) {
+                        procedures =  procedureRepository.findByDoctorId(staff.getId());
+                } else {
+                        procedures = procedureRepository.findByNurseId(staff.getId());
+                }
+                return procedures.stream()
                                 .filter(p -> (p.getPreOperative().isShouldContinueProcedure()
                                                 || (!p.getPreOperative().isShouldContinueProcedure()
                                                                 && p.getPreOperative().isDoBnp()))

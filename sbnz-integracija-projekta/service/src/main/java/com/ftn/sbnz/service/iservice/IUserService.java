@@ -1,6 +1,7 @@
 package com.ftn.sbnz.service.iservice;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 
 import com.ftn.sbnz.dto.LoginDTO;
@@ -22,4 +23,6 @@ public interface IUserService {
     User updateLicenseNumber(String licenseNumber, Principal u);
 
     User updatePassword(String oldPassword, String newPassword, Principal u);
+
+    List<User> getStaff(Principal u);
 }
