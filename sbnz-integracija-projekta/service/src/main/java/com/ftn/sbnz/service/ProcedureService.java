@@ -74,10 +74,10 @@ public class ProcedureService implements IProcedureService {
                         procedure.setDoctorId(user.getId());
                         procedure.setNurseId(addProcedureDTO.getStaffId());
                 } else {
+                        System.out.println(addProcedureDTO.getStaffId());
                         procedure.setNurseId(user.getId());
                         procedure.setDoctorId(addProcedureDTO.getStaffId());
                 }
-                procedure.setDoctorId(user.getId());
                 procedure.setRisk(addProcedureDTO.getRisk());
                 procedure.setUrgency(addProcedureDTO.getUrgency());
                 procedure.setPreOperative(new PreOperative());
