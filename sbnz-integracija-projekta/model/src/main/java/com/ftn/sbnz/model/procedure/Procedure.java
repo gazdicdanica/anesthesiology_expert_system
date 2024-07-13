@@ -11,7 +11,8 @@ public class Procedure {
     private String name;
 
     private Long patientId;
-    private Long medicalStaffId;
+    private Long doctorId;
+    private Long nurseId;
 
     private long start;
     private OperationRisk risk;
@@ -28,12 +29,14 @@ public class Procedure {
     }
 
     public Procedure(Long patientId, Long medicalStaffId, 
+    Long nurseId,
     String name,
     long date,
      OperationRisk risk, ProcedureUrgency urget,
             PreOperative preOperative, IntraOperative intraOperative, PostOperative postOperative) {
         this.patientId = patientId;
-        this.medicalStaffId = medicalStaffId;
+        this.doctorId = medicalStaffId;
+        this.nurseId = nurseId;
         this.name = name;
         this.start = date;
         this.risk = risk;
@@ -59,12 +62,20 @@ public class Procedure {
         this.patientId = patientId;
     }
 
-    public Long getMedicalStaffId() {
-        return medicalStaffId;
+    public Long getDoctorId() {
+        return doctorId;
     }
 
-    public void setMedicalStaffId(Long medicalStaffId) {
-        this.medicalStaffId = medicalStaffId;
+    public void setDoctorId(Long medicalStaffId) {
+        this.doctorId = medicalStaffId;
+    }
+
+    public Long getNurseId() {
+        return nurseId;
+    }
+
+    public void setNurseId(Long nurseId) {
+        this.nurseId = nurseId;
     }
 
     public String getName() {
@@ -138,7 +149,7 @@ public class Procedure {
 
     @Override
     public String toString() {
-        return "Procedure [id=" + id + ", medicalStaffId=" + medicalStaffId + ", name=" + name + ", patientId="
+        return "Procedure [id=" + id + ", medicalStaffId=" + doctorId + ", nurseId=" + nurseId + ", name=" + name + ", patientId="
                 + patientId + ", postOperative=" + postOperative + ", preOperative=" + preOperative + ", intraoperative=" + intraOperative + ", risk=" + risk
                 + ", urgency=" + urgency + "]";
     }

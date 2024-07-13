@@ -123,7 +123,7 @@ class _SymptomsState extends State<Symptoms> {
                       : () {
                           _diagnosis();
                         },
-                  child: state is ProcedureUpdateLoading
+                  child: state is ProcedureDiagnosisLoading
                       ? const CircularProgressIndicator(
                           color: Colors.white,
                         )

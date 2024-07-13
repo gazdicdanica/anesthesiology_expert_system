@@ -70,4 +70,9 @@ public class UserController {
 		return new ResponseEntity<>(userService.updatePassword(passwordDTO.getOldPassword(), passwordDTO.getNewPassword(), u), HttpStatus.OK);
 	}
 
+	@GetMapping("/staff")
+	public ResponseEntity<?> getStaff(Principal u){
+		return new ResponseEntity<>(userService.getStaff(u), HttpStatus.OK);
+	}
+
 }

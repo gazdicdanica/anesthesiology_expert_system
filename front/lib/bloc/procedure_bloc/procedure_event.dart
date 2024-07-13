@@ -22,11 +22,12 @@ final class AddProcedure extends ProcedureEvent {
   final ProcedureUrgency urgency;
   final OperationRisk risk;
   final String name;
+  final int staffId;
 
-  const AddProcedure(this.patientId, this.urgency, this.risk, this.name);
+  const AddProcedure(this.patientId, this.urgency, this.risk, this.name, this.staffId);
 
   @override
-  List<Object> get props => [patientId, urgency, risk];
+  List<Object> get props => [patientId, urgency, risk, staffId];
 }
 
 final class FetchProcedures extends ProcedureEvent {

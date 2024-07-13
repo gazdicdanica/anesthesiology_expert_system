@@ -19,10 +19,11 @@ class ProcedureBloc extends Bloc<ProcedureEvent, ProcedureState> {
     final patientId = event.patientId;
     final urgency = event.urgency;
     final risk = event.risk;
+    final staffId = event.staffId;
 
     try {
       final procedure = await _procedureRepository.addProcedure(
-          patientId, risk, urgency, event.name);
+          patientId, risk, urgency, event.name, staffId);
       emit(ProcedureSuccess(procedure));
     } catch (e) {
       emit(const ProcedureError(

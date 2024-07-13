@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front/bloc/patient_bloc/patient_bloc.dart';
 import 'package:front/bloc/procedure_bloc/procedure_bloc.dart';
 import 'package:front/bloc/procedure_single_bloc/procedure_single_bloc.dart';
+import 'package:front/data/shared_pref/repository/shared_pref_repository.dart';
 import 'package:front/models/patient.dart';
 import 'package:front/models/procedure.dart';
 import 'package:front/presentation/widgets/loading_widget.dart';
@@ -28,212 +29,235 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
 
   final expansionController = ExpansionTileController();
 
+  late SharedPrefRepository sharedPrefRepository;
+  bool? isDoctor; // Changed to nullable
+
   @override
   void initState() {
     super.initState();
+
+    sharedPrefRepository = context.read<SharedPrefRepository>();
 
     BlocProvider.of<ProcedureSingleBloc>(context)
         .add(FetchProcedurePatient(widget.procedure.id));
 
     procedure = widget.procedure;
+
+    // Removed getRole() call from initState
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            BlocProvider.of<PatientBloc>(context).add(ResetForm());
-            BlocProvider.of<ProcedureBloc>(context).add(const CloseProcedure());
-          },
-        ),
-      ),
-      body: SafeArea(
-        child: Center(
-          child: BlocConsumer<ProcedureSingleBloc, ProcedureSingleState>(
-            listener: (context, state) {
-              if (state is ProcedureSingleError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.message),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                BlocProvider.of<PatientBloc>(context).add(ResetForm());
-                BlocProvider.of<ProcedureBloc>(context)
-                    .add(const CloseProcedure());
-              }
-              if (state is ProcedurePatientSuccess) {
-                if (state.procedure != null &&
-                    state.procedure!.preOperative.bnpValue != 0.0) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    showMessageDialog(
-                      context,
-                      'Rezultati',
-                      patient.hasHearthFailure
-                          ? 'Testom je utvrdjeno da pacijent ima srčanu insuficijenciju. Dati odgovarajuću terapiju.'
-                          : 'Testom je utvrdjeno da pacijent nema srčanu insuficijenciju. Nastaviti sa predviđenom terapijom radi stabilizovanja zdravstvenog stanja.',
-                    );
-                  });
-                } else if (state.procedure != null &&
-                    !state.procedure!.preOperative.shouldContinueProcedure) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    showMessageDialog(
-                      context,
-                      'Odložite operaciju',
-                      procedure.preOperative.postponeReason ??
-                          'Potrebno je odložiti operaciju.',
-                    );
-                  });
-                }
-              }
-            },
-            builder: (context, state) {
-              if (state is ProcedureSingleLoading) {
-                return const LoadingWidget();
-              }
-              if (state is UpdateAndSuccess) {
-                patient = state.patient;
-                if (state.procedure != null &&
-                    state.procedure!.id == procedure.id) {
-                  procedure = state.procedure!;
-                  _openInfo();
-                }
+    return FutureBuilder<void>(
+      future: getRole(), // Wait for getRole() to complete
+      builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const LoadingWidget(); // Show loading widget while waiting
+        } else {
+          // Once getRole() is done, build the UI
+          return Scaffold(
+            appBar: AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  BlocProvider.of<PatientBloc>(context).add(ResetForm());
+                  BlocProvider.of<ProcedureBloc>(context)
+                      .add(const CloseProcedure());
+                },
+              ),
+            ),
+            body: SafeArea(
+              child: Center(
+                child: BlocConsumer<ProcedureSingleBloc, ProcedureSingleState>(
+                  listener: (context, state) {
+                    if (state is ProcedureSingleError) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(state.message),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                      BlocProvider.of<PatientBloc>(context).add(ResetForm());
+                      BlocProvider.of<ProcedureBloc>(context)
+                          .add(const CloseProcedure());
+                    }
+                    if (state is ProcedurePatientSuccess) {
+                      if (state.procedure != null &&
+                          state.procedure!.preOperative.bnpValue != 0.0) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          showMessageDialog(
+                            context,
+                            'Rezultati',
+                            patient.hasHearthFailure
+                                ? 'Testom je utvrdjeno da pacijent ima srčanu insuficijenciju. Dati odgovarajuću terapiju.'
+                                : 'Testom je utvrdjeno da pacijent nema srčanu insuficijenciju. Nastaviti sa predviđenom terapijom radi stabilizovanja zdravstvenog stanja.',
+                          );
+                        });
+                      } else if (state.procedure != null &&
+                          !state.procedure!.preOperative.shouldContinueProcedure) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          showMessageDialog(
+                            context,
+                            'Odložite operaciju',
+                            procedure.preOperative.postponeReason ??
+                                'Potrebno je odložiti operaciju.',
+                          );
+                        });
+                      }
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state is ProcedureSingleLoading) {
+                      return const LoadingWidget();
+                    }
+                    if (state is UpdateAndSuccess) {
+                      patient = state.patient;
+                      if (state.procedure != null &&
+                          state.procedure!.id == procedure.id) {
+                        procedure = state.procedure!;
+                        _openInfo();
+                      }
 
-                print(state);
-                return CustomScrollView(
-                  slivers: [
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20.0, vertical: 10.0),
-                        child: Align(
-                          alignment: Alignment.topCenter,
-                          child: Column(
-                            children: [
-                              PatientInfo(
-                                patient: patient,
-                                expansionController: expansionController,
-                              ),
-                              const SizedBox(height: 20),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0),
+                      return CustomScrollView(
+                        slivers: [
+                          SliverToBoxAdapter(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20.0, vertical: 10.0),
+                              child: Align(
+                                alignment: Alignment.topCenter,
                                 child: Column(
                                   children: [
-                                    Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        procedure.name,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium,
-                                      ),
+                                    PatientInfo(
+                                      patient: patient,
+                                      expansionController: expansionController,
                                     ),
-                                    RiskUrgency(procedure: procedure),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(height: 20),
-                              // const Divider(),
-                              PreoperativeForm(
-                                procedure: procedure,
-                                patient: patient,
-                              ),
-
-                              if (patient.risk != null &&
-                                  procedure
-                                      .preOperative.shouldContinueProcedure &&
-                                  procedure.preOperative.SIB != 0.0 &&
-                                  procedure.intraOperative == null)
-                                Container(
-                                  padding: const EdgeInsets.only(top: 20),
-                                  width: double.infinity,
-                                  child: ElevatedButton(
-                                    onPressed: state is ProcedureUpdateLoading
-                                        ? () {}
-                                        : () {
-                                            _startOperation();
-                                          },
-                                    child: state is ProcedureUpdateLoading
-                                        ? const CircularProgressIndicator(
-                                            color: Colors.white,
-                                          )
-                                        : const Text('Započni operaciju'),
-                                  ),
-                                ),
-                              const SizedBox(height: 20),
-
-                              if (procedure.intraOperative != null)
-                                IntraOperativeWidget(
-                                  procedure: procedure,
-                                ),
-                              if (procedure.intraOperative != null &&
-                                  procedure.postOperative == null)
-                                Column(
-                                  children: [
-                                    Container(
-                                      padding: const EdgeInsets.only(top: 20),
-                                      width: double.infinity,
-                                      child: ElevatedButton(
-                                        onPressed:
-                                            state is ProcedureUpdateLoading
-                                                ? () {}
-                                                : () {
-                                                    _endOperation();
-                                                  },
-                                        child: state is ProcedureUpdateLoading
-                                            ? const CircularProgressIndicator(
-                                                color: Colors.white,
-                                              )
-                                            : const Text('Završi operaciju'),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              if(procedure.postOperative != null)
-                              
-                                Column(
-                                  children: [
                                     const SizedBox(height: 20),
-                                    PostOperativeWidget(procedure: procedure),
-                                    if(!procedure.postOperative!.isReleased)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0),
+                                      child: Column(
+                                        children: [
+                                          Align(
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              procedure.name,
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium,
+                                            ),
+                                          ),
+                                          RiskUrgency(procedure: procedure),
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 20),
+                                    // const Divider(),
+                                    PreoperativeForm(
+                                      procedure: procedure,
+                                      patient: patient,
+                                      isDoctor: isDoctor ?? false,
+                                    ),
+
+                                    if (patient.risk != null &&
+                                        procedure
+                                            .preOperative.shouldContinueProcedure &&
+                                        procedure.preOperative.SIB != 0.0 &&
+                                        procedure.intraOperative == null &&
+                                        isDoctor == true)
                                       Container(
-                                        padding: const EdgeInsets.only(top: 20, right: 10, left: 10),
+                                        padding: const EdgeInsets.only(top: 20),
                                         width: double.infinity,
                                         child: ElevatedButton(
-                                          onPressed:
-                                              state is ProcedureUpdateLoading
-                                                  ? () {}
-                                                  : () {
-                                                      _dischargePatient();
-                                                    },
+                                          onPressed: state is ProcedureUpdateLoading
+                                              ? () {}
+                                              : () {
+                                            _startOperation();
+                                          },
                                           child: state is ProcedureUpdateLoading
                                               ? const CircularProgressIndicator(
-                                                  color: Colors.white,
-                                                )
-                                              : const Text('Otpusti pacijenta'),
+                                            color: Colors.white,
+                                          )
+                                              : const Text('Započni operaciju'),
                                         ),
                                       ),
-                                    ],
-                                )
-                            ],
+                                    const SizedBox(height: 20),
+
+                                    if (procedure.intraOperative != null)
+                                      IntraOperativeWidget(
+                                        procedure: procedure,
+                                      ),
+                                    if (procedure.intraOperative != null &&
+                                        procedure.postOperative == null && isDoctor == true)
+                                      Column(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.only(top: 20),
+                                            width: double.infinity,
+                                            child: ElevatedButton(
+                                              onPressed:
+                                                  state is ProcedureUpdateLoading
+                                                      ? () {}
+                                                      : () {
+                                                    _endOperation();
+                                                  },
+                                              child: state is ProcedureUpdateLoading
+                                                  ? const CircularProgressIndicator(
+                                                color: Colors.white,
+                                              )
+                                                  : const Text('Završi operaciju'),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    if (procedure.postOperative != null)
+                                      Column(
+                                        children: [
+                                          const SizedBox(height: 20),
+                                          PostOperativeWidget(procedure: procedure),
+                                          if (!procedure.postOperative!.isReleased && isDoctor == true)
+                                            Container(
+                                              padding: const EdgeInsets.only(
+                                                  top: 20, right: 10, left: 10),
+                                              width: double.infinity,
+                                              child: ElevatedButton(
+                                                onPressed:
+                                                    state is ProcedureUpdateLoading
+                                                        ? () {}
+                                                        : () {
+                                                      _dischargePatient();
+                                                    },
+                                                child: state is ProcedureUpdateLoading
+                                                    ? const CircularProgressIndicator(
+                                                  color: Colors.white,
+                                                )
+                                                    : const Text('Otpusti pacijenta'),
+                                              ),
+                                            ),
+                                        ],
+                                      )
+                                  ],
+                                ),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              }
-              // return const SizedBox();
-              return const LoadingWidget();
-            },
-          ),
-        ),
-      ),
+                        ],
+                      );
+                    }
+                    return const LoadingWidget();
+                  },
+                ),
+              ),
+            ),
+          );
+        }
+      },
     );
+  }
+
+  Future<void> getRole() async {
+    isDoctor = await sharedPrefRepository.getRole() == "DOCTOR";
+    print(isDoctor);
   }
 
   void showMessageDialog(BuildContext context, String title, String content) {

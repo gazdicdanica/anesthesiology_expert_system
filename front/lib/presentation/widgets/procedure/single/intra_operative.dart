@@ -128,9 +128,11 @@ class _IntraOperativeWidgetState extends State<IntraOperativeWidget> {
               ),
         ),
         childrenPadding: const EdgeInsets.symmetric(horizontal: 10),
+        expandedCrossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 10),
           Wrap(
+            alignment: WrapAlignment.start,
             runSpacing: 6.0,
             children: [
               const Icon(

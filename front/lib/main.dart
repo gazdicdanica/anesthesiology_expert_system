@@ -5,6 +5,7 @@ import 'package:front/bloc/patient_bloc/patient_bloc.dart';
 import 'package:front/bloc/patient_form_bloc/patient_form_bloc.dart';
 import 'package:front/bloc/procedure_bloc/procedure_bloc.dart';
 import 'package:front/bloc/procedure_single_bloc/procedure_single_bloc.dart';
+import 'package:front/bloc/staff_bloc/staff_bloc.dart';
 // import 'package:front/bloc_observer.dart';
 import 'package:front/data/auth/data_provider/auth_data_provider.dart';
 import 'package:front/data/auth/repository/auth_repository.dart';
@@ -79,6 +80,11 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => ProcedureSingleBloc(
+              context.read<ProcedureRepository>(),
+            ),
+          ),
+          BlocProvider(
+            create: (context) => StaffBloc(
               context.read<ProcedureRepository>(),
             ),
           ),

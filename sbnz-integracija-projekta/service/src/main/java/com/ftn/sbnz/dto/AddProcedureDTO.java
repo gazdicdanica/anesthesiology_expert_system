@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AddProcedureDTO {
     private Long patientId;
+    private Long staffId;
     private String name;
     private OperationRisk risk;
     private ProcedureUrgency urgency;

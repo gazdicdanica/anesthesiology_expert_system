@@ -39,6 +39,14 @@ final class ProcedureUpdateLoading extends UpdateAndSuccess {
   List<Object> get props => [super.patient, super.procedure ?? ""];
 }
 
+final class ProcedureDiagnosisLoading extends UpdateAndSuccess {
+
+  const ProcedureDiagnosisLoading(super.patient, super.procedure);
+
+  @override
+  List<Object> get props => [super.patient, super.procedure ?? ""];
+}
+
 final class ProcedureSingleError extends ProcedureSingleState {
   final String message;
 

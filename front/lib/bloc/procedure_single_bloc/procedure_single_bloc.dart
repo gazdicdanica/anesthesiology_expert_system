@@ -90,7 +90,7 @@ class ProcedureSingleBloc
 
   _updateSymptoms(UpdateSymptoms event, emit) async {
     final currentState = state as ProcedurePatientSuccess;
-    emit(ProcedureUpdateLoading(currentState.patient, currentState.procedure));
+    emit(ProcedureDiagnosisLoading(currentState.patient, currentState.procedure));
     try {
       final dto = await _procedureRepository.addSymptoms(event.symptoms, event.procedureId);
       emit(ProcedurePatientSuccess(dto.patient, dto.procedure));

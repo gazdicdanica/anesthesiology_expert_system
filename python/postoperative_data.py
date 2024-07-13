@@ -24,7 +24,7 @@ def send_request(sap, pulseOximetry, breath, heartBeat):
 
 while True:
     sap = random.randint(30, 145)
-    pulseOximetry = random.randint(88, 100)
+    pulseOximetry = random.randint(70, 90)
     breath = random.choices([True, False], weights=[2, 5], k=1)[0]
     heartBeat = True
 

@@ -8,6 +8,6 @@ import com.ftn.sbnz.model.procedure.Procedure;
 
 public interface ProcedureRepository extends JpaRepository<Procedure, Long>{
 
-    List<Procedure> findByMedicalStaffId(Long id);
-    
+    List<Procedure> findByDoctorId(Long id);
+    List<Procedure> findByNurseId(Long id);
 } 

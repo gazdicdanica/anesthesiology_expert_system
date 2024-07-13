@@ -3,7 +3,8 @@ import 'package:front/models/alarm.dart';
 class Procedure {
   final int id;
   final int patientId;
-  final int medicalStaffId;
+  final int doctorId;
+  final int nurseId;
   final String name;
   final OperationRisk risk;
   final ProcedureUrgency urgency;
@@ -14,7 +15,8 @@ class Procedure {
   Procedure({
     required this.id,
     required this.patientId,
-    required this.medicalStaffId,
+    required this.doctorId,
+    required this.nurseId,
     required this.name,
     required this.risk,
     required this.urgency,
@@ -27,7 +29,8 @@ class Procedure {
     return Procedure(
       id: json['id'],
       patientId: json['patientId'],
-      medicalStaffId: json['medicalStaffId'],
+      doctorId: json['doctorId'],
+      nurseId: json['nurseId'],
       name: json['name'],
       risk: getRisk(json['risk']),
       urgency: getUrgency(json['urgency']),
@@ -41,7 +44,8 @@ class Procedure {
     return {
       'id': id,
       'patientId': patientId,
-      'medicalStaffId': medicalStaffId,
+      'doctorId': doctorId,
+      'nurseId': nurseId,
       'name': name,
       'risk': risk.toString().split('.').last,
       'urgency': urgency.toString().split('.').last,
@@ -53,7 +57,7 @@ class Procedure {
 
   @override
   String toString() {
-    return 'Procedure{id: $id, patientId: $patientId, medicalStaffId: $medicalStaffId, name: $name, risk: $risk, urgency: $urgency, preOperative: $preOperative, postOperative: $postOperative, intraOperative: $intraOperative}';
+    return 'Procedure{id: $id, patientId: $patientId, medicalStaffId: $nurseId, name: $name, risk: $risk, urgency: $urgency, preOperative: $preOperative, postOperative: $postOperative, intraOperative: $intraOperative}';
   }
 }
 
