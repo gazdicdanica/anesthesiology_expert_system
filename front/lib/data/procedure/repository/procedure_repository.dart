@@ -87,7 +87,15 @@ class ProcedureRepository {
 
   Future<List<User>> getStaff() async {
     String response = await _procedureDataProvider.getStaff();
-    List<dynamic> staff = jsonDecode(response);
+    String decodedResp = utf8.decode(response.runes.toList());
+    List<dynamic> staff = jsonDecode(decodedResp);
     return staff.map((user) => User.fromJson(user)).toList();
+  }
+
+  Future<Map<String, String>> getProcedureStaff(int procedureId) async {
+    String response = await _procedureDataProvider.getProcedureStaff(procedureId);
+    String decodedResp = utf8.decode(response.runes.toList());
+    Map<String, dynamic> staff = jsonDecode(decodedResp);
+    return staff.map((key, value) => MapEntry(key, value.toString()));
   } 
 }

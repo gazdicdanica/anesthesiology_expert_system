@@ -10,6 +10,7 @@ import com.ftn.sbnz.dto.DiagnosisDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PostOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
+import com.ftn.sbnz.dto.StaffDTO;
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.Alarm;
 import com.ftn.sbnz.model.procedure.Procedure;
@@ -42,4 +43,6 @@ public interface IProcedureService {
 
     DiagnosisDTO addSymptom(Long procedureId, AddSymptomsDTO symptoms, Principal u);
     List<Alarm> getAllAlarmsForProcedure(Long procedureId);
+
+    StaffDTO getStaff(Long procedureId);
 }

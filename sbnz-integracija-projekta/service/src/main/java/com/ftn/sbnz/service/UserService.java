@@ -111,4 +111,9 @@ public class UserService implements IUserService {
 		}
 		return userRepository.findByRole(User.Role.DOCTOR);
 	}
+
+	@Override
+	public Optional<User> findById(Long id) {
+		return userRepository.findById(id);
+	}
 }

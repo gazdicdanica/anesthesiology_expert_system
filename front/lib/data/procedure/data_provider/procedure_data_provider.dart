@@ -215,4 +215,21 @@ class ProcedureDataProvider {
       throw CustomException('Greška prilikom dobavljanja osoblja');
     }
   }
+
+
+  Future<String> getProcedureStaff(int procedureId) async{
+    final token = await _sharedPrefRepository.getToken();
+
+    final res = await http.get(Uri.parse("${path}procedure/$procedureId/staff"),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer $token'
+        });
+
+    if (res.statusCode == 200) {
+      return res.body;
+    } else {
+      throw CustomException('Greška prilikom dobavljanja osoblja');
+    }
+  }
 }

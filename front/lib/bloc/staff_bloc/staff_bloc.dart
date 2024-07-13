@@ -13,6 +13,7 @@ class StaffBloc extends Bloc<StaffEvent, StaffState> {
   StaffBloc(this._procedureRepository) : super(StaffInitial()) {
 
     on<FetchStaff>(_fetchStaff);
+    on<FetchProcedureStaff>(_fetchProcedureStaff);
   }
 
 
@@ -24,6 +25,18 @@ class StaffBloc extends Bloc<StaffEvent, StaffState> {
       emit(StaffSuccess(staff));
     } catch (e) {
       emit(const StaffError("Greška prilikom dobavljanja dostupnog osoblja"));
+    }
+  }
+
+
+  _fetchProcedureStaff(FetchProcedureStaff event, emit) async {
+    emit(StaffLoading());
+
+    try {
+      final staff = await _procedureRepository.getProcedureStaff(event.procedureId);
+      emit(StaffProcedureSuccess(staff));
+    } catch (e) {
+      emit(const StaffError("Greška prilikom dobavljanja osoblja"));
     }
   }
 }

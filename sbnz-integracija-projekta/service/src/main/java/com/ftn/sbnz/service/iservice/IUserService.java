@@ -17,6 +17,8 @@ public interface IUserService {
     Optional<User> findByUsername(String username);
 
     User get(String username);
+
+    Optional<User> findById(Long id);
     
     User updateFullname(String name, Principal u);
 

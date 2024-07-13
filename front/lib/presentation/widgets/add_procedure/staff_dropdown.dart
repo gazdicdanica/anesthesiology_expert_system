@@ -8,6 +8,7 @@ class StaffDropdown extends StatefulWidget {
   const StaffDropdown({super.key, required this.selectStaff});
 
   final void Function(User?) selectStaff;
+
   @override
   State<StaffDropdown> createState() => _StaffDropdownState();
 }
@@ -26,19 +27,21 @@ class _StaffDropdownState extends State<StaffDropdown> {
     getRoleText();
   }
 
-  getRoleText() async {
+  Future<void> getRoleText() async {
     String? role = await _sharedPrefRepository.getRole();
     if (role == "DOCTOR") {
-      roleText = "Medicinski tehničar";
+      setState(() {
+        roleText = "Medicinski tehničar";
+      });
     } else {
-      roleText = "Doktor";
+      setState(() {
+        roleText = "Doktor";
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    User? selectedStaff;
-
     return BlocBuilder<StaffBloc, StaffState>(
       builder: (context, state) {
         if (state is StaffLoading) {
@@ -47,32 +50,29 @@ class _StaffDropdownState extends State<StaffDropdown> {
           );
         }
         if (state is StaffSuccess) {
-          return DropdownButtonFormField<User>(
-              itemHeight: null,
-              isExpanded: true,
-              style: Theme.of(context).textTheme.bodyLarge,
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.medical_services),
+
+          return DropdownMenu<User>(
+              width: MediaQuery.of(context).size.width -50,
+              inputDecorationTheme: const InputDecorationTheme(
+                floatingLabelBehavior: FloatingLabelBehavior.always,
                 prefixIconColor: Colors.blue,
-                labelText: roleText,
-                errorText: null,
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                
               ),
-              value: selectedStaff,
-              hint: const Text("Izaberite osoblje"),
-              items: state.staff.map((staff) {
-                return DropdownMenuItem(
-                  value: staff,
-                  child: Text(staff.fullname),
-                );
-              }).toList(),
-              onChanged: (User? value) {
-                widget.selectStaff(value);
-                setState(() {
-                  selectedStaff = value;
-                });
-              });
+              label: Text(roleText),
+              enableFilter: true,
+              requestFocusOnTap: true,
+              onSelected: (value) => widget.selectStaff(value),
+              // width: double.infinity,
+              hintText: "Izaberite osoblje",
+              textStyle: Theme.of(context).textTheme.bodyLarge,
+              leadingIcon: const Icon(Icons.medical_services),
+                dropdownMenuEntries: state.staff.map<DropdownMenuEntry<User>>(
+              (User user) {
+                return DropdownMenuEntry(value: user, label: user.fullname, );
+              },
+            ).toList());
+          
         } else {
           return Container();
         }

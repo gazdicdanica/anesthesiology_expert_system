@@ -12,6 +12,7 @@ import 'package:front/presentation/widgets/procedure/single/intra_operative.dart
 import 'package:front/presentation/widgets/procedure/single/patient_info.dart';
 import 'package:front/presentation/widgets/procedure/single/post_operative.dart';
 import 'package:front/presentation/widgets/procedure/single/pre_operative_form.dart';
+import 'package:front/presentation/widgets/procedure/single/staff_widget.dart';
 import 'package:front/theme.dart';
 
 class ProcedureWidget extends StatefulWidget {
@@ -145,6 +146,8 @@ class _ProcedureWidgetState extends State<ProcedureWidget> {
                                             ),
                                           ),
                                           RiskUrgency(procedure: procedure),
+                                          const SizedBox(height: 20),
+                                          StaffWidget(procedureId: procedure.id),
                                         ],
                                       ),
                                     ),
