@@ -6,10 +6,12 @@ import 'package:front/models/procedure.dart';
 
 class PreoperativeForm extends StatefulWidget {
   const PreoperativeForm(
-      {super.key, required this.procedure, required this.patient});
+      {super.key, required this.procedure, required this.patient, required this.isDoctor});
 
   final Procedure procedure;
   final Patient patient;
+
+  final bool isDoctor;
 
   @override
   State<PreoperativeForm> createState() => _PreoperativeFormState();
@@ -71,7 +73,7 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
                           child: TextFormField(
                             controller: sibController,
                             keyboardType: TextInputType.number,
-                            enabled: procedure.preOperative.SIB == 0.0,
+                            enabled: procedure.preOperative.SIB == 0.0 && widget.isDoctor,
                             decoration: InputDecoration(
                               labelText: "ŠUK",
                               suffix: Text("mmol",
@@ -85,7 +87,7 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
                           child: TextFormField(
                             controller: hba1cController,
                             keyboardType: TextInputType.number,
-                            enabled: procedure.preOperative.HBA1C == 0.0,
+                            enabled: procedure.preOperative.HBA1C == 0.0 && widget.isDoctor,
                             decoration: InputDecoration(
                               labelText: "HbA1c",
                               suffix: Text("%",
@@ -102,7 +104,7 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
                           child: TextFormField(
                             controller: creatinineController,
                             keyboardType: TextInputType.number,
-                            enabled: procedure.preOperative.creatinine == 0.0,
+                            enabled: procedure.preOperative.creatinine == 0.0 && widget.isDoctor,
                             decoration: InputDecoration(
                               labelText: "Kreatinin",
                               suffix: Text("mg/dl",
@@ -116,7 +118,7 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
                           child: TextFormField(
                             controller: sapController,
                             keyboardType: TextInputType.number,
-                            enabled: procedure.preOperative.creatinine == 0.0,
+                            enabled: procedure.preOperative.creatinine == 0.0 && widget.isDoctor,
                             decoration: InputDecoration(
                               labelText: "SAP",
                               suffix: Text("mmHg",
@@ -129,7 +131,7 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
                     ),
                     if (!procedure.preOperative.doBnp && procedure.preOperative.bnpValue == 0.0)
                       const SizedBox(height: 30),
-                    if (procedure.preOperative.SIB == 0.0)
+                    if (procedure.preOperative.SIB == 0.0 && widget.isDoctor)
                       Column(
                         children: [
                           SizedBox(
@@ -159,7 +161,7 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
                                 child: TextFormField(
                                   controller: bnpController,
                                   enabled:
-                                      procedure.preOperative.bnpValue == 0.0,
+                                      procedure.preOperative.bnpValue == 0.0 && widget.isDoctor,
                                   decoration: InputDecoration(
                                     labelText: "BNP",
                                     suffix: Text("pg/ml",
@@ -174,7 +176,7 @@ class _PreoperativeFormState extends State<PreoperativeForm> {
                             ],
                           ),
                           const SizedBox(height: 30),
-                          if (procedure.preOperative.bnpValue == 0.0)
+                          if (procedure.preOperative.bnpValue == 0.0 && widget.isDoctor)
                             Column(
                               children: [
                                 SizedBox(

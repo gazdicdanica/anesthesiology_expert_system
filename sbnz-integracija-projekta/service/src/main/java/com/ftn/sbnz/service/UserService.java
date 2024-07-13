@@ -9,6 +9,7 @@ import com.ftn.sbnz.model.user.User;
 import com.ftn.sbnz.repository.UserRepository;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -47,6 +48,7 @@ public class UserService implements IUserService {
 		user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
 		user.setFullname(registerDTO.getFullname());
 		user.setRole(registerDTO.getRole());
+		user.setLicenseNumber(registerDTO.getLicenseNumber());
 		this.userRepository.save(user);
 	}
 
@@ -62,7 +64,7 @@ public class UserService implements IUserService {
 			throw new BadRequestException("Pogrešna email adresa ili lozinka.");
 		}
 	
-		String jwt = JwtUtil.generateToken(user.getUsername());
+		String jwt = JwtUtil.generateToken(user.getUsername(), user.getRole());
 
 		return jwt;
 	}
@@ -99,5 +101,19 @@ public class UserService implements IUserService {
 		}
 		user.setPassword(passwordEncoder.encode(newPassword));
 		return userRepository.save(user);
+	}
+
+	@Override 
+	public List<User> getStaff(Principal u) {
+		User user = userRepository.findByUsername(u.getName()).orElseThrow(() -> new EntityNotFoundException("Korisnik nije pronađen."));
+		if (user.getRole() == User.Role.DOCTOR){
+			return userRepository.findByRole(User.Role.NURSE);
+		}
+		return userRepository.findByRole(User.Role.DOCTOR);
+	}
+
+	@Override
+	public Optional<User> findById(Long id) {
+		return userRepository.findById(id);
 	}
 }

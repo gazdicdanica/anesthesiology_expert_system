@@ -1,4 +1,5 @@
 import 'package:front/data/shared_pref/data_provider/shared_pref_data_provider.dart';
+import 'package:jwt_decode/jwt_decode.dart';
 
 class SharedPrefRepository {
   final SharedPrefDataProvider _dataProvider;
@@ -7,11 +8,21 @@ class SharedPrefRepository {
 
   void saveToken(String value) async {
     await _dataProvider.saveString("token", value);
+
+    Map<String, dynamic> payload = Jwt.parseJwt(value);
+    String role = payload['role'];
+    await _dataProvider.saveString("role", role);
   }
 
   Future<String?> getToken() async {
     String? token = await _dataProvider.getString("token");
     return Future.value(token);
+  }
+
+  Future<String?> getRole() async {
+    print(await _dataProvider.getString("role"));
+    String? role = await _dataProvider.getString("role");
+    return Future.value(role);
   }
 
   void removeToken() async {

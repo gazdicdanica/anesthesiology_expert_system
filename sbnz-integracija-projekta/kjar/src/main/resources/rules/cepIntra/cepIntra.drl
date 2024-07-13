@@ -52,7 +52,7 @@ end
 rule "exstrasystole rule"
     when
         $patient : Patient($id: id)
-        $procedure: Procedure(patientId == $id, $procedureId: id, $doctorId: medicalStaffId, $intraOp: intraOperative)
+        $procedure: Procedure(patientId == $id, $procedureId: id, $doctorId: doctorId, $intraOp: intraOperative)
         not(Alarm(patientId == $id, symptom == SymptomEvent.Symptom.Exstrasystole))
         Number($count : intValue) from accumulate(
             $exs: ExtrasystoleEvent(patientId == $id)
@@ -66,6 +66,7 @@ rule "exstrasystole rule"
         //предиктор срчаних компликација, алармирај лекара
         System.out.println("Patient " + $patient.getFullname() + ": Detected more than 25 exstrasystoles in 5 minutes. Cardiovascular complications are possible.");
         Alarm alarm = new Alarm(0L, $id, $doctorId, SymptomEvent.Symptom.Exstrasystole, System.currentTimeMillis());
+        
 
         insert(alarm);
         modify($intraOp){
@@ -111,7 +112,7 @@ end
 rule "tachycardia alarm"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Tachycardia))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Tachycardia alarm.");
@@ -149,7 +150,7 @@ end
 rule "bradycardia alarm"
     when 
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Bradycardia))
     then
         System.out.println("Patient " + $patient.getFullname() + ": bradycardia alarm.");
@@ -194,7 +195,7 @@ end
 rule "hypertension alarm rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypertension))
     then
         System.out.println("Patient " + $patient.getFullname() + ": Detected hypertension.");
@@ -227,7 +228,7 @@ end
 rule "hypotension alarm rule"
     when
         $patient: Patient($id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId, $procedureId: id, intraOperative != null, $intraOp: intraOperative)
         exists(SymptomEvent(patientId == $id, procedureId == $procedureId, symptom == SymptomEvent.Symptom.Hypotension))
         
         Number($count: intValue) from accumulate(

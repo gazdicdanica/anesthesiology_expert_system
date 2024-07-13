@@ -286,7 +286,7 @@ end
 rule "ASA III echocardiography"
     when
         $patient : Patient(asa == Patient.ASA.III, $id: id)
-        $procedure: Procedure(patientId == $id, risk == Procedure.OperationRisk.HIGH, $doctorId: medicalStaffId) @watch(preOperative)
+        $procedure: Procedure(patientId == $id, risk == Procedure.OperationRisk.HIGH, $doctorId: doctorId) @watch(preOperative)
         $preOp: PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
         System.out.println("Echocardiography");
@@ -299,7 +299,7 @@ end
 rule "ASA III stres test and echocardiography"
     when
         $patient : Patient(asa == Patient.ASA.III, risk == Patient.PatientRisk.HIGH, hasCVSFamilyHistory == true, $id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: medicalStaffId) @watch(preOperative)
+        $procedure: Procedure(patientId == $id, $doctorId: doctorId) @watch(preOperative)
         $preOp: PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
         System.out.println("Stress test and echocardiography");
@@ -311,7 +311,7 @@ end
 rule "ASA IV tests"
     when
         $patient : Patient(asa == Patient.ASA.IV, !hasHearthFailure, $id: id)
-        $procedure: Procedure(patientId == $id,  $doctorId: medicalStaffId) @watch(preOperative)
+        $procedure: Procedure(patientId == $id,  $doctorId: doctorId) @watch(preOperative)
         $preOp: PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
         System.out.println("Stres test, echocardiography, B-type natriuretic peptide");

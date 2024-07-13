@@ -4,7 +4,9 @@ import 'package:front/bloc/patient_bloc/patient_bloc.dart';
 import 'package:front/bloc/procedure_bloc/procedure_bloc.dart';
 import 'package:front/models/patient.dart';
 import 'package:front/models/procedure.dart';
+import 'package:front/models/user.dart';
 import 'package:front/presentation/widgets/add_procedure/risk_dropdown.dart';
+import 'package:front/presentation/widgets/add_procedure/staff_dropdown.dart';
 import 'package:front/presentation/widgets/add_procedure/urgency_dropdown.dart';
 import 'package:front/theme.dart';
 
@@ -20,6 +22,7 @@ class ProcedureForm extends StatefulWidget {
 class _ProcedureFormState extends State<ProcedureForm> {
   OperationRisk? selectedRisk;
   ProcedureUrgency? selectedUrgency;
+  User? selectedUser;
 
   final _procedureNameController = TextEditingController();
 
@@ -94,6 +97,8 @@ class _ProcedureFormState extends State<ProcedureForm> {
                                 ? state.riskError
                                 : null,
                           ),
+                          const SizedBox(height: 30),
+                          StaffDropdown(selectStaff: _selectUser,),
                         ],
                       );
                     },
@@ -127,6 +132,10 @@ class _ProcedureFormState extends State<ProcedureForm> {
     selectedRisk = risk;
   }
 
+  void _selectUser(User? user) {
+    selectedUser = user;
+  }
+
   void _validate(BuildContext context) {
     // BlocProvider.of<ProcedureBloc>(context).add(
     //   ValidateProcedureForm(
@@ -138,7 +147,7 @@ class _ProcedureFormState extends State<ProcedureForm> {
 
   void _addProcedure(BuildContext context) {
     context.read<ProcedureBloc>().add(AddProcedure(widget.patient.id,
-        selectedUrgency!, selectedRisk!, _procedureNameController.text.trim()));
+        selectedUrgency!, selectedRisk!, _procedureNameController.text.trim(), selectedUser!.id));
     context.read<PatientBloc>().add(ResetForm());
   }
 }

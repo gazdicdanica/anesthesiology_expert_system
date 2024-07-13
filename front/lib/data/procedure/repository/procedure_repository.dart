@@ -6,6 +6,7 @@ import 'package:front/models/dto/base_rules_dto.dart';
 import 'package:front/models/dto/diagnosis_dto.dart';
 import 'package:front/models/patient.dart';
 import 'package:front/models/procedure.dart';
+import 'package:front/models/user.dart';
 
 class ProcedureRepository {
   final ProcedureDataProvider _procedureDataProvider;
@@ -13,9 +14,9 @@ class ProcedureRepository {
   ProcedureRepository(this._procedureDataProvider);
 
   Future<Procedure> addProcedure(int patientId, OperationRisk risk,
-      ProcedureUrgency urgency, String name) async {
+      ProcedureUrgency urgency, String name, int staffId) async {
     String response = await _procedureDataProvider.addProcedure(
-        patientId, risk, urgency, name);
+        patientId, risk, urgency, name, staffId);
     String decodedResponse = utf8.decode(response.runes.toList());
     return Procedure.fromJson(jsonDecode(decodedResponse));
   }
@@ -82,4 +83,19 @@ class ProcedureRepository {
     
     return dto;
   }
+
+
+  Future<List<User>> getStaff() async {
+    String response = await _procedureDataProvider.getStaff();
+    String decodedResp = utf8.decode(response.runes.toList());
+    List<dynamic> staff = jsonDecode(decodedResp);
+    return staff.map((user) => User.fromJson(user)).toList();
+  }
+
+  Future<Map<String, String>> getProcedureStaff(int procedureId) async {
+    String response = await _procedureDataProvider.getProcedureStaff(procedureId);
+    String decodedResp = utf8.decode(response.runes.toList());
+    Map<String, dynamic> staff = jsonDecode(decodedResp);
+    return staff.map((key, value) => MapEntry(key, value.toString()));
+  } 
 }

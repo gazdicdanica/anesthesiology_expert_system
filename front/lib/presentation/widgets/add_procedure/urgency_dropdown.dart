@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:front/models/procedure.dart';
 
-class UrgencyDropdown extends StatefulWidget{
-  const UrgencyDropdown({super.key, required this.selectUrgency, this.error, required this.validate});
+class UrgencyDropdown extends StatefulWidget {
+  const UrgencyDropdown(
+      {super.key,
+      required this.selectUrgency,
+      this.error,
+      required this.validate});
 
   final void Function(ProcedureUrgency?) selectUrgency;
   final void Function(BuildContext context) validate;
@@ -13,47 +17,43 @@ class UrgencyDropdown extends StatefulWidget{
 }
 
 class _UrgencyDropdownState extends State<UrgencyDropdown> {
-  ProcedureUrgency? _selectedUrgency;
 
   @override
   Widget build(BuildContext context) {
-
-    return DropdownButtonFormField<ProcedureUrgency>(
-      style: Theme.of(context).textTheme.bodyLarge,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.access_time),
+    return DropdownMenu<ProcedureUrgency>(
+      width: MediaQuery.of(context).size.width - 50,
+      inputDecorationTheme: const InputDecorationTheme(
+        contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+        floatingLabelBehavior: FloatingLabelBehavior.always,
         prefixIconColor: Colors.blue,
-        labelText: 'Hitnost operacije',
-        contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-        errorText: widget.error,
       ),
-      value: _selectedUrgency,
-      items: const [
-        DropdownMenuItem(
-          value: ProcedureUrgency.ELECTIVE,
-          child: Text('Elektivna operacija'),
-        ),
-        DropdownMenuItem(
-          value: ProcedureUrgency.TIME_SENSITIVE,
-          child: Text('Vremenski zavisna operacija'),
-        ),
-        DropdownMenuItem(
-          value: ProcedureUrgency.URGENT,
-          child: Text('Urgentna operacija'),
-        ),
-        DropdownMenuItem(
-          value: ProcedureUrgency.IMMEDIATE,
-          child: Text('Neposredna operacija'),
-        ),
-      ],
-      onChanged: (value) {
+      errorText: widget.error,
+      label: const Text('Hitnost operacije'),
+      leadingIcon: const Icon(Icons.access_time),
+      onSelected: (value) {
         widget.selectUrgency(value);
         widget.validate(context);
-        setState(() {
-          _selectedUrgency = value!;
-        });
       },
-      hint: const Text('Izaberite hitnost'),
+      hintText: 'Izaberite hitnost',
+      textStyle: Theme.of(context).textTheme.bodyLarge,
+      dropdownMenuEntries: const [
+        DropdownMenuEntry(
+          value: ProcedureUrgency.ELECTIVE,
+          label: 'Elektivna operacija',
+        ),
+        DropdownMenuEntry(
+          value: ProcedureUrgency.TIME_SENSITIVE,
+          label: 'Vremenski zavisna operacija',
+        ),
+        DropdownMenuEntry(
+          value: ProcedureUrgency.URGENT,
+          label: 'Urgentna operacija',
+        ),
+        DropdownMenuEntry(
+          value: ProcedureUrgency.IMMEDIATE,
+          label: 'Neposredna operacija',
+        ),
+      ],
     );
   }
 }
