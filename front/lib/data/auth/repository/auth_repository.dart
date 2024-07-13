@@ -28,7 +28,6 @@ class AuthRepository{
     return User.fromJson(jsonDecode(decodedResponse));
   }
 
-
   Future<User> update(String? fullname, String? licenceNumber, String? oldPassword, String? newPassword) async {
     String response = await dataProvider.update(fullname, licenceNumber, oldPassword, newPassword);
     String decodedResponse = utf8.decode(response.runes.toList());

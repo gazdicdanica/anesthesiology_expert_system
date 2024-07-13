@@ -20,6 +20,15 @@ final class StaffSuccess extends StaffState {
   List<Object> get props => [staff];
 }
 
+final class StaffProcedureSuccess extends StaffState {
+  final Map<String, String> staff;
+
+  const StaffProcedureSuccess(this.staff);
+
+  @override
+  List<Object> get props => [staff];
+}
+
 
 final class StaffError extends StaffState {
   final String message;

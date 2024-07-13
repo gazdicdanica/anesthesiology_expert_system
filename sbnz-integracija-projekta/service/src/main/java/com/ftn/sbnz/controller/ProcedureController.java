@@ -21,6 +21,7 @@ import com.ftn.sbnz.dto.AddSymptomsDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PostOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
+import com.ftn.sbnz.dto.StaffDTO;
 import com.ftn.sbnz.model.procedure.Alarm;
 import com.ftn.sbnz.model.procedure.Procedure;
 import com.ftn.sbnz.service.iservice.IProcedureService;
@@ -123,4 +124,9 @@ public class ProcedureController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
+
+    @GetMapping(value = "/{procedureId}/staff")
+    public ResponseEntity<StaffDTO> getStaff(@PathVariable Long procedureId) {
+        return ResponseEntity.ok(procedureService.getStaff(procedureId));
+    }
 }

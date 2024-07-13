@@ -14,3 +14,12 @@ class FetchStaff extends StaffEvent {
   @override
   List<Object> get props => [];
 }
+
+class FetchProcedureStaff extends StaffEvent {
+  final int procedureId;
+
+  const FetchProcedureStaff(this.procedureId);
+
+  @override
+  List<Object> get props => [procedureId];
+}

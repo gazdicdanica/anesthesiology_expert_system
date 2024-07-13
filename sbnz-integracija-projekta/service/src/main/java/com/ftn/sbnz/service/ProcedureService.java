@@ -21,6 +21,7 @@ import com.ftn.sbnz.dto.DiagnosisDTO;
 import com.ftn.sbnz.dto.IntraOperativeDataDTO;
 import com.ftn.sbnz.dto.PostOperativeDataDTO;
 import com.ftn.sbnz.dto.PreoperativeDTO;
+import com.ftn.sbnz.dto.StaffDTO;
 import com.ftn.sbnz.exception.BadRequestException;
 import com.ftn.sbnz.exception.EntityNotFoundException;
 import com.ftn.sbnz.model.events.BreathEvent;
@@ -486,5 +487,17 @@ public class ProcedureService implements IProcedureService {
                 }
                 
                 return new ArrayList<>();
+        }
+
+
+        @Override
+        public StaffDTO getStaff(Long procedureId) {
+                Procedure procedure = procedureRepository.findById(procedureId)
+                                .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
+                User doctor = userService.findById(procedure.getDoctorId())
+                                .orElseThrow(() -> new EntityNotFoundException("Doktor nije pronadjen"));
+                User nurse = userService.findById(procedure.getNurseId())
+                                .orElseThrow(() -> new EntityNotFoundException("Medicinska sestra nije pronadjena"));
+                return new StaffDTO(nurse.getFullname(), doctor.getFullname());
         }
 }
