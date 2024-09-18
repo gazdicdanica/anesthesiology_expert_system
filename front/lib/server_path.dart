@@ -1,2 +1,2 @@
-const String path = 'http://192.168.0.18:8080/api/';
-const String socketPath = 'http://192.168.0.18:8080/socket';
+const String path = 'http://172.20.10.5:8080/api/';
+const String socketPath = 'http://172.20.10.5:8080/socket';

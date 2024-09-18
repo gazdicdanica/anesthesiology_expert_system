@@ -1,18 +1,12 @@
 package com.ftn.sbnz.model.events;
 
-import javax.persistence.*;
-
 import org.kie.api.definition.type.Expires;
 import org.kie.api.definition.type.Role;
 
 @Role(Role.Type.EVENT)
-@Entity
 @Expires(value = "5s")
 public class SymptomEvent {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
     private Long patientId;
     private Long procedureId;
     private Symptom symptom;

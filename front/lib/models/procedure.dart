@@ -1,8 +1,9 @@
 import 'package:front/models/alarm.dart';
+import 'package:front/models/patient.dart';
 
 class Procedure {
   final int id;
-  final int patientId;
+  final Patient patient;
   final int doctorId;
   final int nurseId;
   final String name;
@@ -14,7 +15,7 @@ class Procedure {
 
   Procedure({
     required this.id,
-    required this.patientId,
+    required this.patient,
     required this.doctorId,
     required this.nurseId,
     required this.name,
@@ -28,7 +29,7 @@ class Procedure {
   factory Procedure.fromJson(Map<String, dynamic> json) {
     return Procedure(
       id: json['id'],
-      patientId: json['patientId'],
+      patient: Patient.fromJson(json['patient']),
       doctorId: json['doctorId'],
       nurseId: json['nurseId'],
       name: json['name'],
@@ -43,7 +44,7 @@ class Procedure {
   toJson() {
     return {
       'id': id,
-      'patientId': patientId,
+      'patientId': patient,
       'doctorId': doctorId,
       'nurseId': nurseId,
       'name': name,
@@ -57,7 +58,7 @@ class Procedure {
 
   @override
   String toString() {
-    return 'Procedure{id: $id, patientId: $patientId, medicalStaffId: $nurseId, name: $name, risk: $risk, urgency: $urgency, preOperative: $preOperative, postOperative: $postOperative, intraOperative: $intraOperative}';
+    return 'Procedure{id: $id, patientId: $patient, medicalStaffId: $nurseId, name: $name, risk: $risk, urgency: $urgency, preOperative: $preOperative, postOperative: $postOperative, intraOperative: $intraOperative}';
   }
 }
 

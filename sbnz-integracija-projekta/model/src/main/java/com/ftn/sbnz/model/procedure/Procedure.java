@@ -1,6 +1,8 @@
 package com.ftn.sbnz.model.procedure;
 import javax.persistence.*;
 
+import com.ftn.sbnz.model.patient.Patient;
+
 @Entity
 @Table(name = "procedures")
 public class Procedure {
@@ -10,7 +12,9 @@ public class Procedure {
 
     private String name;
 
-    private Long patientId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "patient_id")
+    private Patient patient;
     private Long doctorId;
     private Long nurseId;
 
@@ -28,13 +32,13 @@ public class Procedure {
     public Procedure() {
     }
 
-    public Procedure(Long patientId, Long medicalStaffId, 
+    public Procedure(Patient patientId, Long medicalStaffId, 
     Long nurseId,
     String name,
     long date,
      OperationRisk risk, ProcedureUrgency urget,
             PreOperative preOperative, IntraOperative intraOperative, PostOperative postOperative) {
-        this.patientId = patientId;
+        this.patient = patientId;
         this.doctorId = medicalStaffId;
         this.nurseId = nurseId;
         this.name = name;
@@ -54,12 +58,12 @@ public class Procedure {
         this.id = id;
     }
 
-    public Long getPatientId() {
-        return patientId;
+    public Patient getPatient() {
+        return patient;
     }
 
-    public void setPatientId(Long patientId) {
-        this.patientId = patientId;
+    public void setPatient(Patient patientId) {
+        this.patient = patientId;
     }
 
     public Long getDoctorId() {
@@ -150,7 +154,7 @@ public class Procedure {
     @Override
     public String toString() {
         return "Procedure [id=" + id + ", medicalStaffId=" + doctorId + ", nurseId=" + nurseId + ", name=" + name + ", patientId="
-                + patientId + ", postOperative=" + postOperative + ", preOperative=" + preOperative + ", intraoperative=" + intraOperative + ", risk=" + risk
+                + patient + ", postOperative=" + postOperative + ", preOperative=" + preOperative + ", intraoperative=" + intraOperative + ", risk=" + risk
                 + ", urgency=" + urgency + "]";
     }
 }

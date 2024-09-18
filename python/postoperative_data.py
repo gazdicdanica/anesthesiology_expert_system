@@ -2,9 +2,9 @@ import requests, json, time, sys, random
 
 patient_id = sys.argv[1]
 procedure_id = sys.argv[2]
-ip = sys.argv[3]
+# ip = sys.argv[3]
 
-endpoint = "http://" + ip + ":8080/api/procedure/" + patient_id + "/postOpData"
+endpoint = "http://localhost:8080/api/procedure/" + patient_id + "/postOpData"
 counter = 0
 
 def send_request(sap, pulseOximetry, breath, heartBeat):
@@ -24,7 +24,7 @@ def send_request(sap, pulseOximetry, breath, heartBeat):
 
 while True:
     sap = random.randint(30, 145)
-    pulseOximetry = random.randint(70, 90)
+    pulseOximetry = random.randint(50, 100)
     breath = random.choices([True, False], weights=[2, 5], k=1)[0]
     heartBeat = True
 

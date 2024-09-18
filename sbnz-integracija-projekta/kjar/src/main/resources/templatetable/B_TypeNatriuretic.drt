@@ -14,7 +14,7 @@ import com.ftn.sbnz.model.procedure.PreOperative;
 rule "B-type natriuretic peptide heart failure @{row.rowNumber}"
     when
         $patient: Patient($id: id, age >= @{ageLower}, age <= @{ageHigher})
-        $procedure: Procedure(patientId == $id, preOperative.getBnpValue() > @{result})
+        $procedure: Procedure(patient == $patient, preOperative.getBnpValue() > @{result})
     then
         modify($patient){
             setHasHearthFailure(true);

@@ -12,27 +12,17 @@ public class Alarm {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Long patientId;
-    private Long doctorId;
     private Symptom symptom;
     private long timestamp;
 
     public Alarm() {
     }
 
-    // public Alarm(Long patientId, Long doctorId, Symptom message, long timestamp) {
-    //     this.patientId = patientId;
-    //     this.doctorId = doctorId;
-    //     this.symptom = message;
-    //     this.timestamp = timestamp;
-    // }
-
-    public Alarm(Long id, Long patientId, Long doctorId, Symptom message, long timestamp) {
+    public Alarm(Long id, Long patientId, Symptom message, long timestamp) {
         this.id = id;
-        this.patientId = patientId;
-        this.doctorId = doctorId;
         this.symptom = message;
+        this.patientId = patientId;
         this.timestamp = timestamp;
     }
 
@@ -44,28 +34,20 @@ public class Alarm {
         this.id = id;
     }
 
-    public Long getPatientId() {
-        return patientId;
-    }
-
-    public void setPatientId(Long patientId) {
-        this.patientId = patientId;
-    }
-
-    public Long getDoctorId() {
-        return doctorId;
-    }
-
-    public void setDoctorId(Long doctorId) {
-        this.doctorId = doctorId;
-    }
-
     public Symptom getSymptom() {
         return symptom;
     }
 
     public void setSymptom(Symptom message) {
         this.symptom = message;
+    }
+
+    public Long getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(Long patientId) {
+        this.patientId = patientId;
     }
 
     public long getTimestamp() {
@@ -79,9 +61,8 @@ public class Alarm {
     @Override
     public String toString() {
         return "Alarm{" +
-                "patientId=" + patientId +
-                ", doctorId=" + doctorId +
                 ", message='" + symptom + '\'' +
+                ", patientId=" + patientId +
                 ", timestamp=" + timestamp +
                 '}';
     }
@@ -91,10 +72,9 @@ public class Alarm {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((id == null) ? 0 : id.hashCode());
-        result = prime * result + ((patientId == null) ? 0 : patientId.hashCode());
-        result = prime * result + ((doctorId == null) ? 0 : doctorId.hashCode());
         result = prime * result + ((symptom == null) ? 0 : symptom.hashCode());
         result = prime * result + (int) (timestamp ^ (timestamp >>> 32));
+        result = prime * result + ((patientId == null) ? 0 : patientId.hashCode());
         return result;
     }
 
@@ -116,11 +96,6 @@ public class Alarm {
             if (other.patientId != null)
                 return false;
         } else if (!patientId.equals(other.patientId))
-            return false;
-        if (doctorId == null) {
-            if (other.doctorId != null)
-                return false;
-        } else if (!doctorId.equals(other.doctorId))
             return false;
         if (symptom != other.symptom)
             return false;

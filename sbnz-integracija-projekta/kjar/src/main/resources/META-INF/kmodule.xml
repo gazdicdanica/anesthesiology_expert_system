@@ -2,13 +2,13 @@
     <kbase name="bwBase" eventProcessingMode="stream" packages="backward">
         <ksession name="bwKsession" clockType="realtime" />
     </kbase>
-    <kbase name="cepKbase" eventProcessingMode="stream" packages="cepIntra">
+    <kbase name="cepKbase" eventProcessingMode="stream" packages="intraoperative">
         <ksession type="stateful" name="cepKsession" clockType="pseudo"/>
     </kbase>
-    <kbase name="cepKbasePOP" eventProcessingMode="stream" packages="cepPost">
+    <kbase name="cepKbasePOP" eventProcessingMode="stream" packages="postoperative">
         <ksession type="stateful" name="cepKsessionPOP" clockType="pseudo"/>
     </kbase>
-    <kbase name="baseKbase" eventProcessingMode="stream" packages="base">
+    <kbase name="baseKbase" eventProcessingMode="stream" packages="preoperative">
         <ksession name="baseKsession" clockType="realtime"/>
     </kbase>
     <kbase name="diagnosisKbase" eventProcessingMode="stream" packages="diagnosis">

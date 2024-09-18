@@ -26,7 +26,7 @@ class _StaffWidgetState extends State<StaffWidget> {
       }
       if (state is StaffProcedureSuccess) {
         return Padding(
-          padding: const EdgeInsets.only(left: 35.0),
+          padding: const EdgeInsets.only(left: 10.0),
           child: Column(children: [
             const SizedBox(height: 8),
             Row(

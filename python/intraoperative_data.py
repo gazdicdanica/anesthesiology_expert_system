@@ -2,11 +2,11 @@ import requests, json, time, sys, random
 
 patient_id = sys.argv[1]
 procedure_id = sys.argv[2]
-ip = sys.argv[3]
+# ip = sys.argv[3]
 
-endpoint_sap = "http://" + ip + ":8080/api/procedure/" + patient_id + "/sapEvent"
-endpoint_hb = "http://" + ip + ":8080/api/procedure/" + patient_id + "/heartBeat"
-endpoint_symptom = "http://" + ip + ":8080/api/procedure/" + patient_id + "/symptomEvent"
+endpoint_sap = "http://localhost:8080/api/procedure/" + patient_id + "/sapEvent"
+endpoint_hb = "http://localhost:8080/api/procedure/" + patient_id + "/heartBeat"
+endpoint_symptom = "http://localhost:8080/api/procedure/" + patient_id + "/symptomEvent"
 base = {
     "patientId": patient_id,
     "procedureId": procedure_id
@@ -44,11 +44,9 @@ def send_request(data, url):
 
 while True:
     sap = random.randint(50, 145)
-    # exstrasystole = random.choices([False, True], weights=[3, 1], k=1)[0]
-    exstrasystole = True
+    exstrasystole = random.choices([False, True], weights=[3, 1], k=1)[0]
 
     send_request(base, endpoint_hb)
-    # send_data(patient_id, procedure_id, sap, exstrasystole)
     time.sleep(1.4)
     send_request(base, endpoint_hb)
     time.sleep(1.4)

@@ -27,5 +27,5 @@ public class RetardDTO {
     public void setUnixTime(long unixTime) {
         this.unixTime = unixTime;
     }
-    
+
 }

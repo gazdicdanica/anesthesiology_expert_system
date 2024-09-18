@@ -69,7 +69,8 @@ public class ProcedureService implements IProcedureService {
                 User user = userService.findByUsername(u.getName())
                                 .orElseThrow(() -> new EntityNotFoundException("Not authenticated"));
                 Procedure procedure = new Procedure();
-                procedure.setPatientId(addProcedureDTO.getPatientId());
+                // procedure.setPatientId(addProcedureDTO.getPatientId());
+                procedure.setPatient(patientService.findById(addProcedureDTO.getPatientId()));
                 procedure.setName(addProcedureDTO.getName());
                 if(user.getRole() == User.Role.DOCTOR) {
                         procedure.setDoctorId(user.getId());
@@ -108,13 +109,13 @@ public class ProcedureService implements IProcedureService {
         public Patient getPatientByProcedure(Long id) {
                 Procedure procedure = procedureRepository.findById(id)
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
-                return patientService.findById(procedure.getPatientId());
+                return patientService.findById(procedure.getPatient().getId());
         }
 
         @Override
         public BaseRulesDTO updatePreoperative(Long id, PreoperativeDTO preoperativeDTO) {
                 Procedure procedure = fetchAndUpdateProcedure(id, preoperativeDTO);
-                Patient patient = fetchAndUpdatePatient(procedure.getPatientId(), preoperativeDTO);
+                Patient patient = fetchAndUpdatePatient(procedure.getPatient().getId(), preoperativeDTO);
 
                 KieSession kieSession = kieService.createKieSession("baseKsession");
 
@@ -173,7 +174,7 @@ public class ProcedureService implements IProcedureService {
                 preOperative.setDoBnp(false);
                 procedure.setPreOperative(preOperative);
 
-                Patient patient = patientService.findById(procedure.getPatientId());
+                Patient patient = patientService.findById(procedure.getPatient().getId());
 
                 KieSession templateSession = kieService.createKieSessionFromTemplate(patient, procedure,
                                 procedure.getPreOperative(), "/templatetable/B_TypeNatriuretic.drt", 9, 10,
@@ -197,7 +198,7 @@ public class ProcedureService implements IProcedureService {
                 Procedure procedure = procedureRepository.findById(id)
                                 .orElseThrow(() -> new EntityNotFoundException("Procedura nije pronadjena"));
                 PreOperative preOperative = procedure.getPreOperative();
-                Patient patient = patientService.findById(procedure.getPatientId());
+                Patient patient = patientService.findById(procedure.getPatient().getId());
 
                 procedure.setIntraOperative(new IntraOperative());
                 procedure = procedureRepository.save(procedure);
@@ -461,15 +462,14 @@ public class ProcedureService implements IProcedureService {
 
                 for (Symptom symptom : symptoms.getSymptoms()) {
                         if (!procedure.getPostOperative().getAlarms().stream().anyMatch(a -> a.getSymptom().equals(symptom))) {
-                                procedure.getPostOperative().addAlarm(new Alarm(0L, procedure.getPatientId(), user.getId(),
-                                                symptom, System.currentTimeMillis()));
+                                procedure.getPostOperative().addAlarm(new Alarm(0L, procedure.getPatient().getId() ,symptom, System.currentTimeMillis()));
                                 procedureRepository.save(procedure);
         
                         }
         
                 }
                 
-                Patient patient = getDiagnosis(procedure.getPatientId(), procedureId);
+                Patient patient = getDiagnosis(procedure.getPatient().getId(), procedureId);
                 return new DiagnosisDTO(patient, procedure);
         }
 

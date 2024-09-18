@@ -19,7 +19,6 @@ public class PostOperative {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private boolean isReleased = false;
-    private double pulseOximetry;
 
     
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
@@ -29,9 +28,8 @@ public class PostOperative {
         this.isReleased = false;
     }
 
-    public PostOperative(boolean isReleased, double pulseOximetry) {
+    public PostOperative(boolean isReleased) {
         this.isReleased = isReleased;
-        this.pulseOximetry = pulseOximetry;
     }
 
     public boolean isReleased() {
@@ -50,13 +48,6 @@ public class PostOperative {
         this.id = id;
     }
 
-    public double getPulseOximetry() {
-        return pulseOximetry;
-    }
-
-    public void setPulseOximetry(double pulseOximetry) {
-        this.pulseOximetry = pulseOximetry;
-    }
     public Set<Alarm> getAlarms() {
         return alarms;
     }

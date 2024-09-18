@@ -1,4 +1,4 @@
-package base;
+package preoperative;
 
 import com.ftn.sbnz.model.patient.Patient;
 import com.ftn.sbnz.model.procedure.Procedure;
@@ -8,8 +8,8 @@ import com.ftn.sbnz.model.procedure.Alarm;
 
 rule "Controlled DM by SIB"
     when
-        $p: Patient( hasDiabetes == true)
-        $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
+        $p: Patient( hasDiabetes == true )
+        $proc: Procedure(patient == $p, $preOp: preOperative)
         eval($preOp.getSIB() <= 8) && eval($preOp.getSIB() > 0)
     then
         System.out.println("Controlled DM by SIB");
@@ -20,8 +20,8 @@ end
 
 rule "Uncotrolled DM by SIB"
     when
-        $p: Patient( hasDiabetes == true)
-        $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
+        $p: Patient( hasDiabetes == true )
+        $proc: Procedure(patient == $p, $preOp: preOperative)
         eval($preOp.getSIB() > 8)
     then
         System.out.println("Uncotrolled DM by SIB");
@@ -32,8 +32,8 @@ end
 
 rule "Controlled DM by HbA1c"
     when
-        $p: Patient( hasDiabetes == true)
-        $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
+        $p: Patient( hasDiabetes == true )
+        $proc: Procedure(patient == $p, $preOp: preOperative)
         eval($preOp.getHBA1C() <= 7) && eval($preOp.getHBA1C() > 0)
     then
         System.out.println("Controlled DM by HbA1c");
@@ -44,8 +44,8 @@ end
 
 rule "Uncotrolled DM by HbA1c"
     when
-        $p: Patient( hasDiabetes == true)
-        $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
+        $p: Patient( hasDiabetes == true )
+        $proc: Procedure(patient == $p, $preOp: preOperative)
         eval($preOp.getHBA1C() > 7)
     then
         System.out.println("Uncotrolled DM by HbA1c");
@@ -57,7 +57,7 @@ end
 rule "Undiagnosed DM"
     when
         $p: Patient(hasDiabetes == false)
-        $proc: Procedure(patientId == $p.getId(), $preOp: preOperative)
+        $proc: Procedure(patient == $p, $preOp: preOperative)
         eval($preOp.getSIB() > 6)
     then
         System.out.println("Undiagnosed DM");
@@ -77,7 +77,7 @@ rule "High risk operation"
     lock-on-active true
     when 
         $p: Patient()
-        $proc: Procedure(patientId == $p.getId(), risk == Procedure.OperationRisk.HIGH)
+        $proc: Procedure(patient == $p, risk == Procedure.OperationRisk.HIGH)
     then
         System.out.println("High risk operation");
         modify($p){
@@ -90,7 +90,7 @@ rule "Ischemic heart disease"
     lock-on-active true
     when 
         $p: Patient(hadHearthAttack == true)
-        $proc: Procedure(patientId == $p.getId())
+        $proc: Procedure(patient == $p)
     then
         System.out.println("Ischemic heart disease");
         modify($p){
@@ -103,7 +103,7 @@ rule "Heart failure"
     lock-on-active true
     when 
         $p: Patient(hasHearthFailure == true)
-        $proc: Procedure(patientId == $p.getId())
+        $proc: Procedure(patient == $p)
     then
         System.out.println("Heart failure");
         modify($p){
@@ -116,7 +116,7 @@ rule "Cerebrovascular disease"
     lock-on-active true
     when 
         $p: Patient(hadStroke == true)
-        $proc: Procedure(patientId == $p.getId())
+        $proc: Procedure(patient == $p)
     then
         System.out.println("Cerebrovascular disease");
         modify($p){
@@ -129,7 +129,7 @@ rule "Has diabetes"
     lock-on-active true
     when 
         $p: Patient(hasDiabetes == true)
-        $proc: Procedure(patientId == $p.getId())
+        $proc: Procedure(patient == $p)
     then
         System.out.println("Has diabetes");
         modify($p){
@@ -142,7 +142,7 @@ rule "Elevated creatinine"
     lock-on-active true
     when 
         $p: Patient()
-        $proc: Procedure(patientId == $p.getId(), preOperative.creatinine > 2)
+        $proc: Procedure(patient == $p, preOperative.creatinine > 2)
     then
         System.out.println("Elevated creatinine");
         modify($p){
@@ -225,7 +225,7 @@ end
 rule "ASA I and ASA II start operation"
     when
         $patient : Patient(asa == Patient.ASA.I || asa == Patient.ASA.II)
-        $procedure: Procedure(patientId == $patient.getId())
+        $procedure: Procedure(patient == $patient)
         $preOp: PreOperative(shouldContinueProcedure == true) from $procedure.getPreOperative()
     then
         System.out.println("ASA I and ASA II start operation");
@@ -237,7 +237,7 @@ end
 rule "ASA III start operation"
     when
         $patient : Patient(asa == Patient.ASA.III)
-        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.ProcedureUrgency.IMMEDIATE || urgency == Procedure.ProcedureUrgency.URGENT || urgency == Procedure.ProcedureUrgency.TIME_SENSITIVE))
+        $procedure: Procedure(patient == $patient, (urgency == Procedure.ProcedureUrgency.IMMEDIATE || urgency == Procedure.ProcedureUrgency.URGENT || urgency == Procedure.ProcedureUrgency.TIME_SENSITIVE))
         $preOp: PreOperative(shouldContinueProcedure == true) from $procedure.getPreOperative()
     then
         System.out.println("ASA III start operation");
@@ -249,7 +249,7 @@ end
 rule "ASA III postpone operation"
     when
         $patient : Patient(asa == Patient.ASA.III)
-        $procedure: Procedure(patientId == $patient.getId(), urgency == Procedure.ProcedureUrgency.ELECTIVE, $preOp : preOperative)
+        $procedure: Procedure(patient == $patient, urgency == Procedure.ProcedureUrgency.ELECTIVE, $preOp : preOperative)
     then
         // postpone operation
         System.out.println("ASA III Postpone operation");
@@ -261,7 +261,7 @@ end
 rule "ASA IV start operation"
     when
         $patient : Patient(asa == Patient.ASA.IV)
-        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.ProcedureUrgency.IMMEDIATE || urgency == Procedure.ProcedureUrgency.URGENT))
+        $procedure: Procedure(patient == $patient, (urgency == Procedure.ProcedureUrgency.IMMEDIATE || urgency == Procedure.ProcedureUrgency.URGENT))
         $preOp: PreOperative(shouldContinueProcedure == true) from $procedure.getPreOperative()
     then
         // start operation
@@ -274,7 +274,7 @@ end
 rule "ASA IV postpone operation"
     when
         $patient : Patient(asa == Patient.ASA.IV)
-        $procedure: Procedure(patientId == $patient.getId(), (urgency == Procedure.ProcedureUrgency.TIME_SENSITIVE || urgency == Procedure.ProcedureUrgency.ELECTIVE), $preOp : preOperative)
+        $procedure: Procedure(patient == $patient, (urgency == Procedure.ProcedureUrgency.TIME_SENSITIVE || urgency == Procedure.ProcedureUrgency.ELECTIVE), $preOp : preOperative)
     then
         // postpone operation
         System.out.println("ASA IV Postpone operation");
@@ -286,7 +286,7 @@ end
 rule "ASA III echocardiography"
     when
         $patient : Patient(asa == Patient.ASA.III, $id: id)
-        $procedure: Procedure(patientId == $id, risk == Procedure.OperationRisk.HIGH, $doctorId: doctorId) @watch(preOperative)
+        $procedure: Procedure(patient == $patient, risk == Procedure.OperationRisk.HIGH) @watch(preOperative)
         $preOp: PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
         System.out.println("Echocardiography");
@@ -299,7 +299,7 @@ end
 rule "ASA III stres test and echocardiography"
     when
         $patient : Patient(asa == Patient.ASA.III, risk == Patient.PatientRisk.HIGH, hasCVSFamilyHistory == true, $id: id)
-        $procedure: Procedure(patientId == $id, $doctorId: doctorId) @watch(preOperative)
+        $procedure: Procedure(patient == $patient) @watch(preOperative)
         $preOp: PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
         System.out.println("Stress test and echocardiography");
@@ -311,7 +311,7 @@ end
 rule "ASA IV tests"
     when
         $patient : Patient(asa == Patient.ASA.IV, !hasHearthFailure, $id: id)
-        $procedure: Procedure(patientId == $id,  $doctorId: doctorId) @watch(preOperative)
+        $procedure: Procedure(patient == $patient) @watch(preOperative)
         $preOp: PreOperative(shouldContinueProcedure == false) from $procedure.getPreOperative()
     then
         System.out.println("Stres test, echocardiography, B-type natriuretic peptide");
@@ -336,7 +336,7 @@ end
 // rule "B-type natriuretic peptide heart failure"
 //     when
 //         $patient: Patient($id: id)
-//         $procedure: Procedure(patientId == $id, preOperative.getBnpValue() > 500)
+//         $procedure: Procedure(patient == $id, preOperative.getBnpValue() > 500)
 //     then
 //         modify($patient){
 //             setHasHearthFailure(true);
@@ -346,7 +346,7 @@ end
 // rule "B-type natriuretic peptide no heart failure"
 //     when
 //         $patient: Patient($id: id)
-//         $procedure: Procedure(patientId == $id, preOperative.getBnpValue() <= 500 && preOperative.getBnpValue() > 0)
+//         $procedure: Procedure(patient == $id, preOperative.getBnpValue() <= 500 && preOperative.getBnpValue() > 0)
 //     then
 //         modify($patient){
 //             setHasHearthFailure(false);

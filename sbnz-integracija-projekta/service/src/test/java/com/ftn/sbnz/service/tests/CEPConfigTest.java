@@ -50,7 +50,7 @@ public class CEPConfigTest {
         patient.setHadHearthAttack(false);
 
         // Procedure procedure = new Procedure();
-        // procedure.setPatientId(1L);
+        // procedure.setPatientId(patient);
         // PreOperative preOperative = new PreOperative();
         // preOperative.setSIB(10);
         // procedure.setPreOperative(preOperative);
@@ -60,8 +60,8 @@ public class CEPConfigTest {
 
         int rules = ksession.fireAllRules();
         System.out.println("Rules fired: " + rules);
-
-        assertEquals(patient.getAsa(), Patient.ASA.I);
+        assertEquals(Patient.ASA.I, patient.getAsa());
+        // assertEquals(patient.getAsa(), Patient.ASA.I);
         ksession.dispose();
 
     }
@@ -152,7 +152,7 @@ public class CEPConfigTest {
 
         Procedure procedure = new Procedure();
         procedure.setId(1L);
-        procedure.setPatientId(1L);
+        procedure.setPatient(patient);
         procedure.setDoctorId(2L);
         procedure.setUrgency(Procedure.ProcedureUrgency.ELECTIVE);
         procedure.setRisk(Procedure.OperationRisk.HIGH);
@@ -223,7 +223,7 @@ public class CEPConfigTest {
         Procedure procedure = new Procedure();
         procedure.setId(1L);
         procedure.setPreOperative(preOperative);
-        procedure.setPatientId(1L);
+        procedure.setPatient(patient);
         procedure.setRisk(OperationRisk.LOW);
         IntraOperative intraOperative = new IntraOperative();
         procedure.setIntraOperative(intraOperative);
@@ -257,7 +257,7 @@ public class CEPConfigTest {
         patient.setDMControlled(false);
         Procedure procedure = new Procedure();
         procedure.setId(1L);
-        procedure.setPatientId(1L);
+        procedure.setPatient(patient);
         procedure.setDoctorId(2L);
 
         SAPEvent ev1 = new SAPEvent(1L, 65);
@@ -292,7 +292,7 @@ public class CEPConfigTest {
         patient.setBasalSAP(140);
         Procedure procedure = new Procedure();
         procedure.setId(1L);
-        procedure.setPatientId(1L);
+        procedure.setPatient(patient);
         procedure.setDoctorId(2L);
 
         SAPEvent ev1 = new SAPEvent(1L, 75);
@@ -327,7 +327,7 @@ public class CEPConfigTest {
         patient.setBasalSAP(140);
         Procedure procedure = new Procedure();
         procedure.setId(1L);
-        procedure.setPatientId(1L);
+        procedure.setPatient(patient);
         procedure.setDoctorId(2L);
 
         SAPEvent ev1 = new SAPEvent(1L, 165);
@@ -362,7 +362,7 @@ public class CEPConfigTest {
         patient.setBasalSAP(100);
         Procedure procedure = new Procedure();
         procedure.setId(1L);
-        procedure.setPatientId(1L);
+        procedure.setPatient(patient);
         procedure.setDoctorId(2L);
 
         SAPEvent ev1 = new SAPEvent(1L, 175);
@@ -398,7 +398,7 @@ public class CEPConfigTest {
         patient.setBasalSAP(100);
         Procedure procedure = new Procedure();
         procedure.setId(1L);
-        procedure.setPatientId(1L);
+        procedure.setPatient(patient);
         procedure.setDoctorId(2L);
 
         PulseOximetryEvent ev1 = new PulseOximetryEvent(1L, 75);
@@ -434,7 +434,7 @@ public class CEPConfigTest {
         patient.setBasalSAP(100);
         Procedure procedure = new Procedure();
         procedure.setId(1L);
-        procedure.setPatientId(1L);
+        procedure.setPatient(patient);
         procedure.setDoctorId(2L);
 
         PulseOximetryEvent ev1 = new PulseOximetryEvent(1L, 65);
@@ -470,7 +470,7 @@ public class CEPConfigTest {
         patient.setBasalSAP(100);
         Procedure procedure = new Procedure();
         procedure.setId(1L);
-        procedure.setPatientId(1L);
+        procedure.setPatient(patient);
         procedure.setDoctorId(2L);
 
         BreathEvent ev1 = new BreathEvent(1L);
@@ -511,7 +511,7 @@ public class CEPConfigTest {
         // Create and set up procedure
         Procedure procedure = new Procedure();
         procedure.setId(1L);
-        procedure.setPatientId(1L);
+        procedure.setPatient(patient);
         procedure.setDoctorId(101L);
 
         // Insert initial facts into the session
@@ -583,7 +583,7 @@ public class CEPConfigTest {
         patient.setId(1L);
         Procedure procedure = new Procedure();
         procedure.setId(1L);
-        procedure.setPatientId(1L);
+        procedure.setPatient(patient);
 
         SymptomEvent ev1 = new SymptomEvent(1L, 1L, SymptomEvent.Symptom.Dyspnea);
         SymptomEvent ev2 = new SymptomEvent(1L, 1L, SymptomEvent.Symptom.Tachypnea);

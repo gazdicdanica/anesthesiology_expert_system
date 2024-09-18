@@ -22,21 +22,14 @@ public class IntraOperative {
 
     private Monitoring monitoring;
 
-    private int bpm;
-    private int sap;
-    private int extrasystoleCounter;
-
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<Alarm> alarms = new HashSet<>();
 
     public IntraOperative() {
     }
 
-    public IntraOperative(Monitoring monitoring, int bpm, int sap, Set<Alarm> alarms) {
+    public IntraOperative(Monitoring monitoring, Set<Alarm> alarms) {
         this.monitoring = monitoring;
-        this.bpm = bpm;
-        this.sap = sap;
-        this.extrasystoleCounter = 0;
         this.alarms = alarms;
     }
 
@@ -54,30 +47,6 @@ public class IntraOperative {
 
     public void setMonitoring(Monitoring monitoring) {
         this.monitoring = monitoring;
-    }
-
-    public int getBpm() {
-        return bpm;
-    }
-
-    public void setBpm(int bpm) {
-        this.bpm = bpm;
-    }
-
-    public int getSap() {
-        return sap;
-    }
-
-    public void setSap(double sap) {
-        this.sap = (int) sap;
-    }
-
-    public int getExtrasystoleCounter() {
-        return extrasystoleCounter;
-    }
-
-    public void setExtrasystoleCounter(int extrasystoleCounter) {
-        this.extrasystoleCounter = extrasystoleCounter;
     }
 
     public Set<Alarm> getAlarms() {
@@ -105,9 +74,6 @@ public class IntraOperative {
         return "IntraOperative{" +
                 "id=" + id +
                 ", monitoring=" + monitoring +
-                ", bpm=" + bpm +
-                ", sap=" + sap +
-                ", extrasystoleCounter=" + extrasystoleCounter +
                 ", alarms=" + alarms +
                 '}';
     }

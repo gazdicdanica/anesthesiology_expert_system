@@ -48,11 +48,10 @@ public class PatientService implements IPatientService{
         Patient patient = modelMapper.map(addPatientDTO, Patient.class);
         patient.calculateBMI();
         patient = patientRepository.save(patient);
-        // if(patient.getId() == 1) {
-            generatePatientHistory(patient.getId(), 2);
+        generatePatientHistory(patient.getId(), 2);
 
-            patient = hasHeartProblems(patient.getId());
-        // }
+        patient = hasHeartProblems(patient.getId());
+        
         return patient;
     }
 

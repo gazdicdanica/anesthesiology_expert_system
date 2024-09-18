@@ -10,7 +10,7 @@ agenda-group "monitoring"
 
     when
         $patient: Patient(risk == Patient.PatientRisk.LOW || risk == Patient.PatientRisk.MEDIUM)
-        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.LOW || risk == Procedure.OperationRisk.MEDIUM, $intraOp: intraOperative)
+        $procedure: Procedure(patient == $patient, preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.LOW || risk == Procedure.OperationRisk.MEDIUM, $intraOp: intraOperative)
     then
         System.err.println("noninvasive monitoring SAP, three-lead ECG");
         modify($intraOp){
@@ -23,10 +23,10 @@ agenda-group "monitoring"
 
     when
         $patient: Patient(risk == Patient.PatientRisk.HIGH)
-        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.LOW, $intraOp: intraOperative)
+        $procedure: Procedure(patient == $patient, preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.LOW, $intraOp: intraOperative)
 
     then
-        System.out.println("noninvasive monitoring SAP, three-lead ECG");
+        System.out.println("noninvasive monitoring, three-lead ECG");
         modify($intraOp){
             setMonitoring(IntraOperative.Monitoring.NON_INVASIVE);
         }
@@ -37,7 +37,8 @@ agenda-group "monitoring"
 
     when
         $patient: Patient(risk == Patient.PatientRisk.HIGH)
-        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.HIGH || risk == Procedure.OperationRisk.MEDIUM, $intraOp: intraOperative)
+        $procedure: Procedure(patient == $patient, preOperative.shouldContinueProcedure, 
+        risk == Procedure.OperationRisk.HIGH || risk == Procedure.OperationRisk.MEDIUM, $intraOp: intraOperative)
 
     then
         System.out.println("invasive monitoring, five-lead ECG");
@@ -51,7 +52,7 @@ agenda-group "monitoring"
 
     when
         $patient: Patient(risk == Patient.PatientRisk.LOW || risk == Patient.PatientRisk.MEDIUM)
-        $procedure: Procedure(patientId == $patient.getId(), preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.HIGH, $intraOp: intraOperative)
+        $procedure: Procedure(patient == $patient, preOperative.shouldContinueProcedure, risk == Procedure.OperationRisk.HIGH, $intraOp: intraOperative)
 
     then
         System.out.println("invasive monitoring, five-lead ECG");
